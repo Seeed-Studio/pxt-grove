@@ -82,6 +82,7 @@ namespace grove {
             paj7620.init();
             control.inBackground(() => {
                 const gesture = paj7620.read();
+                basic.showNumber(gesture)
                 if (gesture != lastGesture) {
                     lastGesture = gesture;
                     control.raiseEvent(gestureEventId, lastGesture);
