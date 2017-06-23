@@ -370,14 +370,14 @@ namespace grove {
         
         /**
          * Show a single number from 0 to 9 at a specified digit of Grove - 4-Digit Display
-         * @param bitAddr value of bit number
          * @param dispData value of number
+         * @param bitAddr value of bit number
          */
         //% blockId=grove_tm1637_display_bit block="%strip|show single number|%dispData|at digit|%bitAddr"
-        //% bitAddr.min=0 bitAddr.max=3
         //% dispData.min=0 dispData.max=9
+        //% bitAddr.min=0 bitAddr.max=3
         //% advanced=true
-        bit(bitAddr: number, dispData: number)
+        bit(dispData: number, bitAddr: number)
         {
             let segData = 0;
             segData = this.coding(dispData);
