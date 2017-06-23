@@ -81,11 +81,13 @@ namespace grove {
         if (!paj7620) {
             paj7620.init();
             control.inBackground(() => {
-                const gesture = paj7620.read();
-                basic.showNumber(data ++);
-                if (gesture != lastGesture) {
-                    lastGesture = gesture;
-                    control.raiseEvent(gestureEventId, lastGesture);
+                while(true) {
+                    const gesture = paj7620.read();
+                    if (gesture != lastGesture) {
+                        lastGesture = gesture;
+                        control.raiseEvent(gestureEventId, lastGesture);
+                    }
+                    basic.pause(50);
                 }
             })
         }
