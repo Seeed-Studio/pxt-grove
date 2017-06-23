@@ -69,7 +69,7 @@ namespace grove {
     const gestureEventId = 3100;
     let lastGesture = GroveGesture.None;
     let paj7620: PAJ7620 = undefined;
-
+    let data: number = 0;
     /**
      * Do something when a gesture is detected by Grove - Gesture
      * @param gesture type of gesture to detect
@@ -82,7 +82,7 @@ namespace grove {
             paj7620.init();
             control.inBackground(() => {
                 const gesture = paj7620.read();
-                basic.showNumber(gesture)
+                basic.showNumber(data ++);
                 if (gesture != lastGesture) {
                     lastGesture = gesture;
                     control.raiseEvent(gestureEventId, lastGesture);
