@@ -21,7 +21,7 @@ grove.onGesture(GroveGesture.Anticlockwise, () => {
 })
 
 {
-    let display = grove.dislay(DigitalPin.P2, DigitalPin.P16);
+    let display = grove.createDisplay(DigitalPin.P0, DigitalPin.P1);
     let data = 0;
 
     display.point(true);
@@ -45,6 +45,7 @@ grove.onGesture(GroveGesture.Anticlockwise, () => {
     basic.pause(500);
     
     display.set(7);
+    
     while(true)
     {
         display.show(data ++);

@@ -145,7 +145,7 @@ namespace grove {
      * @param dataPin value of data pin number
      */
     //% blockId=grove_tm1637_create block="4-Digit Display at|%clkPin|and|%dataPin"
-    export function dislay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
+    export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
     {
         let display = new TM1637();
         
