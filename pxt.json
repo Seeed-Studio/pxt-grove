@@ -8,7 +8,8 @@
     },
     "files": [
         "README.md",
-        "main.ts"
+        "main.ts",
+        "_locales/ja/Grove-strings.json"
     ],
     "testFiles": [
         "test.ts"
