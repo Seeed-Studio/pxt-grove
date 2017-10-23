@@ -69,7 +69,7 @@ namespace grove {
     const gestureEventId = 3100;
     let lastGesture = GroveGesture.None;
     let paj7620: PAJ7620 = undefined;
-    let data: number = 0;
+    let distanceBackup: number = 0;
     /**
      * Do something when a gesture is detected by Grove - Gesture
      * @param gesture type of gesture to detect
@@ -102,31 +102,20 @@ namespace grove {
     {
         let duration = 0;
         let RangeInCentimeters = 0;
-        let buf: number [] = [0, 0, 0, 0, 0];
-        let num = 0;
         
-        for(let i = 0; i < 5; i ++)
-        {
-            pins.digitalWritePin(pin, 0);
-            control.waitMicros(2);
-            pins.digitalWritePin(pin, 1);
-            control.waitMicros(5);
-            pins.digitalWritePin(pin, 0);
-            
-            buf[i] = pins.pulseIn(pin, PulseValue.High, 100000); // Max duration 100 ms
-        }
-        
-        for(let i = 0; i < 5; i ++)
-        {
-            if(buf[i] != 0)
-            {
-                duration = duration + buf[i];
-                num ++;
-            }
-        }
-        
-        duration = duration / num;
+        pins.digitalWritePin(pin, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(20);
+        pins.digitalWritePin(pin, 0);        
+        duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
+
         RangeInCentimeters = duration * 153 / 29 / 2 / 100;
+               
+        if(RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
+        else RangeInCentimeters = distanceBackup;
+
+        basic.pause(50);
         
         return RangeInCentimeters;
     }
@@ -139,34 +128,23 @@ namespace grove {
     export function measureInInches(pin: DigitalPin): number
     {
         let duration = 0;
-        let RangeInCentimeters = 0;
-        let buf: number [] = [0, 0, 0, 0, 0];
-        let num = 0;
+        let RangeInInches = 0;
         
-        for(let i = 0; i < 5; i ++)
-        {
-            pins.digitalWritePin(pin, 0);
-            control.waitMicros(2);
-            pins.digitalWritePin(pin, 1);
-            control.waitMicros(5);
-            pins.digitalWritePin(pin, 0);
-            
-            buf[i] = pins.pulseIn(pin, PulseValue.High, 100000); // Max duration 100 ms
-        }
+        pins.digitalWritePin(pin, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(20);
+        pins.digitalWritePin(pin, 0);        
+        duration = pins.pulseIn(pin, PulseValue.High, 100000); // Max duration 100 ms
         
-        for(let i = 0; i < 5; i ++)
-        {
-            if(buf[i] != 0)
-            {
-                duration = duration + buf[i];
-                num ++;
-            }
-        }
+        RangeInInches = duration * 153 / 74 / 2 / 100;
         
-        duration = duration / num;
-        RangeInCentimeters = duration * 153 / 74 / 2 / 100;
+        if(RangeInInches > 0) distanceBackup = RangeInInches;
+        else RangeInInches = distanceBackup;
         
-        return RangeInCentimeters;
+        basic.pause(50);
+        
+        return RangeInInches;
     }
     
     /**
@@ -179,10 +157,12 @@ namespace grove {
     {
         let display = new TM1637();
         
+        display.buf = pins.createBuffer(4);
         display.clkPin = clkPin;
         display.dataPin = dataPin;
         display.brightnessLevel = 0;
         display.pointFlag = false;
+        display.clear();
         
         return display;
     }
@@ -304,6 +284,7 @@ namespace grove {
         dataPin: DigitalPin;
         brightnessLevel: number;     
         pointFlag: boolean;
+        buf: Buffer;
 
         private writeByte(wrData: number) 
         {
@@ -363,6 +344,11 @@ namespace grove {
                 this.bit(0x7f, 2);
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
+                
+                this.buf[3] = dispData;
+                this.buf[2] = 0x7f;
+                this.buf[1] = 0x7f;
+                this.buf[0] = 0x7f;
             }
             else if(dispData < 100)
             {
@@ -370,6 +356,11 @@ namespace grove {
                 this.bit((dispData / 10) % 10, 2);
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
+                
+                this.buf[3] = dispData % 10;
+                this.buf[2] = (dispData / 10) % 10;
+                this.buf[1] = 0x7f;
+                this.buf[0] = 0x7f;
             }
             else if(dispData < 1000)
             {
@@ -377,6 +368,11 @@ namespace grove {
                 this.bit((dispData / 10) % 10, 2);
                 this.bit((dispData / 100) % 10, 1);
                 this.bit(0x7f, 0);
+                
+                this.buf[3] = dispData % 10;
+                this.buf[2] = (dispData / 10) % 10;
+                this.buf[1] = (dispData / 100) % 10;
+                this.buf[0] = 0x7f;
             }
             else
             {
@@ -384,6 +380,11 @@ namespace grove {
                 this.bit((dispData / 10) % 10, 2);
                 this.bit((dispData / 100) % 10, 1);
                 this.bit((dispData / 1000) % 10, 0);
+                
+                this.buf[3] = dispData % 10;
+                this.buf[2] = (dispData / 10) % 10;
+                this.buf[1] = (dispData / 100) % 10;
+                this.buf[0] = (dispData / 1000) % 10;
             }
         }
         
@@ -396,6 +397,11 @@ namespace grove {
         set(level: number)
         {
             this.brightnessLevel = level;
+            
+            this.bit(this.buf[0], 0x00);
+            this.bit(this.buf[1], 0x01);
+            this.bit(this.buf[2], 0x02);
+            this.bit(this.buf[3], 0x03);
         }
         
         /**
@@ -409,18 +415,24 @@ namespace grove {
         //% advanced=true
         bit(dispData: number, bitAddr: number)
         {
-            let segData = 0;
-            segData = this.coding(dispData);
-            this.start();
-            this.writeByte(0x44);
-            this.stop();
-            this.start();
-            this.writeByte(bitAddr | 0xc0);
-            this.writeByte(segData);
-            this.stop();
-            this.start();
-            this.writeByte(0x88 + this.brightnessLevel);
-            this.stop();
+            if((dispData == 0x7f) || ((dispData <= 9) && (bitAddr <= 3)))
+            {
+                let segData = 0;
+                
+                segData = this.coding(dispData);
+                this.start();
+                this.writeByte(0x44);
+                this.stop();
+                this.start();
+                this.writeByte(bitAddr | 0xc0);
+                this.writeByte(segData);
+                this.stop();
+                this.start();
+                this.writeByte(0x88 + this.brightnessLevel);
+                this.stop();
+                
+                this.buf[bitAddr] = dispData;
+            }
         }
         
         /**
@@ -432,6 +444,11 @@ namespace grove {
         point(point: boolean)
         {
             this.pointFlag = point;
+            
+            this.bit(this.buf[0], 0x00);
+            this.bit(this.buf[1], 0x01);
+            this.bit(this.buf[2], 0x02);
+            this.bit(this.buf[3], 0x03);
         }
         
         /**
@@ -441,10 +458,10 @@ namespace grove {
         //% advanced=true
         clear()
         {
-            this.bit(0x00, 0x7f);
-            this.bit(0x01, 0x7f);
-            this.bit(0x02, 0x7f);
-            this.bit(0x03, 0x7f);
+            this.bit(0x7f, 0x00);
+            this.bit(0x7f, 0x01);
+            this.bit(0x7f, 0x02);
+            this.bit(0x7f, 0x03);
         }
     }
 }
