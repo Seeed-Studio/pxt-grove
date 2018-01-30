@@ -7,6 +7,7 @@ A Microsoft MakeCode package for for Seeed Studio Grove module.
 ### Grove - Gesture
 
 Create gesture events.
+
 ```blocks
 grove.onGesture(GroveGesture.Up, () => {
     basic.showString("Up")
@@ -19,12 +20,14 @@ grove.onGesture(GroveGesture.Down, () => {
 ### Grove - Ultrasonic Ranger
 
 Measure distance in centimeters, specify the signal pin.
+
 ```blocks
 let distance = 0
 distance = grove.measureInCentimeters(DigitalPin.P0)
 ```
 
 Measure distance in inches, specify the signal pin.
+
 ```blocks
 let distance = 0
 distance = grove.measureInInches(DigitalPin.P0)
@@ -33,6 +36,7 @@ distance = grove.measureInInches(DigitalPin.P0)
 ### Grove - 4 digital display
 
 Create a 4 Digital Display driver, specify the clk and data pin, and set the brightness level, then start display value.
+
 ```blocks
 let display: grove.TM1637 = null
 display = grove.createDisplay(DigitalPin.P0, DigitalPin.P1)
@@ -57,5 +61,3 @@ MIT
 ## Supported targets
 
 * for PXT/microbit
-(The metadata above is needed for package search.)
-
