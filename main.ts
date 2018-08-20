@@ -76,7 +76,7 @@ namespace grove {
      * @param handler code to run
      */
     //% blockId=grove_gesture_create_event block="on Gesture|%gesture"
-    export function onGesture(gesture: GroveGesture, handler: Action) {
+    export function onGesture(gesture: GroveGesture, handler: () => void) {
         control.onEvent(gestureEventId, gesture, handler);
         if (!paj7620) {
             paj7620.init();
