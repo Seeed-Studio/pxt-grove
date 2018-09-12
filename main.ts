@@ -110,7 +110,7 @@ namespace grove {
         pins.digitalWritePin(pin, 0);        
         duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
 
-        RangeInCentimeters = duration * 153 / 29 / 2 / 100;
+        RangeInCentimeters = Math.idiv(Math.idiv(Math.idiv(Math.imul(duration, 153), 29), 2), 100);
                
         if(RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
         else RangeInCentimeters = distanceBackup;
@@ -137,7 +137,7 @@ namespace grove {
         pins.digitalWritePin(pin, 0);        
         duration = pins.pulseIn(pin, PulseValue.High, 100000); // Max duration 100 ms
         
-        RangeInInches = duration * 153 / 74 / 2 / 100;
+        RangeInInches = Math.idiv(Math.idiv(Math.idiv(Math.imul(duration, 153), 74), 2), 100);
         
         if(RangeInInches > 0) distanceBackup = RangeInInches;
         else RangeInInches = distanceBackup;
@@ -344,47 +344,27 @@ namespace grove {
                 this.bit(0x7f, 2);
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
-                
-                this.buf[3] = dispData;
-                this.buf[2] = 0x7f;
-                this.buf[1] = 0x7f;
-                this.buf[0] = 0x7f;
             }
             else if(dispData < 100)
             {
                 this.bit(dispData % 10, 3);
-                this.bit((dispData / 10) % 10, 2);
+                this.bit(Math.idiv(dispData, 10) % 10, 2);
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
-                
-                this.buf[3] = dispData % 10;
-                this.buf[2] = (dispData / 10) % 10;
-                this.buf[1] = 0x7f;
-                this.buf[0] = 0x7f;
             }
             else if(dispData < 1000)
             {
                 this.bit(dispData % 10, 3);
-                this.bit((dispData / 10) % 10, 2);
-                this.bit((dispData / 100) % 10, 1);
+                this.bit(Math.idiv(dispData, 10) % 10, 2);
+                this.bit(Math.idiv(dispData, 100) % 10, 1);
                 this.bit(0x7f, 0);
-                
-                this.buf[3] = dispData % 10;
-                this.buf[2] = (dispData / 10) % 10;
-                this.buf[1] = (dispData / 100) % 10;
-                this.buf[0] = 0x7f;
             }
             else
             {
                 this.bit(dispData % 10, 3);
-                this.bit((dispData / 10) % 10, 2);
-                this.bit((dispData / 100) % 10, 1);
-                this.bit((dispData / 1000) % 10, 0);
-                
-                this.buf[3] = dispData % 10;
-                this.buf[2] = (dispData / 10) % 10;
-                this.buf[1] = (dispData / 100) % 10;
-                this.buf[0] = (dispData / 1000) % 10;
+                this.bit(Math.idiv(dispData, 10) % 10, 2);
+                this.bit(Math.idiv(dispData, 100) % 10, 1);
+                this.bit(Math.idiv(dispData, 1000) % 10, 0);
             }
         }
         
