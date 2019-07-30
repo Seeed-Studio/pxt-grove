@@ -95,30 +95,8 @@ namespace grove {
     let lastGesture = GroveGesture.None;
     let lastJoystick = GroveJoystickKey.None;
     let joystick: GroveJoystick = undefined;
-    let paj7620: PAJ7620 = undefined;
     let distanceBackup: number = 0;
-    /**
-     * Do something when a gesture is detected by Grove - Gesture
-     * @param gesture type of gesture to detect
-     * @param handler code to run
-     */
-    //% blockId=grove_gesture_create_event block="on Gesture|%gesture"
-    export function onGesture(gesture: GroveGesture, handler: () => void) {
-        control.onEvent(gestureEventId, gesture, handler);
-        if (!paj7620) {
-            paj7620.init();
-            control.inBackground(() => {
-                while(true) {
-                    const gesture = paj7620.read();
-                    if (gesture != lastGesture) {
-                        lastGesture = gesture;
-                        control.raiseEvent(gestureEventId, lastGesture);
-                    }
-                    basic.pause(50);
-                }
-            })
-        }
-    }
+
 
 
     /**
@@ -327,6 +305,29 @@ namespace grove {
         }
     }
     
+    let paj7620 =  new PAJ7620() ;
+    /**
+     * Do something when a gesture is detected by Grove - Gesture
+     * @param gesture type of gesture to detect
+     * @param handler code to run
+     */
+    //% blockId=grove_gesture_create_event block="on Gesture|%gesture"
+    export function onGesture(gesture: GroveGesture, handler: () => void) {
+        control.onEvent(gestureEventId, gesture, handler);
+        if (!paj7620) {
+            paj7620.init();
+            control.inBackground(() => {
+                while(true) {
+                    const gesture = paj7620.read();
+                    if (gesture != lastGesture) {
+                        lastGesture = gesture;
+                        control.raiseEvent(gestureEventId, lastGesture);
+                    }
+                    basic.pause(50);
+                }
+            })
+        }
+    }
     /**
      * 
      */
