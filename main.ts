@@ -1,4 +1,3 @@
-
 const initRegisterArray: number[] = [
     0xEF, 0x00, 0x32, 0x29, 0x33, 0x01, 0x34, 0x00, 0x35, 0x01, 0x36, 0x00, 0x37, 0x07, 0x38, 0x17,
     0x39, 0x06, 0x3A, 0x12, 0x3F, 0x00, 0x40, 0x02, 0x41, 0xFF, 0x42, 0x01, 0x46, 0x2D, 0x47, 0x0F,
@@ -90,113 +89,6 @@ enum GroveJoystickKey {
  */
 //% weight=10 color=#9F79EE icon="\uf108" block="Grove"
 namespace grove {
-    const gestureEventId = 3100;
-    const joystickEventID = 3101;
-    let lastGesture = GroveGesture.None;
-    let lastJoystick = GroveJoystickKey.None;
-    let joystick: GroveJoystick = undefined;
-    let distanceBackup: number = 0;
-
-
-
-    /**
-     * Do something when a key is detected by Grove - Thumb Joystick
-     * @param key type of joystick to detect
-     * @param xpin
-     * @param ypin
-     * @param handler code to run
-     */
-    //% blockId=grove_joystick_create_event block="on Key|%key"
-    export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
-        control.onEvent(joystickEventID, key, handler);
-        control.inBackground(() => {
-            while(true) {
-                const key = joystick.read(xpin, ypin);
-                if (key != lastJoystick) {
-                    lastJoystick = key; 
-                    control.raiseEvent(joystickEventID, lastJoystick);
-                }
-                basic.pause(50);
-            }
-        })
-        
-    }
-
-    
-    /**
-     * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
-     * @param pin signal pin of ultrasonic ranger module
-     */
-    //% blockId=grove_ultrasonic_centimeters block="Ultrasonic Sensor (in cm) at|%pin"
-    export function measureInCentimeters(pin: DigitalPin): number
-    {
-        let duration = 0;
-        let RangeInCentimeters = 0;
-        
-        pins.digitalWritePin(pin, 0);
-        control.waitMicros(2);
-        pins.digitalWritePin(pin, 1);
-        control.waitMicros(20);
-        pins.digitalWritePin(pin, 0);        
-        duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
-
-        RangeInCentimeters = duration * 153 / 29 / 2 / 100;
-               
-        if(RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
-        else RangeInCentimeters = distanceBackup;
-
-        basic.pause(50);
-        
-        return RangeInCentimeters;
-    }
-    
-    /**
-     * Create a new driver Grove - Ultrasonic Sensor to measure distances in inch
-     * @param pin signal pin of ultrasonic ranger module
-     */
-    //% blockId=grove_ultrasonic_inches block="Ultrasonic Sensor (in inch) at|%pin"
-    export function measureInInches(pin: DigitalPin): number
-    {
-        let duration = 0;
-        let RangeInInches = 0;
-        
-        pins.digitalWritePin(pin, 0);
-        control.waitMicros(2);
-        pins.digitalWritePin(pin, 1);
-        control.waitMicros(20);
-        pins.digitalWritePin(pin, 0);        
-        duration = pins.pulseIn(pin, PulseValue.High, 100000); // Max duration 100 ms
-        
-        RangeInInches = duration * 153 / 74 / 2 / 100;
-        
-        if(RangeInInches > 0) distanceBackup = RangeInInches;
-        else RangeInInches = distanceBackup;
-        
-        basic.pause(50);
-        
-        return RangeInInches;
-    }
-    
-    /**
-     * Create a new driver Grove - 4-Digit Display
-     * @param clkPin value of clk pin number
-     * @param dataPin value of data pin number
-     */
-    //% blockId=grove_tm1637_create block="4-Digit Display at|%clkPin|and|%dataPin"
-    export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
-    {
-        let display = new TM1637();
-        
-        display.buf = pins.createBuffer(4);
-        display.clkPin = clkPin;
-        display.dataPin = dataPin;
-        display.brightnessLevel = 0;
-        display.pointFlag = false;
-        display.clear();
-        
-        return display;
-    }
-    
     /**
      * 
      */
@@ -305,29 +197,6 @@ namespace grove {
         }
     }
     
-    let paj7620 =  new PAJ7620() ;
-    /**
-     * Do something when a gesture is detected by Grove - Gesture
-     * @param gesture type of gesture to detect
-     * @param handler code to run
-     */
-    //% blockId=grove_gesture_create_event block="on Gesture|%gesture"
-    export function onGesture(gesture: GroveGesture, handler: () => void) {
-        control.onEvent(gestureEventId, gesture, handler);
-        if (!paj7620) {
-            paj7620.init();
-            control.inBackground(() => {
-                while(true) {
-                    const gesture = paj7620.read();
-                    if (gesture != lastGesture) {
-                        lastGesture = gesture;
-                        control.raiseEvent(gestureEventId, lastGesture);
-                    }
-                    basic.pause(50);
-                }
-            })
-        }
-    }
     /**
      * 
      */
@@ -558,9 +427,133 @@ namespace grove {
             return result;
         }
     }
+    
+    const gestureEventId = 3100;
+    const joystickEventID = 3101;
+    let lastGesture = GroveGesture.None;
+    let lastJoystick = GroveJoystickKey.None;
+    let distanceBackup: number = 0;
+    let joystick = new GroveJoystick();
+    let paj7620 = new PAJ7620();
+    
+    /**
+     * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
+     * @param pin signal pin of ultrasonic ranger module
+     */
+    //% blockId=grove_ultrasonic_centimeters block="Ultrasonic Sensor (in cm) at|%pin"
+    export function measureInCentimeters(pin: DigitalPin): number
+    {
+        let duration = 0;
+        let RangeInCentimeters = 0;
+        
+        pins.digitalWritePin(pin, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(20);
+        pins.digitalWritePin(pin, 0);        
+        duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
+
+        RangeInCentimeters = duration * 153 / 29 / 2 / 100;
+               
+        if(RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
+        else RangeInCentimeters = distanceBackup;
+
+        basic.pause(50);
+        
+        return RangeInCentimeters;
+    }
+    
+    /**
+     * Create a new driver Grove - Ultrasonic Sensor to measure distances in inch
+     * @param pin signal pin of ultrasonic ranger module
+     */
+    //% blockId=grove_ultrasonic_inches block="Ultrasonic Sensor (in inch) at|%pin"
+    export function measureInInches(pin: DigitalPin): number
+    {
+        let duration = 0;
+        let RangeInInches = 0;
+        
+        pins.digitalWritePin(pin, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(20);
+        pins.digitalWritePin(pin, 0);        
+        duration = pins.pulseIn(pin, PulseValue.High, 100000); // Max duration 100 ms
+        
+        RangeInInches = duration * 153 / 74 / 2 / 100;
+        
+        if(RangeInInches > 0) distanceBackup = RangeInInches;
+        else RangeInInches = distanceBackup;
+        
+        basic.pause(50);
+        
+        return RangeInInches;
+    }
+    
+    /**
+     * Create a new driver Grove - 4-Digit Display
+     * @param clkPin value of clk pin number
+     * @param dataPin value of data pin number
+     */
+    //% blockId=grove_tm1637_create block="4-Digit Display at|%clkPin|and|%dataPin"
+    export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
+    {
+        let display = new TM1637();
+        
+        display.buf = pins.createBuffer(4);
+        display.clkPin = clkPin;
+        display.dataPin = dataPin;
+        display.brightnessLevel = 0;
+        display.pointFlag = false;
+        display.clear();
+        
+        return display;
+    }
+    
+    /**
+     * Do something when a gesture is detected by Grove - Gesture
+     * @param gesture type of gesture to detect
+     * @param handler code to run
+     */
+    //% blockId=grove_gesture_create_event block="on Gesture|%gesture"
+    export function onGesture(gesture: GroveGesture, handler: () => void) {
+        control.onEvent(gestureEventId, gesture, handler);
+        if (!paj7620) {
+            paj7620.init();
+            control.inBackground(() => {
+                while(true) {
+                    const gesture = paj7620.read();
+                    if (gesture != lastGesture) {
+                        lastGesture = gesture;
+                        control.raiseEvent(gestureEventId, lastGesture);
+                    }
+                    basic.pause(50);
+                }
+            })
+        }
+    }
 
 
-    // export class GroveHicell {
-
-    // }
+    /**
+     * Do something when a key is detected by Grove - Thumb Joystick
+     * @param key type of joystick to detect
+     * @param xpin
+     * @param ypin
+     * @param handler code to run
+     */
+    //% blockId=grove_joystick_create_event block="on Key|%key|at|%xpin|and|%ypin|"
+    export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
+        control.onEvent(joystickEventID, key, handler);
+        control.inBackground(() => {
+            while(true) {
+                const key = joystick.read(xpin, ypin);
+                if (key != lastJoystick) {
+                    lastJoystick = key; 
+                    control.raiseEvent(joystickEventID, lastJoystick);
+                }
+                basic.pause(50);
+            }
+        })
+        
+    }
 }
