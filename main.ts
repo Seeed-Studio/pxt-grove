@@ -509,51 +509,33 @@ namespace grove {
         
         return display;
     }
-    
+ 
     /**
-     * Do something when a gesture is detected by Grove - Gesture
-     * @param gesture type of gesture to detect
-     * @param handler code to run
+     * init Grove Gesture modules
+     * 
      */
-    //% blockId=grove_gesture_create_event block="on Gesture|%gesture"
-    export function onGesture(gesture: GroveGesture, handler: () => void) {
-        control.onEvent(gestureEventId, gesture, handler);
+    //% blockId=grove_initgesture block="init gesture"
+    export function initGesture() {
         if (!paj7620) {
             paj7620.init();
-            control.inBackground(() => {
-                while(true) {
-                    const gesture = paj7620.read();
-                    if (gesture != lastGesture) {
-                        lastGesture = gesture;
-                        control.raiseEvent(gestureEventId, lastGesture);
-                    }
-                    basic.pause(50);
-                }
-            })
         }
     }
 
-
     /**
-     * Do something when a key is detected by Grove - Thumb Joystick
-     * @param key type of joystick to detect
-     * @param xpin
-     * @param ypin
-     * @param handler code to run
+     * get Grove Gesture modle
+     * 
      */
-    //% blockId=grove_joystick_create_event block="on Key|%key|at|%xpin|and|%ypin|"
-    export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
-        control.onEvent(joystickEventID, key, handler);
-        control.inBackground(() => {
-            while(true) {
-                const key = joystick.read(xpin, ypin);
-                if (key != lastJoystick) {
-                    lastJoystick = key; 
-                    control.raiseEvent(joystickEventID, lastJoystick);
-                }
-                basic.pause(50);
-            }
-        })
-        
+    //% blockId=grove_getgesture block="get gesture model"
+    export function getGestureModel(): number {
+        return paj7620.read();
     }
+    /**
+     * get Joystick key
+     * 
+     */
+    //% blockId=grove_getjoystick block="get joystick key at|%xpin|and|%xpin"
+    export function getJoystick(xpin: AnalogPin, ypin: AnalogPin): number {
+        return joystick.read(xpin, ypin);
+    }
+
 }
