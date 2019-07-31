@@ -21,4 +21,5 @@
   "grove.TM1637.bit|block": "%strip|zeige Ziffer|%dispData|an Stelle|%bitAddr|",
   "grove.TM1637.point|block": "%strip|schalte Kommapunkt|%point|",
   "grove.TM1637.clear|block": "%strip|lösche 4-Ziffern Display"
+  
 }
