@@ -9,6 +9,16 @@ A Microsoft MakeCode package for for Seeed Studio Grove module.
 get gesture model.
 
 ```blocks
+
+
+grove.onGesture(GroveGesture.Up, () => {
+    basic.showString("Up");
+})
+grove.onGesture(GroveGesture.Down, () => {
+    basic.showString("Down");
+})
+
+
 grove.initGesture()
 basic.forever(function () {
     if (grove.getGestureModel() == 1) {
