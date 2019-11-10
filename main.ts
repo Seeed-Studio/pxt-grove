@@ -265,12 +265,7 @@ namespace grove {
                 this.bit(dispData, 3);
                 this.bit(0x7f, 2);
                 this.bit(0x7f, 1);
-                this.bit(0x7f, 0);
-                
-                this.buf[3] = dispData;
-                this.buf[2] = 0x7f;
-                this.buf[1] = 0x7f;
-                this.buf[0] = 0x7f;
+                this.bit(0x7f, 0);                
             }
             else if(dispData < 100)
             {
@@ -278,11 +273,6 @@ namespace grove {
                 this.bit((dispData / 10) % 10, 2);
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
-                
-                this.buf[3] = dispData % 10;
-                this.buf[2] = (dispData / 10) % 10;
-                this.buf[1] = 0x7f;
-                this.buf[0] = 0x7f;
             }
             else if(dispData < 1000)
             {
@@ -290,11 +280,6 @@ namespace grove {
                 this.bit((dispData / 10) % 10, 2);
                 this.bit((dispData / 100) % 10, 1);
                 this.bit(0x7f, 0);
-                
-                this.buf[3] = dispData % 10;
-                this.buf[2] = (dispData / 10) % 10;
-                this.buf[1] = (dispData / 100) % 10;
-                this.buf[0] = 0x7f;
             }
             else
             {
@@ -302,11 +287,6 @@ namespace grove {
                 this.bit((dispData / 10) % 10, 2);
                 this.bit((dispData / 100) % 10, 1);
                 this.bit((dispData / 1000) % 10, 0);
-                
-                this.buf[3] = dispData % 10;
-                this.buf[2] = (dispData / 10) % 10;
-                this.buf[1] = (dispData / 100) % 10;
-                this.buf[0] = (dispData / 1000) % 10;
             }
         }
         
