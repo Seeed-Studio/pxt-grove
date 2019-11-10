@@ -292,7 +292,7 @@ namespace grove {
         
         /**
          * Set the brightness level of display at from 0 to 7
-         * @param level value of brightness level
+         * @param level value of brightness light level
          */
         //% blockId=grove_tm1637_set_display_level block="%strip|brightness level to|%level"
         //% level.min=0 level.max=7
