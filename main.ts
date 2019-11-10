@@ -270,23 +270,23 @@ namespace grove {
             else if(dispData < 100)
             {
                 this.bit(dispData % 10, 3);
-                this.bit((dispData / 10) % 10, 2);
+                this.bit(Math.floor(dispData / 10) % 10, 2);
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
             }
             else if(dispData < 1000)
             {
                 this.bit(dispData % 10, 3);
-                this.bit((dispData / 10) % 10, 2);
-                this.bit((dispData / 100) % 10, 1);
+                this.bit(Math.floor(dispData / 10) % 10, 2);
+                this.bit(Math.floor(dispData / 100) % 10, 1);
                 this.bit(0x7f, 0);
             }
             else
             {
                 this.bit(dispData % 10, 3);
-                this.bit((dispData / 10) % 10, 2);
-                this.bit((dispData / 100) % 10, 1);
-                this.bit((dispData / 1000) % 10, 0);
+                this.bit(Math.floor(dispData / 10) % 10, 2);
+                this.bit(Math.floor(dispData / 100) % 10, 1);
+                this.bit(Math.floor(dispData / 1000) % 10, 0);
             }
         }
         
