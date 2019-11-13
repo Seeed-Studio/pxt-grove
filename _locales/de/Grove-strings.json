@@ -33,7 +33,7 @@
     "GroveJoystickKey.LL|block": "Unten links",
     "GroveJoystickKey.LR|block": "Unten rechts",
     "GroveJoystickKey.Press|block": "Gedrückt",
-    "grove.read|block": "%strip|lies Position von Joystick",
+    "grove.read|block": "%strip|lies Position von Joystick|%xpin|und|%ypin",
     "grove.onJoystick|block": "wenn Grove - Joysticktaste|%key",
     "grove.getJoystick|block": "hole Joysticktaste an|%xpin|und|%ypin"
 }
