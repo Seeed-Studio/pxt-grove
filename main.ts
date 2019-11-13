@@ -29,7 +29,7 @@ const initRegisterArray: number[] = [
     0x7C, 0x84, 0x7D, 0x03, 0x7E, 0x01
 ];
 
-let TubeTab: number [] = [
+let TubeTab: number[] = [
     0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07,
     0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71
 ];
@@ -156,176 +156,164 @@ namespace grove {
             switch (data) {
                 case 0x01:
                     result = GroveGesture.Right;
-                break;
+                    break;
 
                 case 0x02:
                     result = GroveGesture.Left;
-                break;
+                    break;
 
                 case 0x04:
                     result = GroveGesture.Up;
-                break;
+                    break;
 
                 case 0x08:
                     result = GroveGesture.Down;
-                break;
+                    break;
 
                 case 0x10:
                     result = GroveGesture.Forward;
-                break;
+                    break;
 
                 case 0x20:
                     result = GroveGesture.Backward;
-                break;
+                    break;
 
                 case 0x40:
                     result = GroveGesture.Clockwise;
-                break;
+                    break;
 
                 case 0x80:
                     result = GroveGesture.Anticlockwise;
-                break;
+                    break;
 
                 default:
                     data = this.paj7620ReadReg(0x44);
                     if (data == 0x01)
                         result = GroveGesture.Wave;
-                break;
+                    break;
             }
 
             return result;
         }
     }
-    
+
     /**
      * 
      */
-    export class TM1637
-    {
+    export class TM1637 {
         clkPin: DigitalPin;
         dataPin: DigitalPin;
-        brightnessLevel: number;     
+        brightnessLevel: number;
         pointFlag: boolean;
         buf: Buffer;
 
-        private writeByte(wrData: number) 
-        {
-            for(let i = 0; i < 8; i ++)
-            {
+        private writeByte(wrData: number) {
+            for (let i = 0; i < 8; i++) {
                 pins.digitalWritePin(this.clkPin, 0);
-                if(wrData & 0x01)pins.digitalWritePin(this.dataPin, 1);
+                if (wrData & 0x01) pins.digitalWritePin(this.dataPin, 1);
                 else pins.digitalWritePin(this.dataPin, 0);
                 wrData >>= 1;
                 pins.digitalWritePin(this.clkPin, 1);
             }
-            
+
             pins.digitalWritePin(this.clkPin, 0); // Wait for ACK
             pins.digitalWritePin(this.dataPin, 1);
             pins.digitalWritePin(this.clkPin, 1);
         }
-        
-        private start()
-        {
+
+        private start() {
             pins.digitalWritePin(this.clkPin, 1);
             pins.digitalWritePin(this.dataPin, 1);
             pins.digitalWritePin(this.dataPin, 0);
             pins.digitalWritePin(this.clkPin, 0);
         }
-        
-        private stop()
-        {
+
+        private stop() {
             pins.digitalWritePin(this.clkPin, 0);
             pins.digitalWritePin(this.dataPin, 0);
             pins.digitalWritePin(this.clkPin, 1);
             pins.digitalWritePin(this.dataPin, 1);
         }
-        
-        private coding(dispData: number): number
-        {
+
+        private coding(dispData: number): number {
             let pointData = 0;
-            
-            if(this.pointFlag == true)pointData = 0x80;
-            else if(this.pointFlag == false)pointData = 0;
-            
-            if(dispData == 0x7f)dispData = 0x00 + pointData;
+
+            if (this.pointFlag == true) pointData = 0x80;
+            else if (this.pointFlag == false) pointData = 0;
+
+            if (dispData == 0x7f) dispData = 0x00 + pointData;
             else dispData = TubeTab[dispData] + pointData;
-            
+
             return dispData;
-        } 
+        }
 
         /**
          * Show a 4 digits number on display
          * @param dispData value of number
          */
         //% blockId=grove_tm1637_display_number block="%strip|show number|%dispData"
-        show(dispData: number)
-        {       
-            if(dispData < 10)
-            {
+        show(dispData: number) {
+            if (dispData < 10) {
                 this.bit(dispData, 3);
                 this.bit(0x7f, 2);
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
-                
+
                 this.buf[3] = dispData;
                 this.buf[2] = 0x7f;
                 this.buf[1] = 0x7f;
                 this.buf[0] = 0x7f;
             }
-            else if(dispData < 100)
-            {
+            else if (dispData < 100) {
                 this.bit(dispData % 10, 3);
                 this.bit((dispData / 10) % 10, 2);
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
-                
+
                 this.buf[3] = dispData % 10;
                 this.buf[2] = (dispData / 10) % 10;
                 this.buf[1] = 0x7f;
                 this.buf[0] = 0x7f;
             }
-            else if(dispData < 1000)
-            {
+            else if (dispData < 1000) {
                 this.bit(dispData % 10, 3);
                 this.bit((dispData / 10) % 10, 2);
                 this.bit((dispData / 100) % 10, 1);
                 this.bit(0x7f, 0);
-                
+
                 this.buf[3] = dispData % 10;
                 this.buf[2] = (dispData / 10) % 10;
                 this.buf[1] = (dispData / 100) % 10;
                 this.buf[0] = 0x7f;
             }
-            else
-            {
+            else {
                 this.bit(dispData % 10, 3);
                 this.bit((dispData / 10) % 10, 2);
                 this.bit((dispData / 100) % 10, 1);
                 this.bit((dispData / 1000) % 10, 0);
-                
+
                 this.buf[3] = dispData % 10;
                 this.buf[2] = (dispData / 10) % 10;
                 this.buf[1] = (dispData / 100) % 10;
                 this.buf[0] = (dispData / 1000) % 10;
             }
         }
-        
+
         /**
          * Set the brightness level of display at from 0 to 7
          * @param level value of brightness level
          */
         //% blockId=grove_tm1637_set_display_level block="%strip|brightness level to|%level"
         //% level.min=0 level.max=7
-        set(level: number)
-        {
+        set(level: number) {
             this.brightnessLevel = level;
-            
+
             this.bit(this.buf[0], 0x00);
             this.bit(this.buf[1], 0x01);
             this.bit(this.buf[2], 0x02);
             this.bit(this.buf[3], 0x03);
         }
-        
+
         /**
          * Show a single number from 0 to 9 at a specified digit of Grove - 4-Digit Display
          * @param dispData value of number
@@ -335,12 +323,10 @@ namespace grove {
         //% dispData.min=0 dispData.max=9
         //% bitAddr.min=0 bitAddr.max=3
         //% advanced=true
-        bit(dispData: number, bitAddr: number)
-        {
-            if((dispData == 0x7f) || ((dispData <= 9) && (bitAddr <= 3)))
-            {
+        bit(dispData: number, bitAddr: number) {
+            if ((dispData == 0x7f) || ((dispData <= 9) && (bitAddr <= 3))) {
                 let segData = 0;
-                
+
                 segData = this.coding(dispData);
                 this.start();
                 this.writeByte(0x44);
@@ -352,34 +338,32 @@ namespace grove {
                 this.start();
                 this.writeByte(0x88 + this.brightnessLevel);
                 this.stop();
-                
+
                 this.buf[bitAddr] = dispData;
             }
         }
-        
+
         /**
          * Turn on or off the colon point on Grove - 4-Digit Display
          * @param pointEn value of point switch
          */
         //% blockId=grove_tm1637_display_point block="%strip|turn|%point|colon point"
         //% advanced=true
-        point(point: boolean)
-        {
+        point(point: boolean) {
             this.pointFlag = point;
-            
+
             this.bit(this.buf[0], 0x00);
             this.bit(this.buf[1], 0x01);
             this.bit(this.buf[2], 0x02);
             this.bit(this.buf[3], 0x03);
         }
-        
+
         /**
          * Clear the display
          */
         //% blockId=grove_tm1637_display_clear block="%strip|clear"
         //% advanced=true
-        clear()
-        {
+        clear() {
             this.bit(0x7f, 0x00);
             this.bit(0x7f, 0x01);
             this.bit(0x7f, 0x02);
@@ -388,8 +372,7 @@ namespace grove {
     }
 
 
-    export class GroveJoystick
-    {
+    export class GroveJoystick {
         /**
          * Detect position from Grove - Thumb Joystick
          * @param xPin
@@ -422,12 +405,12 @@ namespace grove {
                 }
             }
             else {
-                result =  GroveJoystickKey.None;
+                result = GroveJoystickKey.None;
             }
             return result;
         }
     }
-    
+
     const gestureEventId = 3100;
     const joystickEventID = 3101;
     let lastGesture = GroveGesture.None;
@@ -435,81 +418,78 @@ namespace grove {
     let distanceBackup: number = 0;
     let joystick = new GroveJoystick();
     let paj7620 = new PAJ7620();
-    
+
     /**
      * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
      * @param pin signal pin of ultrasonic ranger module
      */
     //% blockId=grove_ultrasonic_centimeters block="Ultrasonic Sensor (in cm) at|%pin"
-    export function measureInCentimeters(pin: DigitalPin): number
-    {
+    export function measureInCentimeters(pin: DigitalPin): number {
         let duration = 0;
         let RangeInCentimeters = 0;
-        
+
         pins.digitalWritePin(pin, 0);
         control.waitMicros(2);
         pins.digitalWritePin(pin, 1);
         control.waitMicros(20);
-        pins.digitalWritePin(pin, 0);        
+        pins.digitalWritePin(pin, 0);
         duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
 
         RangeInCentimeters = duration * 153 / 29 / 2 / 100;
-               
-        if(RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
+
+        if (RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
         else RangeInCentimeters = distanceBackup;
 
         basic.pause(50);
-        
+
         return RangeInCentimeters;
     }
-    
+
     /**
      * Create a new driver Grove - Ultrasonic Sensor to measure distances in inch
      * @param pin signal pin of ultrasonic ranger module
      */
     //% blockId=grove_ultrasonic_inches block="Ultrasonic Sensor (in inch) at|%pin"
-    export function measureInInches(pin: DigitalPin): number
-    {
+    export function measureInInches(pin: DigitalPin): number {
         let duration = 0;
         let RangeInInches = 0;
-        
+
         pins.digitalWritePin(pin, 0);
         control.waitMicros(2);
         pins.digitalWritePin(pin, 1);
         control.waitMicros(20);
-        pins.digitalWritePin(pin, 0);        
+        pins.digitalWritePin(pin, 0);
         duration = pins.pulseIn(pin, PulseValue.High, 100000); // Max duration 100 ms
-        
+
         RangeInInches = duration * 153 / 74 / 2 / 100;
-        
-        if(RangeInInches > 0) distanceBackup = RangeInInches;
+
+        if (RangeInInches > 0) distanceBackup = RangeInInches;
         else RangeInInches = distanceBackup;
-        
+
         basic.pause(50);
-        
+
         return RangeInInches;
     }
-    
+
     /**
      * Create a new driver Grove - 4-Digit Display
      * @param clkPin value of clk pin number
      * @param dataPin value of data pin number
      */
     //% blockId=grove_tm1637_create block="4-Digit Display at|%clkPin|and|%dataPin"
-    export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
-    {
+    export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637 {
         let display = new TM1637();
-        
+
         display.buf = pins.createBuffer(4);
         display.clkPin = clkPin;
         display.dataPin = dataPin;
         display.brightnessLevel = 0;
         display.pointFlag = false;
         display.clear();
-        
+
         return display;
     }
- 
+
     /**
      * init Grove Gesture modules
      * 
@@ -549,7 +529,7 @@ namespace grove {
         control.onEvent(gestureEventId, gesture, handler);
         paj7620.init();
         control.inBackground(() => {
-            while(true) {
+            while (true) {
                 const gesture = paj7620.read();
                 if (gesture != lastGesture) {
                     lastGesture = gesture;
@@ -572,15 +552,15 @@ namespace grove {
     export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
         control.onEvent(joystickEventID, key, handler);
         control.inBackground(() => {
-            while(true) {
+            while (true) {
                 const key = joystick.read(xpin, ypin);
                 if (key != lastJoystick) {
-                    lastJoystick = key; 
+                    lastJoystick = key;
                     control.raiseEvent(joystickEventID, lastJoystick);
                 }
                 basic.pause(50);
             }
         })
-        
+
     }
 }
