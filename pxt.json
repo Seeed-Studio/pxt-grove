@@ -9,7 +9,8 @@
     "files": [
         "README.md",
         "main.ts",
-        "_locales/ja/Grove-strings.json"
+        "_locales/ja/Grove-strings.json",
+        "_locales/de/Grove-strings.json"
     ],
     "testFiles": [
         "test.ts"
