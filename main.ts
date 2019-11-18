@@ -513,7 +513,7 @@ namespace grove {
      * get Joystick key
      * 
      */
-    //% blockId=grove_getjoystick block="get joystick key at|%xpin|and|%xpin"
+    //% blockId=grove_getjoystick block="get joystick key at|%xpin|and|%ypin"
     export function getJoystick(xpin: AnalogPin, ypin: AnalogPin): number {
         return joystick.read(xpin, ypin);
     }
