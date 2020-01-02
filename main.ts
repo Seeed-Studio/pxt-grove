@@ -297,7 +297,7 @@ namespace grove {
                 }
                 this.bit(0x7f, 0);
             }
-            else
+            else if(dispData < 10000)
             {
                 this.bit(dispData % 10, 3);
                 if(compare_01 > 90){
@@ -315,6 +315,13 @@ namespace grove {
                 } else{
                     this.bit(Math.floor(dispData / 1000) % 10, 0);
                 }
+            }
+            else 
+            {
+                this.bit(9, 3);
+                this.bit(9, 2);
+                this.bit(9, 1);
+                this.bit(9, 0);
             }
         }
         
