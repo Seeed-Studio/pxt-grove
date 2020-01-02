@@ -260,9 +260,8 @@ namespace grove {
         //% blockId=grove_tm1637_display_number block="%strip|show number|%dispData"
         show(dispData: number)
         {       
-            let compare_01:number = Math.floor(dispData / 10);
-            let compare_001:number = Math.floor(dispData / 100);
-            let compare_0001:number = Math.floor(dispData / 1000);
+            let compare_01:number = dispData % 100;
+            let compare_001:number = dispData % 1000;
 
             if(dispData < 10)
             {
@@ -311,7 +310,7 @@ namespace grove {
                 } else{
                     this.bit(Math.floor(dispData / 100) % 10, 1);
                 }
-                if(compare_0001 > 9000){
+                if(dispData > 9000){
                     this.bit(9, 0);
                 } else{
                     this.bit(Math.floor(dispData / 1000) % 10, 0);
