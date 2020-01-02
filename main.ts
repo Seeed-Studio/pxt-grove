@@ -260,6 +260,10 @@ namespace grove {
         //% blockId=grove_tm1637_display_number block="%strip|show number|%dispData"
         show(dispData: number)
         {       
+            let compare_01:number = Math.floor(dispData / 10);
+            let compare_001:number = Math.floor(dispData / 100);
+            let compare_0001:number = Math.floor(dispData / 1000);
+
             if(dispData < 10)
             {
                 this.bit(dispData, 3);
@@ -270,23 +274,48 @@ namespace grove {
             else if(dispData < 100)
             {
                 this.bit(dispData % 10, 3);
-                this.bit(Math.floor(dispData / 10) % 10, 2);
+                if(dispData > 90){
+                    this.bit(9, 2);
+                } else{
+                    this.bit(Math.floor(dispData / 10) % 10, 2);
+                }
+                
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
             }
             else if(dispData < 1000)
             {
                 this.bit(dispData % 10, 3);
-                this.bit(Math.floor(dispData / 10) % 10, 2);
-                this.bit(Math.floor(dispData / 100) % 10, 1);
+                if(compare_01 > 90){
+                    this.bit(9, 2);
+                } else{
+                    this.bit(Math.floor(dispData / 10) % 10, 2);
+                }
+                if(compare_001 > 900){
+                    this.bit(9, 1);
+                } else{
+                    this.bit(Math.floor(dispData / 100) % 10, 1);
+                }
                 this.bit(0x7f, 0);
             }
             else
             {
                 this.bit(dispData % 10, 3);
-                this.bit(Math.floor(dispData / 10) % 10, 2);
-                this.bit(Math.floor(dispData / 100) % 10, 1);
-                this.bit(Math.floor(dispData / 1000) % 10, 0);
+                if(compare_01 > 90){
+                    this.bit(9, 2);
+                } else{
+                    this.bit(Math.floor(dispData / 10) % 10, 2);
+                }
+                if(compare_001 > 900){
+                    this.bit(9, 1);
+                } else{
+                    this.bit(Math.floor(dispData / 100) % 10, 1);
+                }
+                if(compare_0001 > 9000){
+                    this.bit(9, 0);
+                } else{
+                    this.bit(Math.floor(dispData / 1000) % 10, 0);
+                }
             }
         }
         
