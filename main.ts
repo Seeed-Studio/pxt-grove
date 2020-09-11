@@ -260,59 +260,74 @@ namespace grove {
         //% blockId=grove_tm1637_display_number block="%strip|show number|%dispData"
         show(dispData: number)
         {       
+            let compare_01:number = dispData % 100;
+            let compare_001:number = dispData % 1000;
+
             if(dispData < 10)
             {
                 this.bit(dispData, 3);
                 this.bit(0x7f, 2);
                 this.bit(0x7f, 1);
-                this.bit(0x7f, 0);
-                
-                this.buf[3] = dispData;
-                this.buf[2] = 0x7f;
-                this.buf[1] = 0x7f;
-                this.buf[0] = 0x7f;
+                this.bit(0x7f, 0);                
             }
             else if(dispData < 100)
             {
                 this.bit(dispData % 10, 3);
-                this.bit((dispData / 10) % 10, 2);
+                if(dispData > 90){
+                    this.bit(9, 2);
+                } else{
+                    this.bit(Math.floor(dispData / 10) % 10, 2);
+                }
+                
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
-                
-                this.buf[3] = dispData % 10;
-                this.buf[2] = (dispData / 10) % 10;
-                this.buf[1] = 0x7f;
-                this.buf[0] = 0x7f;
             }
             else if(dispData < 1000)
             {
                 this.bit(dispData % 10, 3);
-                this.bit((dispData / 10) % 10, 2);
-                this.bit((dispData / 100) % 10, 1);
+                if(compare_01 > 90){
+                    this.bit(9, 2);
+                } else{
+                    this.bit(Math.floor(dispData / 10) % 10, 2);
+                }
+                if(compare_001 > 900){
+                    this.bit(9, 1);
+                } else{
+                    this.bit(Math.floor(dispData / 100) % 10, 1);
+                }
                 this.bit(0x7f, 0);
-                
-                this.buf[3] = dispData % 10;
-                this.buf[2] = (dispData / 10) % 10;
-                this.buf[1] = (dispData / 100) % 10;
-                this.buf[0] = 0x7f;
             }
-            else
+            else if(dispData < 10000)
             {
                 this.bit(dispData % 10, 3);
-                this.bit((dispData / 10) % 10, 2);
-                this.bit((dispData / 100) % 10, 1);
-                this.bit((dispData / 1000) % 10, 0);
-                
-                this.buf[3] = dispData % 10;
-                this.buf[2] = (dispData / 10) % 10;
-                this.buf[1] = (dispData / 100) % 10;
-                this.buf[0] = (dispData / 1000) % 10;
+                if(compare_01 > 90){
+                    this.bit(9, 2);
+                } else{
+                    this.bit(Math.floor(dispData / 10) % 10, 2);
+                }
+                if(compare_001 > 900){
+                    this.bit(9, 1);
+                } else{
+                    this.bit(Math.floor(dispData / 100) % 10, 1);
+                }
+                if(dispData > 9000){
+                    this.bit(9, 0);
+                } else{
+                    this.bit(Math.floor(dispData / 1000) % 10, 0);
+                }
+            }
+            else 
+            {
+                this.bit(9, 3);
+                this.bit(9, 2);
+                this.bit(9, 1);
+                this.bit(9, 0);
             }
         }
         
         /**
          * Set the brightness level of display at from 0 to 7
-         * @param level value of brightness level
+         * @param level value of brightness light level
          */
         //% blockId=grove_tm1637_set_display_level block="%strip|brightness level to|%level"
         //% level.min=0 level.max=7
@@ -395,7 +410,7 @@ namespace grove {
          * @param xPin
          * @param yPin
          */
-        //% blockId=grove_joystick_read block="%strip|read position of joystick"
+        //% blockId=grove_joystick_read block="%strip|read position of joystick at|%xpin|and|%ypin"
         //% advanced=true
         read(xPin: AnalogPin, yPin: AnalogPin): number {
             let xdata = 0, ydata = 0, result = 0;
@@ -533,7 +548,7 @@ namespace grove {
      * get Joystick key
      * 
      */
-    //% blockId=grove_getjoystick block="get joystick key at|%xpin|and|%xpin"
+    //% blockId=grove_getjoystick block="get joystick key at|%xpin|and|%ypin"
     export function getJoystick(xpin: AnalogPin, ypin: AnalogPin): number {
         return joystick.read(xpin, ypin);
     }
@@ -568,7 +583,7 @@ namespace grove {
      * @param ypin
      * @param handler code to run
      */
-    //% blockId=grove_joystick_create_event block="on Key|%key"
+    //% blockId=grove_joystick_create_event block="on Key|%key at |%xpin|and|%ypin"
     export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
         control.onEvent(joystickEventID, key, handler);
         control.inBackground(() => {
