@@ -456,6 +456,8 @@ namespace grove {
      * @param pin signal pin of ultrasonic ranger module
      */
     //% blockId=grove_ultrasonic_centimeters block="Ultrasonic Sensor (in cm) at|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     export function measureInCentimeters(pin: DigitalPin): number
     {
         let duration = 0;
@@ -483,6 +485,8 @@ namespace grove {
      * @param pin signal pin of ultrasonic ranger module
      */
     //% blockId=grove_ultrasonic_inches block="Ultrasonic Sensor (in inch) at|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     export function measureInInches(pin: DigitalPin): number
     {
         let duration = 0;
@@ -511,6 +515,10 @@ namespace grove {
      * @param dataPin value of data pin number
      */
     //% blockId=grove_tm1637_create block="4-Digit Display at|%clkPin|and|%dataPin"
+    //% clkPin.fieldEditor="gridpicker" clkPin.fieldOptions.columns=4
+    //% clkPin.fieldOptions.tooltips="false" clkPin.fieldOptions.width="250"
+    //% dataPin.fieldEditor="gridpicker" dataPin.fieldOptions.columns=4
+    //% dataPin.fieldOptions.tooltips="false" dataPin.fieldOptions.width="250"
     export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
     {
         let display = new TM1637();
