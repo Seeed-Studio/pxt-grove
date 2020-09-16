@@ -1,5 +1,5 @@
 {
-    "name": "Grove",
+    "name": "grove",
     "version": "0.1.7",
     "description": "A Microsoft MakeCode package for Seeed Studio Grove module",
     "license": "MIT",
@@ -15,5 +15,9 @@
     "testFiles": [
         "test.ts"
     ],
-    "public": true
+    "public": true,
+    "supportedTargets": [
+        "calliopemini"
+    ],
+    "preferredEditor": "tsprj"
 }
