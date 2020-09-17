@@ -23,7 +23,7 @@
     "grove.TM1637.bit|block": "%4Digit|zeige Ziffer|%dispData|an Stelle|%bitAddr|",
     "grove.TM1637.point|block": "%4Digit|schalte Kommapunkt|%point|",
     "grove.TM1637.clear|block": "%4Digit|lösche 4-Ziffern Display",
-    "GroveJoystickKey.None|block": "Keiner",
+    "GroveJoystickKey.None|block": "Keine",
     "GroveJoystickKey.Right|block": "Rechts",
     "GroveJoystickKey.Left|block": "Links",
     "GroveJoystickKey.Up|block": "Hoch",
@@ -33,7 +33,7 @@
     "GroveJoystickKey.LL|block": "Unten links",
     "GroveJoystickKey.LR|block": "Unten rechts",
     "GroveJoystickKey.Press|block": "Gedrückt",
-    "grove.strip.read|block": "%GroveModule|lies Position von Joystick an|%xpin|und|%ypin",
+    "grove.strip.read|block": "%ThumbJoystick|lies Position von Joystick an|%xpin|und|%ypin",
     "grove.onJoystick|block": "wenn Grove - Joysticktaste|%key an|%xpin|und|%ypin",
     "grove.getJoystick|block": "hole Joysticktaste an|%xpin|und|%ypin"
 }
