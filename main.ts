@@ -462,7 +462,7 @@ namespace grove {
     //% blockId=grove_ultrasonic_centimeters block="Ultrasonic Sensor (in cm) at|%pin"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
-    //% group="Ultrasonic"
+    //% group="Ultrasonic" pin.defl=DigitalPin.C16
     export function measureInCentimeters(pin: DigitalPin): number
     {
         let duration = 0;
