@@ -579,6 +579,7 @@ namespace grove {
      * Useful for comparisons
      */
     //% blockId=ggesture block="%key"
+    //% group="Gesture"
     export function ggesture(g: GroveGesture): number {
         return g;
     }
@@ -610,6 +611,7 @@ namespace grove {
      * Useful for comparisons
      */
     //% blockId=joystickkey block="%key"
+    //% group="Thumbjoystick"
     export function joystickkey(key: GroveJoystickKey): number {
         return key;
     }
