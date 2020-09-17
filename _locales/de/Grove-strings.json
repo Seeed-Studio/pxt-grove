@@ -1,9 +1,9 @@
 {
     "{id:category}Grove": "Grove",
-    "{id:groups}4-Digit": "4 Ziffern Display",
-    "{id:groups}Ultrasonic": "Ultraschall",
-    "{id:groups}Gesture": "Gestenerkennung",
-    "{id:groups}Thumbjoystick": "Grove Joystick",
+    "{id:group}4-Digit": "4 Ziffern Display",
+    "{id:group}Ultrasonic": "Ultraschall",
+    "{id:group}Gesture": "Gestenerkennung",
+    "{id:group}Thumbjoystick": "Grove Joystick",
     "GroveGesture.None|block": "keine",
     "GroveGesture.Right|block": "rechts",
     "GroveGesture.Left|block": "links",
