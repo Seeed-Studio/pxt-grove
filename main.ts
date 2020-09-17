@@ -545,7 +545,7 @@ namespace grove {
     }
 
     /**
-     * get Grove Gesture modle
+     * get Grove Gesture model
      * 
      */
     //% blockId=grove_getgesture block="get gesture model"
