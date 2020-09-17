@@ -16,7 +16,7 @@
     "GroveGesture.Wave|block": "Welle",
     "grove.initGesture|block": "initialisiere Grove Gestenerkennung",
     "grove.getGestureModel|block": "lies Geste",
-    "grove.onGesture|block": "wenn Grove - Gestensensorgeste |%gesture|",
+    "grove.onGesture|block": "wenn Grovegeste |%gesture|",
     "grove.measureInCentimeters|block": "Ultraschallsensor (in cm) an |%pin",
     "grove.measureInInches|block": "Ultraschallsensor (in inch) an |%pin",
     "grove.createDisplay|block": "4-Ziffern Display an|%clkPin|und|%dataPin",

@@ -61,25 +61,25 @@ enum GroveGesture {
 }
 
 enum GroveJoystickKey {
-    //% block=None
+    //% block="None"
     None = 0,
-    //% block=Right
+    //% block="Right"
     Right = 1,
-    //% block=Left
+    //% block="Left"
     Left = 2,
-    //% block=Up
+    //% block="Up"
     Up = 3,
-    //% block=Down
+    //% block="Down"
     Down = 4,
-    //% block=Upper left
+    //% block="Upper left"
     UL = 5,
-    //% block=Upper right
+    //% block="Upper right"
     UR = 6,
-    //% block=Lower left
+    //% block="Lower left"
     LL = 7,
-    //% block=Lower right
+    //% block="Lower right"
     LR = 8,
-    //% block=press
+    //% block="press"
     Press = 9
 }
 
@@ -595,6 +595,14 @@ namespace grove {
         })
     }
 
+    /**
+     * Converts the key name to a number
+     * Useful for comparisons
+     */
+    //% blockId=joystickkey block="%key"
+    export function joystickkey(key: GroveJoystickKey): number {
+        return key;
+    }
 
     /**
      * Do something when a key is detected by Grove - Thumb Joystick
