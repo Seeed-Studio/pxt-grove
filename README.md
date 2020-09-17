@@ -126,4 +126,4 @@ MIT
 
 ## Supported targets
 
-* for PXT/microbit
+* for PXT/calliopemini

@@ -416,6 +416,7 @@ namespace grove {
          */
      
         joyread(xPin: AnalogPin, yPin: AnalogPin): number {
+
             let xdata = 0, ydata = 0, result = 0;
             if (xPin && yPin) {
                 xdata = pins.analogReadPin(xPin);
@@ -463,6 +464,7 @@ namespace grove {
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" pin.defl=DigitalPin.C16
+
     export function measureInCentimeters(pin: DigitalPin): number
     {
         let duration = 0;
@@ -613,6 +615,7 @@ namespace grove {
      */
     //% blockId=grove_joystick_create_event block="on Key|%key at |%xpin|and|%ypin"
     //% group="Thumbjoystick" xpin.defl=AnalogPin.C16 ypin.defl=AnalogPin.C17
+
     export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
         control.onEvent(joystickEventID, key, handler);
         control.inBackground(() => {
