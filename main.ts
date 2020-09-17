@@ -547,7 +547,7 @@ namespace grove {
      * 
      */
     //% blockId=grove_initgesture block="init gesture"
-    //% group="Gesture"
+    //% group="4-Digit"
     export function initGesture() {
         if (!paj7620) {
             paj7620.init();
