@@ -412,7 +412,7 @@ namespace grove {
          */
         //% blockId=grove_joystick_read block="%ThumbJoystick|read position of joystick at|%xpin|and|%ypin"
         //% advanced=true
-        read(xPin: AnalogPin, yPin: AnalogPin): number {
+        joyread(xPin: AnalogPin, yPin: AnalogPin): number {
             let xdata = 0, ydata = 0, result = 0;
             if (xPin && yPin) {
                 xdata = pins.analogReadPin(xPin);
@@ -558,7 +558,7 @@ namespace grove {
      */
     //% blockId=grove_getjoystick block="get joystick key at|%xpin|and|%ypin"
     export function getJoystick(xpin: AnalogPin, ypin: AnalogPin): number {
-        return joystick.read(xpin, ypin);
+        return joystick.joyread(xpin, ypin);
     }
 
 
@@ -596,7 +596,7 @@ namespace grove {
         control.onEvent(joystickEventID, key, handler);
         control.inBackground(() => {
             while(true) {
-                const key = joystick.read(xpin, ypin);
+                const key = joystick.joyread(xpin, ypin);
                 if (key != lastJoystick) {
                     lastJoystick = key; 
                     control.raiseEvent(joystickEventID, lastJoystick);
