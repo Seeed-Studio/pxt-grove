@@ -415,7 +415,7 @@ namespace grove {
          * @param yPin
          */
         //% blockId=grove_joystick_read block="%ThumbJoystick|read position of joystick at|%xpin|and|%ypin"
-        //% group="Thumbjoystick"
+        //% group="Thumbjoystick" xPin.defl=AnalogPin.C16 yPin.defl=AnalogPin.C17
         joyread(xPin: AnalogPin, yPin: AnalogPin): number {
             let xdata = 0, ydata = 0, result = 0;
             if (xPin && yPin) {
@@ -492,7 +492,7 @@ namespace grove {
     //% blockId=grove_ultrasonic_inches block="Ultrasonic Sensor (in inch) at|%pin"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
-    //% group="Ultrasonic"
+    //% group="Ultrasonic" pin.defl=DigitalPin.C16
     export function measureInInches(pin: DigitalPin): number
     {
         let duration = 0;
@@ -525,6 +525,7 @@ namespace grove {
     //% group="4-Digit"
     //% clkPin.fieldOptions.tooltips="false" clkPin.fieldOptions.width="250"
     //% dataPin.fieldEditor="gridpicker" dataPin.fieldOptions.columns=4
+    //% clkPin.defl=DigitalPin.C16 dataPin.defl=DigitalPin.C17
     //% dataPin.fieldOptions.tooltips="false" dataPin.fieldOptions.width="250"
     export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
     {
@@ -566,7 +567,7 @@ namespace grove {
      * 
      */
     //% blockId=grove_getjoystick block="get joystick key at|%xpin|and|%ypin"
-    //% group="Thumbjoystick"
+    //% group="Thumbjoystick" xpin.defl=AnalogPin.C16 ypin.defl=AnalogPin.C17
     export function getJoystick(xpin: AnalogPin, ypin: AnalogPin): number {
         return joystick.joyread(xpin, ypin);
     }
@@ -603,7 +604,7 @@ namespace grove {
      * @param handler code to run
      */
     //% blockId=grove_joystick_create_event block="on Key|%key at |%xpin|and|%ypin"
-    //% group="Thumbjoystick"
+    //% group="Thumbjoystick" xpin.defl=AnalogPin.C16 ypin.defl=AnalogPin.C17
     export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
         control.onEvent(joystickEventID, key, handler);
         control.inBackground(() => {
