@@ -139,7 +139,6 @@ namespace grove {
          * Create a new driver of Grove - Gesture
          */
         //% blockId=grove_gesture_init block="%Gesturemodul|initiate the Grove - Gesture"
-        //% advanced=true
         //% group="Gesture"
             init() {
             this.paj7620Init();
@@ -150,7 +149,6 @@ namespace grove {
          * Detect and recognize the gestures from Grove - Gesture
          */
         //% blockId=grove_gesture_read block="%Gesturemodul|get gesture"
-        //% advanced=true
         //% group="Gesture"
         read(): number {
             let data = 0, result = 0;
@@ -547,7 +545,7 @@ namespace grove {
      * 
      */
     //% blockId=grove_initgesture block="init gesture"
-    //% group="4-Digit"
+    //% group="Gesture"
     export function initGesture() {
         if (!paj7620) {
             paj7620.init();
