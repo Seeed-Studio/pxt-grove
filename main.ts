@@ -414,8 +414,7 @@ namespace grove {
          * @param xPin
          * @param yPin
          */
-        //% blockId=grove_joystick_read block="%thumbJoystick|read position of joystick at|%xPin|and|%yPin"
-        //% group="Thumbjoystick" xPin.defl=AnalogPin.C16 yPin.defl=AnalogPin.C17
+     
         joyread(xPin: AnalogPin, yPin: AnalogPin): number {
             let xdata = 0, ydata = 0, result = 0;
             if (xPin && yPin) {
