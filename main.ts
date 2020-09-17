@@ -559,7 +559,7 @@ namespace grove {
      * 
      */
     //% blockId=grove_getgesture block="get gesture model"
-    //% group=Gesture"
+    //% group="Gesture"
     export function getGestureModel(): number {
         return paj7620.read();
     }
@@ -580,7 +580,7 @@ namespace grove {
      * @param handler code to run
      */
     //% blockId=grove_gesture_create_event block="on Gesture|%gesture"
-    //% group=Gesture"
+    //% group="Gesture"
     export function onGesture(gesture: GroveGesture, handler: () => void) {
         control.onEvent(gestureEventId, gesture, handler);
         paj7620.init();

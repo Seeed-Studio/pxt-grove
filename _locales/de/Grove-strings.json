@@ -1,5 +1,9 @@
 {
     "{id:category}Grove": "Grove",
+    "{id:groups}4-Digit": "4 Ziffern Display",
+    "{id:groups}Ultrasonic": "Ultraschall",
+    "{id:groups}Gesture": "Gestenerkennung",
+    "{id:groups}Thumbjoystick": "Grove Joystick",
     "GroveGesture.None|block": "keine",
     "GroveGesture.Right|block": "rechts",
     "GroveGesture.Left|block": "links",
@@ -11,7 +15,7 @@
     "GroveGesture.Anticlockwise|block": "Gegenuhrzeigersinn",
     "GroveGesture.Wave|block": "Welle",
     "grove.initGesture|block": "initialisiere Grove Gestenerkennung",
-    "grove.getGestureModel|block": "hole Geste",
+    "grove.getGestureModel|block": "lies Geste",
     "grove.onGesture|block": "wenn Grove - Gestensensor |%gesture|",
     "grove.measureInCentimeters|block": "Ultraschallsensor (in cm) an |%pin",
     "grove.measureInInches|block": "Ultraschallsensor (in inch) an |%pin",
@@ -35,5 +39,5 @@
     "GroveJoystickKey.Press|block": "Gedrückt",
     "grove.joyread|block": "%GroveJoystick|lies Position von Joystick an|%xpin|und|%ypin",
     "grove.onJoystick|block": "wenn Grove - Joysticktaste|%key an|%xpin|und|%ypin",
-    "grove.getJoystick|block": "hole Joysticktaste an|%xpin|und|%ypin"
+    "grove.getJoystick|block": "lies Joysticktaste an|%xpin|und|%ypin"
 }
