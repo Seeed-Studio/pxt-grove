@@ -137,7 +137,7 @@ namespace grove {
         /**
          * Create a new driver of Grove - Gesture
          */
-        //% blockId=grove_gesture_init block="%strip|initiate the Grove - Gesture"
+        //% blockId=grove_gesture_init block="%Gesturemodul|initiate the Grove - Gesture"
         //% advanced=true
         init() {
             this.paj7620Init();
@@ -147,7 +147,7 @@ namespace grove {
         /**
          * Detect and recognize the gestures from Grove - Gesture
          */
-        //% blockId=grove_gesture_read block="%strip|get gesture"
+        //% blockId=grove_gesture_read block="%Gesturemodul|get gesture"
         //% advanced=true
         read(): number {
             let data = 0, result = 0;
@@ -257,7 +257,7 @@ namespace grove {
          * Show a 4 digits number on display
          * @param dispData value of number
          */
-        //% blockId=grove_tm1637_display_number block="%GroveModule|show number|%dispData"
+        //% blockId=grove_tm1637_display_number block="%4Digit|show number|%dispData"
         show(dispData: number)
         {       
             let compare_01:number = dispData % 100;
@@ -329,7 +329,7 @@ namespace grove {
          * Set the brightness level of display at from 0 to 7
          * @param level value of brightness light level
          */
-        //% blockId=grove_tm1637_set_display_level block="%GroveModule|brightness level to|%level"
+        //% blockId=grove_tm1637_set_display_level block="%4Digit|brightness level to|%level"
         //% level.min=0 level.max=7
         set(level: number)
         {
@@ -346,7 +346,7 @@ namespace grove {
          * @param dispData value of number
          * @param bitAddr value of bit number
          */
-        //% blockId=grove_tm1637_display_bit block="%GroveModule|show single number|%dispData|at digit|%bitAddr"
+        //% blockId=grove_tm1637_display_bit block="%4Digit|show single number|%dispData|at digit|%bitAddr"
         //% dispData.min=0 dispData.max=9
         //% bitAddr.min=0 bitAddr.max=3
         //% advanced=true
@@ -376,7 +376,7 @@ namespace grove {
          * Turn on or off the colon point on Grove - 4-Digit Display
          * @param pointEn value of point switch
          */
-        //% blockId=grove_tm1637_display_point block="%GroveModul|turn|%point|colon point"
+        //% blockId=grove_tm1637_display_point block="%4Digit|turn|%point|colon point"
         //% advanced=true
         point(point: boolean)
         {
@@ -391,7 +391,7 @@ namespace grove {
         /**
          * Clear the display
          */
-        //% blockId=grove_tm1637_display_clear block="%GroveModul|clear"
+        //% blockId=grove_tm1637_display_clear block="%4Digit|clear"
         //% advanced=true
         clear()
         {
@@ -410,7 +410,7 @@ namespace grove {
          * @param xPin
          * @param yPin
          */
-        //% blockId=grove_joystick_read block="%GroveModul|read position of joystick at|%xpin|and|%ypin"
+        //% blockId=grove_joystick_read block="%ThumbJoystick|read position of joystick at|%xpin|and|%ypin"
         //% advanced=true
         read(xPin: AnalogPin, yPin: AnalogPin): number {
             let xdata = 0, ydata = 0, result = 0;
