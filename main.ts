@@ -574,7 +574,15 @@ namespace grove {
         return joystick.joyread(xpin, ypin);
     }
 
-
+   /**
+     * Converts the gesture name to a number
+     * Useful for comparisons
+     */
+    //% blockId=ggesture block="%key"
+    export function ggesture(g: GroveGesture): number {
+        return g;
+    }
+    
     /**
      * Do something when a gesture is detected by Grove - Gesture
      * @param gesture type of gesture to detect
