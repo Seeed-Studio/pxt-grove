@@ -529,6 +529,7 @@ namespace grove {
     //% dataPin.fieldEditor="gridpicker" dataPin.fieldOptions.columns=4
     //% clkPin.defl=DigitalPin.C16 dataPin.defl=DigitalPin.C17
     //% dataPin.fieldOptions.tooltips="false" dataPin.fieldOptions.width="250"
+    //% blockSetVariable=4digit
     export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
     {
         let display = new TM1637();
