@@ -138,9 +138,7 @@ namespace grove {
         /**
          * Create a new driver of Grove - Gesture
          */
-        //% blockId=grove_gesture_init block="%Gesturemodul|initiate the Grove - Gesture"
-        //% group="Gesture"
-            init() {
+        init() {
             this.paj7620Init();
             basic.pause(200);
         }
@@ -148,8 +146,7 @@ namespace grove {
         /**
          * Detect and recognize the gestures from Grove - Gesture
          */
-        //% blockId=grove_gesture_read block="%Gesturemodul|get gesture"
-        //% group="Gesture"
+
         read(): number {
             let data = 0, result = 0;
 
