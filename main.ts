@@ -61,25 +61,25 @@ enum GroveGesture {
 }
 
 enum GroveJoystickKey {
-    //% block=None
+    //% block="None"
     None = 0,
-    //% block=Right
+    //% block="Right"
     Right = 1,
-    //% block=Left
+    //% block="Left"
     Left = 2,
-    //% block=Up
+    //% block="Up"
     Up = 3,
-    //% block=Down
+    //% block="Down"
     Down = 4,
-    //% block=Upper left
+    //% block="Upper left"
     UL = 5,
-    //% block=Upper right
+    //% block="Upper right"
     UR = 6,
-    //% block=Lower left
+    //% block="Lower left"
     LL = 7,
-    //% block=Lower right
+    //% block="Lower right"
     LR = 8,
-    //% block=press
+    //% block="press"
     Press = 9
 }
 
@@ -87,7 +87,8 @@ enum GroveJoystickKey {
 /**
  * Functions to operate Grove module.
  */
-//% weight=10 color=#9F79EE icon="\uf108" block="Grove"
+//% weight=10 color=#9F79EE icon="\uf1b3" block="Grove"
+//% groups='["4-Digit","Ultrasonic","Gesture","Thumbjoystick"]'
 namespace grove {
     /**
      * 
@@ -137,8 +138,6 @@ namespace grove {
         /**
          * Create a new driver of Grove - Gesture
          */
-        //% blockId=grove_gesture_init block="%strip|initiate the Grove - Gesture"
-        //% advanced=true
         init() {
             this.paj7620Init();
             basic.pause(200);
@@ -147,8 +146,7 @@ namespace grove {
         /**
          * Detect and recognize the gestures from Grove - Gesture
          */
-        //% blockId=grove_gesture_read block="%strip|get gesture"
-        //% advanced=true
+
         read(): number {
             let data = 0, result = 0;
 
@@ -257,7 +255,9 @@ namespace grove {
          * Show a 4 digits number on display
          * @param dispData value of number
          */
-        //% blockId=grove_tm1637_display_number block="%strip|show number|%dispData"
+
+        //% blockId=grove_tm1637_display_number block="%4Digit|show number|%dispData"
+        //% group="4-Digit"
         show(dispData: number)
         {       
             let compare_01:number = dispData % 100;
@@ -329,8 +329,9 @@ namespace grove {
          * Set the brightness level of display at from 0 to 7
          * @param level value of brightness light level
          */
-        //% blockId=grove_tm1637_set_display_level block="%strip|brightness level to|%level"
+        //% blockId=grove_tm1637_set_display_level block="%4Digit|brightness level to|%level"
         //% level.min=0 level.max=7
+        //% group="4-Digit"
         set(level: number)
         {
             this.brightnessLevel = level;
@@ -346,10 +347,10 @@ namespace grove {
          * @param dispData value of number
          * @param bitAddr value of bit number
          */
-        //% blockId=grove_tm1637_display_bit block="%strip|show single number|%dispData|at digit|%bitAddr"
+        //% blockId=grove_tm1637_display_bit block="%4Digit|show single number|%dispData|at digit|%bitAddr"
         //% dispData.min=0 dispData.max=9
         //% bitAddr.min=0 bitAddr.max=3
-        //% advanced=true
+        //% group="4-Digit"
         bit(dispData: number, bitAddr: number)
         {
             if((dispData == 0x7f) || ((dispData <= 9) && (bitAddr <= 3)))
@@ -376,8 +377,8 @@ namespace grove {
          * Turn on or off the colon point on Grove - 4-Digit Display
          * @param pointEn value of point switch
          */
-        //% blockId=grove_tm1637_display_point block="%strip|turn|%point|colon point"
-        //% advanced=true
+        //% blockId=grove_tm1637_display_point block="%4Digit|turn|%point|colon point"
+        //% group="4-Digit"
         point(point: boolean)
         {
             this.pointFlag = point;
@@ -391,8 +392,8 @@ namespace grove {
         /**
          * Clear the display
          */
-        //% blockId=grove_tm1637_display_clear block="%strip|clear"
-        //% advanced=true
+        //% blockId=grove_tm1637_display_clear block="%4Digit|clear"
+        //% group="4-Digit"
         clear()
         {
             this.bit(0x7f, 0x00);
@@ -410,9 +411,9 @@ namespace grove {
          * @param xPin
          * @param yPin
          */
-        //% blockId=grove_joystick_read block="%strip|read position of joystick at|%xpin|and|%ypin"
-        //% advanced=true
-        read(xPin: AnalogPin, yPin: AnalogPin): number {
+     
+        joyread(xPin: AnalogPin, yPin: AnalogPin): number {
+
             let xdata = 0, ydata = 0, result = 0;
             if (xPin && yPin) {
                 xdata = pins.analogReadPin(xPin);
@@ -450,12 +451,17 @@ namespace grove {
     let distanceBackup: number = 0;
     let joystick = new GroveJoystick();
     let paj7620 = new PAJ7620();
-    
+    // adapted to Calliope mini V2 Core by M.Klein 17.09.2020
+
     /**
      * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
      * @param pin signal pin of ultrasonic ranger module
      */
     //% blockId=grove_ultrasonic_centimeters block="Ultrasonic Sensor (in cm) at|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
+    //% group="Ultrasonic" pin.defl=DigitalPin.C16
+
     export function measureInCentimeters(pin: DigitalPin): number
     {
         let duration = 0;
@@ -483,6 +489,9 @@ namespace grove {
      * @param pin signal pin of ultrasonic ranger module
      */
     //% blockId=grove_ultrasonic_inches block="Ultrasonic Sensor (in inch) at|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
+    //% group="Ultrasonic" pin.defl=DigitalPin.C16
     export function measureInInches(pin: DigitalPin): number
     {
         let duration = 0;
@@ -511,6 +520,13 @@ namespace grove {
      * @param dataPin value of data pin number
      */
     //% blockId=grove_tm1637_create block="4-Digit Display at|%clkPin|and|%dataPin"
+    //% clkPin.fieldEditor="gridpicker" clkPin.fieldOptions.columns=4
+    //% group="4-Digit"
+    //% clkPin.fieldOptions.tooltips="false" clkPin.fieldOptions.width="250"
+    //% dataPin.fieldEditor="gridpicker" dataPin.fieldOptions.columns=4
+    //% clkPin.defl=DigitalPin.C16 dataPin.defl=DigitalPin.C17
+    //% dataPin.fieldOptions.tooltips="false" dataPin.fieldOptions.width="250"
+    //% blockSetVariable=4digit
     export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
     {
         let display = new TM1637();
@@ -530,6 +546,7 @@ namespace grove {
      * 
      */
     //% blockId=grove_initgesture block="init gesture"
+    //% group="Gesture"
     export function initGesture() {
         if (!paj7620) {
             paj7620.init();
@@ -537,10 +554,11 @@ namespace grove {
     }
 
     /**
-     * get Grove Gesture modle
+     * get Grove Gesture model
      * 
      */
     //% blockId=grove_getgesture block="get gesture model"
+    //% group="Gesture"
     export function getGestureModel(): number {
         return paj7620.read();
     }
@@ -549,17 +567,28 @@ namespace grove {
      * 
      */
     //% blockId=grove_getjoystick block="get joystick key at|%xpin|and|%ypin"
+    //% group="Thumbjoystick" xpin.defl=AnalogPin.C16 ypin.defl=AnalogPin.C17
     export function getJoystick(xpin: AnalogPin, ypin: AnalogPin): number {
-        return joystick.read(xpin, ypin);
+        return joystick.joyread(xpin, ypin);
     }
 
-
+   /**
+     * Converts the gesture name to a number
+     * Useful for comparisons
+     */
+    //% blockId=ggesture block="%key"
+    //% group="Gesture"
+    export function ggesture(g: GroveGesture): number {
+        return g;
+    }
+    
     /**
      * Do something when a gesture is detected by Grove - Gesture
      * @param gesture type of gesture to detect
      * @param handler code to run
      */
     //% blockId=grove_gesture_create_event block="on Gesture|%gesture"
+    //% group="Gesture"
     export function onGesture(gesture: GroveGesture, handler: () => void) {
         control.onEvent(gestureEventId, gesture, handler);
         paj7620.init();
@@ -575,6 +604,15 @@ namespace grove {
         })
     }
 
+    /**
+     * Converts the key name to a number
+     * Useful for comparisons
+     */
+    //% blockId=joystickkey block="%key"
+    //% group="Thumbjoystick"
+    export function joystickkey(key: GroveJoystickKey): number {
+        return key;
+    }
 
     /**
      * Do something when a key is detected by Grove - Thumb Joystick
@@ -584,11 +622,13 @@ namespace grove {
      * @param handler code to run
      */
     //% blockId=grove_joystick_create_event block="on Key|%key at |%xpin|and|%ypin"
+    //% group="Thumbjoystick" xpin.defl=AnalogPin.C16 ypin.defl=AnalogPin.C17
+
     export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
         control.onEvent(joystickEventID, key, handler);
         control.inBackground(() => {
             while(true) {
-                const key = joystick.read(xpin, ypin);
+                const key = joystick.joyread(xpin, ypin);
                 if (key != lastJoystick) {
                     lastJoystick = key; 
                     control.raiseEvent(joystickEventID, lastJoystick);
