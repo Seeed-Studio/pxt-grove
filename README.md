@@ -120,6 +120,31 @@ Use ``||point||`` to open or close point dispay.
 
 Use ``||clear||`` to clean display.
 
+### Grove - UART WiFi V2
+
+Connect to a WiFi and send data to ThinkSpeak or IFTTT, specify the UART tx and rx pin.
+
+```blocks
+grove.setupWifi(
+    SerialPin.P15,
+    SerialPin.P1,
+    BaudRate.BaudRate115200,
+    "test-ssid",
+    "test-passwd"
+)
+
+basic.forever(() => {
+    if (grove.wifiOK()) {
+        basic.showIcon(IconNames.Yes)
+    } else {
+        basic.showIcon(IconNames.No)
+    }
+    grove.sendToThinkSpeak("write_api_key", 1, 2, 3, 4, 5, 6, 7, 8)
+    grove.sendToIFTTT("ifttt_event", "ifttt_key", "hello", 'micro', 'bit')
+    basic.pause(60000)
+})
+```
+
 ## License
 
 MIT
