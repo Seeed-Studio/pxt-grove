@@ -454,6 +454,127 @@ namespace grove {
     // adapted to Calliope mini V2 Core by M.Klein 17.09.2020
 
     /**
+     * Create a new driver Grove - Ultrasonic Sensor to measure distances in inch
+     * @param pin signal pin of ultrasonic ranger module
+     */
+    //% blockId=grove_ultrasonic_inches_v2 block="Ultrasonic Sensor (in inch) at for V2|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
+    //% group="Ultrasonic" pin.defl=DigitalPin.C16
+    export function measureInInchesV2(pin: DigitalPin): number
+    {
+        let duration = 0;
+        let RangeInInches = 0;
+        
+        pins.digitalWritePin(pin, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(20);
+        pins.digitalWritePin(pin, 0);
+        duration = pins.pulseIn(pin, PulseValue.High, 100000); // Max duration 100 ms
+        
+        RangeInInches = duration * 153 / 113 / 2 / 100;
+        
+        if(RangeInInches > 0) distanceBackup = RangeInInches;
+        else RangeInInches = distanceBackup;
+        
+        basic.pause(50);
+        
+        return RangeInInches;
+    }
+    
+    /**
+     * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
+     * @param pin signal pin of ultrasonic ranger module
+     */
+    //% blockId=grove_ultrasonic_centimeters_v2 block="Ultrasonic Sensor (in cm) at for V2|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
+    //% group="Ultrasonic" pin.defl=DigitalPin.C16
+
+    export function measureInCentimetersV2(pin: DigitalPin): number
+    {
+        let duration = 0;
+        let RangeInCentimeters = 0;
+        
+        pins.digitalWritePin(pin, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(20);
+        pins.digitalWritePin(pin, 0);        
+        duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
+
+        RangeInCentimeters = duration * 153 / 44 / 2 / 100 ;
+               
+        if(RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
+        else RangeInCentimeters = distanceBackup;
+
+        basic.pause(50);
+        
+        return RangeInCentimeters;
+    }
+    
+    /**
+     * Create a new driver Grove - Ultrasonic Sensor to measure distances in inch
+     * @param pin signal pin of ultrasonic ranger module
+     */
+    //% blockId=grove_ultrasonic_inches_v2 block="Ultrasonic Sensor (in inch) at for V2|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
+    //% group="Ultrasonic" pin.defl=DigitalPin.C16
+    export function measureInInchesV2(pin: DigitalPin): number
+    {
+        let duration = 0;
+        let RangeInInches = 0;
+        
+        pins.digitalWritePin(pin, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(20);
+        pins.digitalWritePin(pin, 0);        
+        duration = pins.pulseIn(pin, PulseValue.High, 100000); // Max duration 100 ms
+        
+        RangeInInches = duration * 153 / 48 / 2 / 100;
+        
+        if(RangeInInches > 0) distanceBackup = RangeInInches;
+        else RangeInInches = distanceBackup;
+        
+        basic.pause(50);
+        
+        return RangeInInches;
+    }
+    
+    /**
+     * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
+     * @param pin signal pin of ultrasonic ranger module
+     */
+    //% blockId=grove_ultrasonic_centimeters_v2 block="Ultrasonic Sensor (in cm) at for V2|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
+    //% group="Ultrasonic" pin.defl=DigitalPin.C16
+
+    export function measureInCentimetersV2(pin: DigitalPin): number
+    {
+        let duration = 0;
+        let RangeInCentimeters = 0;
+        
+        pins.digitalWritePin(pin, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(20);
+        pins.digitalWritePin(pin, 0);        
+        duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
+
+        RangeInCentimeters = duration * 153 / 19 / 2 / 100 ;
+               
+        if(RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
+        else RangeInCentimeters = distanceBackup;
+
+        basic.pause(50);
+        
+        return RangeInCentimeters;
+    }
+    /**
      * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
      * @param pin signal pin of ultrasonic ranger module
      */
