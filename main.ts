@@ -457,7 +457,7 @@ namespace grove {
      * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
      * @param pin signal pin of ultrasonic ranger module
      */
-    //% blockId=grove_ultrasonic_centimeters_v2 block="Ultrasonic Sensor (in cm) at for V2|%pin"
+    //% blockId=grove_ultrasonic_centimeters_v2 block="(V2)Ultrasonic Sensor (in cm) at|%pin"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" pin.defl=DigitalPin.C16
@@ -488,7 +488,7 @@ namespace grove {
      * Create a new driver Grove - Ultrasonic Sensor to measure distances in inch
      * @param pin signal pin of ultrasonic ranger module
      */
-    //% blockId=grove_ultrasonic_inches_v2 block="Ultrasonic Sensor (in inch) at for V2|%pin"
+    //% blockId=grove_ultrasonic_inches_v2 block="(V2)Ultrasonic Sensor (in inch) at|%pin"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" pin.defl=DigitalPin.C16
