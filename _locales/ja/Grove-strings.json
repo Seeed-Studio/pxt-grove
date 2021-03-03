@@ -20,5 +20,8 @@
   "grove.TM1637.set|block": "%strip|[Grove - 4桁ディスプレイ]|明るさを|%level|に変更する",
   "grove.TM1637.bit|block": "%strip|[Grove - 4桁ディスプレイ]|%dispData|を|%bitAddr|桁目に表示する",
   "grove.TM1637.point|block": "%strip|[Grove - 4桁ディスプレイ]|コロンの表示を|%point|に変更する",
-  "grove.TM1637.clear|block": "%strip|[Grove - 4桁ディスプレイ]|表示を消す"
+  "grove.TM1637.clear|block": "%strip|[Grove - 4桁ディスプレイ]|表示を消す",
+  "grove.aht20ReadTemperatureC|block": "[Grove - 温湿度センサー]|温度（℃）を読み取る",
+  "grove.aht20ReadTemperatureF|block": "[Grove - 温湿度センサー]|温度（℉）を読み取る",
+  "grove.aht20ReadHumidity|block": "[Grove - 温湿度センサー]|湿度を読み取る"
 }
