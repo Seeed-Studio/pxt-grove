@@ -38,5 +38,8 @@
     "GroveJoystickKey.LR|block": "Unten rechts",
     "GroveJoystickKey.Press|block": "Gedrückt",
     "grove.onJoystick|block": "wenn Grove - Joystickrichtung|%key an|%xpin|und|%ypin",
-    "grove.getJoystick|block": "lies Joystickrichtung an|%xpin|und|%ypin"
+    "grove.getJoystick|block": "lies Joystickrichtung an|%xpin|und|%ypin",
+    "grove.aht20ReadTemperatureC|block": "Temperatur (°C)",
+    "grove.aht20ReadTemperatureF|block": "Temperatur (°F)",
+    "grove.aht20ReadHumidity|block": "Feuchtigkeit"
 }
