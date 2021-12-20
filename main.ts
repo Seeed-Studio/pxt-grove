@@ -706,8 +706,8 @@ namespace grove {
      */
     //% block="Setup Wifi|TX %txPin|RX %rxPin|Baud rate %baudrate|SSID = %ssid|Password = %passwd"
     //% group="UartWiFi"
-    //% txPin.defl=SerialPin.P15
-    //% rxPin.defl=SerialPin.P1
+    //% txPin.defl=SerialPin.C16
+    //% rxPin.defl=SerialPin.C17
     //% baudRate.defl=BaudRate.BaudRate115200
     export function setupWifi(txPin: SerialPin, rxPin: SerialPin, baudRate: BaudRate, ssid: string, passwd: string) {
         let result = 0
@@ -835,15 +835,12 @@ namespace grove {
             if (result == 3) continue
             sendAtCmd(data)
             result = waitAtResponse("SEND OK", "SEND FAIL", "ERROR", 5000)
-
-            // // close the TCP connection
+            // close the TCP connection
             // sendAtCmd("AT+CIPCLOSE")
             // waitAtResponse("OK", "ERROR", "None", 2000)
-
             if (result == 1) break
         }
     }
-
 
     function waitAtResponse(target1: string, target2: string, target3: string, timeout: number) {
         let buffer = ""

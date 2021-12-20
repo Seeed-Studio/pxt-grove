@@ -1,7 +1,7 @@
 let _4Digit = grove.createDisplay(DigitalPin.C16, DigitalPin.C17)
 grove.setupWifi(
-    SerialPin.P15,
-    SerialPin.P1,
+    SerialPin.C16,
+    SerialPin.C17,
     BaudRate.BaudRate115200,
     "test-ssid",
     "test-passwd"
