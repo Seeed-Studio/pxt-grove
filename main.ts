@@ -798,8 +798,8 @@ namespace grove {
     //% event.defl="your Event"
     //% key.defl="your Key"
     //% value1.defl="hello"
-    //% value2.defl="micro"
-    //% value3.defl="bit"
+    //% value2.defl="calliope"
+    //% value3.defl="mini"
     export function sendToIFTTT(event: string, key: string, value1: string, value2: string, value3: string) {
         let result = 0
         let retry = 2
