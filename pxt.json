@@ -4,8 +4,7 @@
     "description": "A Microsoft MakeCode package for Seeed Studio Grove module",
     "license": "MIT",
     "dependencies": {
-        "core": "*",
-        "microphone": "*"
+        "core": "*"
     },
     "files": [
         "README.md",
