@@ -4,7 +4,8 @@
     "description": "A Microsoft MakeCode package for Seeed Studio Grove module",
     "license": "MIT",
     "dependencies": {
-        "core": "*"
+        "core": "*",
+        "microphone": "*"
     },
     "files": [
         "README.md",
@@ -18,8 +19,13 @@
         "test.ts"
     ],
     "public": true,
+    "targetVersions": {
+        "target": "4.0.16",
+        "targetId": "microbit"
+    },
     "supportedTargets": [
-        "calliopemini"
+        "calliopemini",
+        "microbit"
     ],
     "preferredEditor": "tsprj"
 }
