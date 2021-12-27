@@ -735,8 +735,8 @@ namespace grove {
     //% group="UartWiFi"
     //% event.defl="your Event"
     //% key.defl="your Key"
-    //% value1.defl="hello"
-    //% value2.defl="calliope"
+    //% value1.defl="Hello"
+    //% value2.defl="Calliope"
     //% value3.defl="mini"
     export function sendToIFTTT(event: string, key: string, value1: string, value2: string, value3: string) {
         let result = 0
