@@ -29,7 +29,7 @@ const initRegisterArray: number[] = [
     0x7C, 0x84, 0x7D, 0x03, 0x7E, 0x01
 ];
 
-let TubeTab: number [] = [
+let TubeTab: number[] = [
     0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07,
     0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71
 ];
@@ -154,102 +154,96 @@ namespace grove {
             switch (data) {
                 case 0x01:
                     result = GroveGesture.Right;
-                break;
+                    break;
 
                 case 0x02:
                     result = GroveGesture.Left;
-                break;
+                    break;
 
                 case 0x04:
                     result = GroveGesture.Up;
-                break;
+                    break;
 
                 case 0x08:
                     result = GroveGesture.Down;
-                break;
+                    break;
 
                 case 0x10:
                     result = GroveGesture.Forward;
-                break;
+                    break;
 
                 case 0x20:
                     result = GroveGesture.Backward;
-                break;
+                    break;
 
                 case 0x40:
                     result = GroveGesture.Clockwise;
-                break;
+                    break;
 
                 case 0x80:
                     result = GroveGesture.Anticlockwise;
-                break;
+                    break;
 
                 default:
                     data = this.paj7620ReadReg(0x44);
                     if (data == 0x01)
                         result = GroveGesture.Wave;
-                break;
+                    break;
             }
 
             return result;
         }
     }
-    
+
     /**
      * 
      */
-    export class TM1637
-    {
+    export class TM1637 {
         clkPin: DigitalPin;
         dataPin: DigitalPin;
-        brightnessLevel: number;     
+        brightnessLevel: number;
         pointFlag: boolean;
         buf: Buffer;
 
-        private writeByte(wrData: number) 
-        {
-            for(let i = 0; i < 8; i ++)
-            {
+        private writeByte(wrData: number) {
+            for (let i = 0; i < 8; i++) {
                 pins.digitalWritePin(this.clkPin, 0);
-                if(wrData & 0x01)pins.digitalWritePin(this.dataPin, 1);
+                if (wrData & 0x01) pins.digitalWritePin(this.dataPin, 1);
                 else pins.digitalWritePin(this.dataPin, 0);
                 wrData >>= 1;
                 pins.digitalWritePin(this.clkPin, 1);
             }
-            
+
             pins.digitalWritePin(this.clkPin, 0); // Wait for ACK
             pins.digitalWritePin(this.dataPin, 1);
             pins.digitalWritePin(this.clkPin, 1);
         }
-        
-        private start()
-        {
+
+        private start() {
             pins.digitalWritePin(this.clkPin, 1);
             pins.digitalWritePin(this.dataPin, 1);
             pins.digitalWritePin(this.dataPin, 0);
             pins.digitalWritePin(this.clkPin, 0);
         }
-        
-        private stop()
-        {
+
+        private stop() {
             pins.digitalWritePin(this.clkPin, 0);
             pins.digitalWritePin(this.dataPin, 0);
             pins.digitalWritePin(this.clkPin, 1);
             pins.digitalWritePin(this.dataPin, 1);
         }
-        
-        private coding(dispData: number): number
-        {
+
+        private coding(dispData: number): number {
             let pointData = 0;
-            
-            if(this.pointFlag == true)pointData = 0x80;
-            else if(this.pointFlag == false)pointData = 0;
-            
-            if(dispData == 0x7f)dispData = 0x00 + pointData;
+
+            if (this.pointFlag == true) pointData = 0x80;
+            else if (this.pointFlag == false) pointData = 0;
+
+            if (dispData == 0x7f) dispData = 0x00 + pointData;
             else dispData = TubeTab[dispData] + pointData;
-            
+
             return dispData;
-        } 
+        }
 
         /**
          * Show a 4 digits number on display
@@ -258,73 +252,67 @@ namespace grove {
 
         //% blockId=grove_tm1637_display_number block="%4Digit|show number|%dispData"
         //% group="4-Digit"
-        show(dispData: number)
-        {       
-            let compare_01:number = dispData % 100;
-            let compare_001:number = dispData % 1000;
+        show(dispData: number) {
+            let compare_01: number = dispData % 100;
+            let compare_001: number = dispData % 1000;
 
-            if(dispData < 10)
-            {
+            if (dispData < 10) {
                 this.bit(dispData, 3);
                 this.bit(0x7f, 2);
                 this.bit(0x7f, 1);
-                this.bit(0x7f, 0);                
+                this.bit(0x7f, 0);
             }
-            else if(dispData < 100)
-            {
+            else if (dispData < 100) {
                 this.bit(dispData % 10, 3);
-                if(dispData > 90){
+                if (dispData > 90) {
                     this.bit(9, 2);
-                } else{
+                } else {
                     this.bit(Math.floor(dispData / 10) % 10, 2);
                 }
-                
+
                 this.bit(0x7f, 1);
                 this.bit(0x7f, 0);
             }
-            else if(dispData < 1000)
-            {
+            else if (dispData < 1000) {
                 this.bit(dispData % 10, 3);
-                if(compare_01 > 90){
+                if (compare_01 > 90) {
                     this.bit(9, 2);
-                } else{
+                } else {
                     this.bit(Math.floor(dispData / 10) % 10, 2);
                 }
-                if(compare_001 > 900){
+                if (compare_001 > 900) {
                     this.bit(9, 1);
-                } else{
+                } else {
                     this.bit(Math.floor(dispData / 100) % 10, 1);
                 }
                 this.bit(0x7f, 0);
             }
-            else if(dispData < 10000)
-            {
+            else if (dispData < 10000) {
                 this.bit(dispData % 10, 3);
-                if(compare_01 > 90){
+                if (compare_01 > 90) {
                     this.bit(9, 2);
-                } else{
+                } else {
                     this.bit(Math.floor(dispData / 10) % 10, 2);
                 }
-                if(compare_001 > 900){
+                if (compare_001 > 900) {
                     this.bit(9, 1);
-                } else{
+                } else {
                     this.bit(Math.floor(dispData / 100) % 10, 1);
                 }
-                if(dispData > 9000){
+                if (dispData > 9000) {
                     this.bit(9, 0);
-                } else{
+                } else {
                     this.bit(Math.floor(dispData / 1000) % 10, 0);
                 }
             }
-            else 
-            {
+            else {
                 this.bit(9, 3);
                 this.bit(9, 2);
                 this.bit(9, 1);
                 this.bit(9, 0);
             }
         }
-        
+
         /**
          * Set the brightness level of display at from 0 to 7
          * @param level value of brightness light level
@@ -332,15 +320,14 @@ namespace grove {
         //% blockId=grove_tm1637_set_display_level block="%4Digit|brightness level to|%level"
         //% level.min=0 level.max=7
         //% group="4-Digit"
-        set(level: number)
-        {
-            this.brightnessLevel = level;    
+        set(level: number) {
+            this.brightnessLevel = level;
             this.bit(this.buf[0], 0x00);
             this.bit(this.buf[1], 0x01);
             this.bit(this.buf[2], 0x02);
             this.bit(this.buf[3], 0x03);
         }
-        
+
         /**
          * Show a single number from 0 to 9 at a specified digit of Grove - 4-Digit Display
          * @param dispData value of number
@@ -350,12 +337,10 @@ namespace grove {
         //% dispData.min=0 dispData.max=9
         //% bitAddr.min=0 bitAddr.max=3
         //% group="4-Digit"
-        bit(dispData: number, bitAddr: number)
-        {
-            if((dispData == 0x7f) || ((dispData <= 9) && (bitAddr <= 3)))
-            {
+        bit(dispData: number, bitAddr: number) {
+            if ((dispData == 0x7f) || ((dispData <= 9) && (bitAddr <= 3))) {
                 let segData = 0;
-                
+
                 segData = this.coding(dispData);
                 this.start();
                 this.writeByte(0x44);
@@ -367,34 +352,32 @@ namespace grove {
                 this.start();
                 this.writeByte(0x88 + this.brightnessLevel);
                 this.stop();
-                
+
                 this.buf[bitAddr] = dispData;
             }
         }
-        
+
         /**
          * Turn on or off the colon point on Grove - 4-Digit Display
          * @param pointEn value of point switch
          */
         //% blockId=grove_tm1637_display_point block="%4Digit|turn|%point|colon point"
-        //% group="4-Digit"
-        point(point: boolean)
-        {
+        //% group="4-Digit"  point.shadow="toggleOnOff"
+        point(point: boolean) {
             this.pointFlag = point;
-            
+
             this.bit(this.buf[0], 0x00);
             this.bit(this.buf[1], 0x01);
             this.bit(this.buf[2], 0x02);
             this.bit(this.buf[3], 0x03);
         }
-        
+
         /**
          * Clear the display
          */
         //% blockId=grove_tm1637_display_clear block="%4Digit|clear"
         //% group="4-Digit"
-        clear()
-        {
+        clear() {
             this.bit(0x7f, 0x00);
             this.bit(0x7f, 0x01);
             this.bit(0x7f, 0x02);
@@ -403,14 +386,13 @@ namespace grove {
     }
 
 
-    export class GroveJoystick
-    {
+    export class GroveJoystick {
         /**
          * Detect position from Grove - Thumb Joystick
          * @param xPin
          * @param yPin
          */
-     
+
         joyread(xPin: AnalogPin, yPin: AnalogPin): number {
 
             let xdata = 0, ydata = 0, result = 0;
@@ -437,12 +419,12 @@ namespace grove {
                 }
             }
             else {
-                result =  GroveJoystickKey.None;
+                result = GroveJoystickKey.None;
             }
             return result;
         }
     }
-    
+
     const gestureEventId = 3100;
     const joystickEventID = 3101;
     let lastGesture = GroveGesture.None;
@@ -451,7 +433,7 @@ namespace grove {
     let joystick = new GroveJoystick();
     let paj7620 = new PAJ7620();
     // adapted to Calliope mini V2 Core by M.Klein 17.09.2020
-    
+
     /**
      * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
      * @param pin signal pin of ultrasonic ranger module
@@ -461,28 +443,27 @@ namespace grove {
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" pin.defl=DigitalPin.C16
 
-    export function measureInCentimeters(pin: DigitalPin): number
-    {
+    export function measureInCentimeters(pin: DigitalPin): number {
         let duration = 0;
         let RangeInCentimeters = 0;
-        
+
         pins.digitalWritePin(pin, 0);
         control.waitMicros(2);
         pins.digitalWritePin(pin, 1);
         control.waitMicros(20);
-        pins.digitalWritePin(pin, 0);        
+        pins.digitalWritePin(pin, 0);
         duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
 
-        RangeInCentimeters = duration * 153 / 29 / 2 / 100;
-               
-        if(RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
+        RangeInCentimeters = Math.round(duration * 153 / 29 / 2 / 100);
+
+        if (RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
         else RangeInCentimeters = distanceBackup;
 
         basic.pause(50);
-        
+
         return RangeInCentimeters;
     }
-    
+
     /**
      * Create a new driver Grove - Ultrasonic Sensor to measure distances in inch
      * @param pin signal pin of ultrasonic ranger module
@@ -491,28 +472,27 @@ namespace grove {
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" pin.defl=DigitalPin.C16
-    export function measureInInches(pin: DigitalPin): number
-    {
+    export function measureInInches(pin: DigitalPin): number {
         let duration = 0;
         let RangeInInches = 0;
-        
+
         pins.digitalWritePin(pin, 0);
         control.waitMicros(2);
         pins.digitalWritePin(pin, 1);
         control.waitMicros(20);
-        pins.digitalWritePin(pin, 0);        
+        pins.digitalWritePin(pin, 0);
         duration = pins.pulseIn(pin, PulseValue.High, 100000); // Max duration 100 ms
-        
-        RangeInInches = duration * 153 / 74 / 2 / 100;
-        
-        if(RangeInInches > 0) distanceBackup = RangeInInches;
+
+        RangeInInches = Math.round(duration * 153 / 74 / 2 / 100);
+
+        if (RangeInInches > 0) distanceBackup = RangeInInches;
         else RangeInInches = distanceBackup;
-        
+
         basic.pause(50);
-        
+
         return RangeInInches;
     }
-    
+
     /**
      * Create a new driver Grove - 4-Digit Display
      * @param clkPin value of clk pin number
@@ -526,20 +506,19 @@ namespace grove {
     //% clkPin.defl=DigitalPin.C16 dataPin.defl=DigitalPin.C17
     //% dataPin.fieldOptions.tooltips="false" dataPin.fieldOptions.width="250"
     //% blockSetVariable=4digit
-    export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
-    {
+    export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637 {
         let display = new TM1637();
-        
+
         display.buf = pins.createBuffer(4);
         display.clkPin = clkPin;
         display.dataPin = dataPin;
         display.brightnessLevel = 0;
         display.pointFlag = false;
         display.clear();
-        
+
         return display;
     }
- 
+
     /**
      * init Grove Gesture modules
      * 
@@ -571,16 +550,16 @@ namespace grove {
         return joystick.joyread(xpin, ypin);
     }
 
-   /**
-     * Converts the gesture name to a number
-     * Useful for comparisons
-     */
+    /**
+      * Converts the gesture name to a number
+      * Useful for comparisons
+      */
     //% blockId=ggesture block="%key"
     //% group="Gesture"
     export function ggesture(g: GroveGesture): number {
         return g;
     }
-    
+
     /**
      * Do something when a gesture is detected by Grove - Gesture
      * @param gesture type of gesture to detect
@@ -592,7 +571,7 @@ namespace grove {
         control.onEvent(gestureEventId, gesture, handler);
         paj7620.init();
         control.inBackground(() => {
-            while(true) {
+            while (true) {
                 const gesture = paj7620.read();
                 if (gesture != lastGesture) {
                     lastGesture = gesture;
@@ -626,16 +605,16 @@ namespace grove {
     export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
         control.onEvent(joystickEventID, key, handler);
         control.inBackground(() => {
-            while(true) {
+            while (true) {
                 const key = joystick.joyread(xpin, ypin);
                 if (key != lastJoystick) {
-                    lastJoystick = key; 
+                    lastJoystick = key;
                     control.raiseEvent(joystickEventID, lastJoystick);
                 }
                 basic.pause(50);
             }
         })
-        
+
     }
 
     let isWifiConnected = false;
@@ -684,11 +663,11 @@ namespace grove {
     /**
      * Send data to ThinkSpeak
      */
-    //% block="Send Data to your ThinkSpeak Channel|Write API Key %apiKey|Field1 %field1|Field2 %field2|Field3 %field3|Field4 %field4|Field5 %field5|Field6 %field6|Field7 %field7|Field8 %field8"
+    //% block="Send Data to your ThinkSpeak Channel|Write API Key %apiKey|Field1 %field1|Field2 %field2||Field3 %field3|Field4 %field4|Field5 %field5|Field6 %field6|Field7 %field7|Field8 %field8"
     //% group="UartWiFi"
     //% expandableArgumentMode="enabled"
     //% apiKey.defl="your Write API Key"
-    export function sendToThinkSpeak(apiKey: string, field1: number=0, field2: number=0, field3: number=0, field4: number=0, field5: number=0, field6: number=0, field7: number=0, field8: number=0) {
+    export function sendToThinkSpeak(apiKey: string, field1: number = 0, field2: number = 0, field3: number = 0, field4: number = 0, field5: number = 0, field6: number = 0, field7: number = 0, field8: number = 0) {
         let result = 0
         let retry = 2
 
@@ -720,11 +699,6 @@ namespace grove {
             if (result == 3) continue
             sendAtCmd(data)
             result = waitAtResponse("SEND OK", "SEND FAIL", "ERROR", 5000)
-
-            // // close the TCP connection
-            // sendAtCmd("AT+CIPCLOSE")
-            // waitAtResponse("OK", "ERROR", "None", 2000)
-
             if (result == 1) break
         }
     }
