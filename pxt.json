@@ -1,7 +1,7 @@
 {
     "name": "Grove",
-    "version": "0.2.7",
-    "description": "A Microsoft MakeCode package for Seeed Studio Grove module",
+    "version": "0.2.8",
+    "description": "A Microsoft MakeCode package for Grove Seeed Studio modules",
     "license": "MIT",
     "dependencies": {
         "core": "*"
@@ -10,7 +10,8 @@
         "README.md",
         "main.ts",
         "_locales/ja/Grove-strings.json",
-        "_locales/de/Grove-strings.json"
+        "_locales/de/Grove-strings.json",
+        "_locales/ua/Grove-strings.json"
     ],
     "testFiles": [
         "test.ts"
