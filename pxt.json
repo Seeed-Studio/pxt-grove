@@ -11,7 +11,7 @@
         "main.ts",
         "_locales/ja/Grove-strings.json",
         "_locales/de/Grove-strings.json",
-        "_locales/ua/Grove-strings.json"
+        "_locales/uk/Grove-strings.json"
     ],
     "testFiles": [
         "test.ts"
