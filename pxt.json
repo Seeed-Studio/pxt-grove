@@ -1,7 +1,7 @@
 {
     "name": "Grove",
-    "version": "0.9.0",
-    "description": "A Microsoft MakeCode package for Seeed Studio Grove module",
+    "version": "0.2.8",
+    "description": "A Microsoft MakeCode package for Grove Seeed Studio modules",
     "license": "MIT",
     "dependencies": {
         "core": "*"
@@ -9,19 +9,16 @@
     "files": [
         "README.md",
         "main.ts",
-        "_locales/de/Grove-strings.json"
+        "_locales/ja/Grove-strings.json",
+        "_locales/de/Grove-strings.json",
+        "_locales/uk/Grove-strings.json"
     ],
     "testFiles": [
         "test.ts"
     ],
     "public": true,
-    "targetVersions": {
-        "target": "4.0.29",
-        "targetId": "calliopemini"
-    },
     "supportedTargets": [
-        "calliopemini",
-        "microbit"
+        "calliopemini"
     ],
     "preferredEditor": "tsprj"
 }
