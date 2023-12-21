@@ -10,6 +10,7 @@
         "README.md",
         "main.ts",
         "blocks/GroveAHT20.ts",
+		"blocks/GroveLCD1602v1.ts",
         "_locales/ja/Grove-strings.json",
         "_locales/de/Grove-strings.json",
         "sensors/AHT20.ts"

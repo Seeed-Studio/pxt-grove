@@ -145,6 +145,16 @@ basic.forever(() => {
 })
 ```
 
+### Grove - LCD 16x2
+
+Show string and number after initialize LCD.
+
+```blocks
+grove.lcd_init()
+grove.lcd_show_string("Hello", 0, 0)
+grove.lcd_show_number(12345, 0, 1)
+```
+
 ## License
 
 MIT
