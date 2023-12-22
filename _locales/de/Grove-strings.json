@@ -38,5 +38,10 @@
     "GroveJoystickKey.LR|block": "Unten rechts",
     "GroveJoystickKey.Press|block": "Gedrückt",
     "grove.onJoystick|block": "wenn Grove - Joystickrichtung|%key an|%xpin|und|%ypin",
-    "grove.getJoystick|block": "lies Joystickrichtung an|%xpin|und|%ypin"
+    "grove.getJoystick|block": "lies Joystickrichtung an|%xpin|und|%ypin",
+    "grove.aht20ReadTemperatureC|block": "Temperatur (°C)",
+    "grove.aht20ReadTemperatureF|block": "Temperatur (°F)",
+    "grove.aht20ReadHumidity|block": "Feuchtigkeit",
+    "grove.sendToThinkSpeak|block": "Sende Daten an deinen ThinkSpeak Kanal|Write API Key %apiKey|Feld 1 %field1|Feld 2 %field2|Feld 3 %field3|Feld 4 %field4|Feld 5 %field5|Feld 6 %field6|Feld 7 %field7|Feld 8 %field8",
+    "grove.sendToIFTTT|block": "Sende Daten an dein IFTTT Event|Event %event|Key %key|Wert 1 %value1|Wert 2 %value2|Wert 3 %value3"
 }
