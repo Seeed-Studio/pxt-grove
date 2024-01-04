@@ -88,7 +88,7 @@ enum GroveJoystickKey {
  * Functions to operate Grove module.
  */
 //% weight=10 color=#9F79EE icon="\uf1b3" block="Grove"
-//% groups='["4-Digit","Ultrasonic","Gesture","Thumbjoystick","UartWiFi"]'
+//% groups='["4-Digit","Ultrasonic","Moisture","Gesture","Thumbjoystick","UartWiFi"]'
 namespace grove {
     /**
      * 
@@ -491,6 +491,31 @@ namespace grove {
         basic.pause(50);
 
         return RangeInInches;
+    }
+
+    /**
+     * Read the analog values of the moisture sensor
+     * @param pin signal pin of moisture sensor module
+     */
+    //% blockId=grove_Moisture_analogVal block="Moisture Sensor (analog values) at|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
+    //% group="Moisture" pin.defl=AnalogPin.C16
+    export function measureMoistureAnalog(pin: AnalogPin): number {
+        return pins.analogReadPin(pin);
+    }
+
+    /**
+     * Read the values of the moisture sensor in percent
+     * @param pin signal pin of moisture sensor module
+     */
+    //% blockId=grove_Moisture_percent block="Moisture Sensor (percent) at|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
+    //% group="Moisture" pin.defl=AnalogPin.C16
+    export function measureMoisturePercent(pin: AnalogPin): number {
+        let percentValue = Math.map(pins.analogReadPin(pin), 0, 1023, 0, 100);
+        return Math.round(percentValue);
     }
 
     /**
