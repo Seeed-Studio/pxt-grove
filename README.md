@@ -104,6 +104,20 @@ Measure distance in inches, specify the signal pin.
 let distance = grove.measureInInches(DigitalPin.P0);
 ```
 
+### Grove - Moisture sensor
+
+Measures the soil moisture as analog values from 0 - 1023
+
+```blocks
+let moisture = grove.measureMoistureAnalog(AnalogPin.C16);
+```
+
+Measures the soil moisture as a percentage from 0 - 100
+
+```blocks
+let moisture = grove.measureMoisturePercent(AnalogPin.C16);
+```
+
 ### Grove - 4 digital display
 
 Create a 4 Digital Display driver, specify the clk and data pin, and set the brightness level, then start display value.
