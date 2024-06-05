@@ -434,6 +434,25 @@ namespace grove {
     let paj7620 = new PAJ7620();
     // adapted to Calliope mini V2 Core by M.Klein 17.09.2020
 
+
+    enum DistanceUnit {
+        //% blockIdentity="grove.distanceUnitId"
+        //% block="cm"
+        cm = 1,
+        //% blockIdentity="grove.distanceUnitId"
+        //% block="inch"
+        inch = 2,
+    };
+
+    enum BoardVersion {
+        //% blockIdentity="grove.boardVersionId"
+        //% block="1"
+        v1 = 1,
+        //% blockIdentity="grove.boardVersionId"
+        //% block="2"
+        v2 = 2,
+    };
+
     /**
      * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
      * @param pin signal pin of ultrasonic ranger module
@@ -442,7 +461,39 @@ namespace grove {
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" pin.defl=DigitalPin.C16
+    export function measureDistance(pin: DigitalPin, unit: DistanceUnit, boardVersion: BoardVersion): number {
+        let duration = 0;
+        let range = 0;
+        const boardVersionDivider = (boardVersion == BoardVersion.v1 ? 44 : 29)
+        const distanceUnitDivider = (unit == DistanceUnit.cm ? 1 : 2.54); // V1 = 1, V2 = 2.54
 
+        pins.digitalWritePin(pin, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(20);
+        pins.digitalWritePin(pin, 0);
+        duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
+
+        range = Math.round(duration * 153 / boardVersionDivider / 2 / 100 / distanceUnitDivider); // V1 = 44, V2 = 29
+
+        if (range > 0) distanceBackup = range;
+        else range = distanceBackup;
+
+        basic.pause(50);
+
+        return range;
+    }
+
+
+    /**
+     * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
+     * @param pin signal pin of ultrasonic ranger module
+     */
+    //% blockId=grove_ultrasonic_centimeters block="Ultrasonic Sensor (in cm) at|%pin"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
+    //% group="Ultrasonic" pin.defl=DigitalPin.C16
+    //% hidden=1 deprecated=1
     export function measureInCentimeters(pin: DigitalPin): number {
         let duration = 0;
         let RangeInCentimeters = 0;
@@ -454,7 +505,7 @@ namespace grove {
         pins.digitalWritePin(pin, 0);
         duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
 
-        RangeInCentimeters = Math.round(duration * 153 / 29 / 2 / 100);
+        RangeInCentimeters = Math.round(duration * 153 / 29 / 2 / 100); // V1 = 44, V2 = 29
 
         if (RangeInCentimeters > 0) distanceBackup = RangeInCentimeters;
         else RangeInCentimeters = distanceBackup;
@@ -472,6 +523,7 @@ namespace grove {
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" pin.defl=DigitalPin.C16
+    //% hidden=1 deprecated=1
     export function measureInInches(pin: DigitalPin): number {
         let duration = 0;
         let RangeInInches = 0;
