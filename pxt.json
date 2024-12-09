@@ -19,8 +19,13 @@
         "test.ts"
     ],
     "public": true,
-    "supportedTargets": [
-        "calliopemini"
-    ],
+    "targetVersions": {
+	"target": "7.0.51",
+	       "targetId": "microbit"
+	  },
+	   "supportedTargets": [
+	       "calliopemini",
+	       "microbit"
+			    ],
     "preferredEditor": "tsprj"
 }
