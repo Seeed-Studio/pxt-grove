@@ -460,7 +460,7 @@ namespace grove {
     //% blockId=grove_ultrasonic_centimeters_v2 block="(V2)Ultrasonic Sensor (in cm) at|%pin"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
-    //% group="Ultrasonic" pin.defl=DigitalPin.C16
+    //% group="Ultrasonic" pin.defl=DigitalPin.P0
 
     export function measureInCentimetersV2(pin: DigitalPin): number
     {
@@ -491,7 +491,7 @@ namespace grove {
     //% blockId=grove_ultrasonic_inches_v2 block="(V2)Ultrasonic Sensor (in inch) at|%pin"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
-    //% group="Ultrasonic" pin.defl=DigitalPin.C16
+    //% group="Ultrasonic" pin.defl=DigitalPin.P0
     export function measureInInchesV2(pin: DigitalPin): number
     {
         let duration = 0;
@@ -521,7 +521,7 @@ namespace grove {
     //% blockId=grove_ultrasonic_centimeters block="Ultrasonic Sensor (in cm) at|%pin"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
-    //% group="Ultrasonic" pin.defl=DigitalPin.C16
+    //% group="Ultrasonic" pin.defl=DigitalPin.P0
 
     export function measureInCentimeters(pin: DigitalPin): number
     {
@@ -552,7 +552,7 @@ namespace grove {
     //% blockId=grove_ultrasonic_inches block="Ultrasonic Sensor (in inch) at|%pin"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
-    //% group="Ultrasonic" pin.defl=DigitalPin.C16
+    //% group="Ultrasonic" pin.defl=DigitalPin.P0
     export function measureInInches(pin: DigitalPin): number
     {
         let duration = 0;
@@ -585,7 +585,7 @@ namespace grove {
     //% group="4-Digit"
     //% clkPin.fieldOptions.tooltips="false" clkPin.fieldOptions.width="250"
     //% dataPin.fieldEditor="gridpicker" dataPin.fieldOptions.columns=4
-    //% clkPin.defl=DigitalPin.C16 dataPin.defl=DigitalPin.C17
+    //% clkPin.defl=DigitalPin.P0 dataPin.defl=DigitalPin.P1
     //% dataPin.fieldOptions.tooltips="false" dataPin.fieldOptions.width="250"
     //% blockSetVariable=4digit
     export function createDisplay(clkPin: DigitalPin, dataPin: DigitalPin): TM1637
@@ -628,7 +628,7 @@ namespace grove {
      * 
      */
     //% blockId=grove_getjoystick block="get joystick key at|%xpin|and|%ypin"
-    //% group="Thumbjoystick" xpin.defl=AnalogPin.C16 ypin.defl=AnalogPin.C17
+    //% group="Thumbjoystick" xpin.defl=AnalogPin.P0 ypin.defl=AnalogPin.P1
     export function getJoystick(xpin: AnalogPin, ypin: AnalogPin): number {
         return joystick.joyread(xpin, ypin);
     }
@@ -683,7 +683,7 @@ namespace grove {
      * @param handler code to run
      */
     //% blockId=grove_joystick_create_event block="on Key|%key at |%xpin|and|%ypin"
-    //% group="Thumbjoystick" xpin.defl=AnalogPin.C16 ypin.defl=AnalogPin.C17
+    //% group="Thumbjoystick" xpin.defl=AnalogPin.P0 ypin.defl=AnalogPin.P1
 
     export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
         control.onEvent(joystickEventID, key, handler);
@@ -866,3 +866,4 @@ namespace grove {
         serial.writeString(cmd + "\u000D\u000A")
     }
 }
+
