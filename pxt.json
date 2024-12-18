@@ -1,6 +1,6 @@
 {
     "name": "Grove",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "description": "A Microsoft MakeCode package for Seeed Studio Grove module",
     "license": "MIT",
     "dependencies": {
@@ -19,8 +19,13 @@
         "test.ts"
     ],
     "public": true,
-    "supportedTargets": [
-        "calliopemini"
-    ],
+    "targetVersions": {
+	"target": "7.0.51",
+	       "targetId": "microbit"
+	  },
+	   "supportedTargets": [
+	       "calliopemini",
+	       "microbit"
+			    ],
     "preferredEditor": "tsprj"
 }

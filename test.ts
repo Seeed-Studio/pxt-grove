@@ -1,4 +1,4 @@
-let _4Digit = grove.createDisplay(DigitalPin.C16, DigitalPin.C17)
+let _4Digit = grove.createDisplay(DigitalPin.P0, DigitalPin.P1)
 grove.setupWifi(
     SerialPin.P15,
     SerialPin.P1,
