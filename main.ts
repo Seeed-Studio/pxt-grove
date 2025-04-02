@@ -83,6 +83,31 @@ enum GroveJoystickKey {
     Press = 9
 }
 
+enum DistanceUnit {
+    //% block="cm"
+    cm = 1,
+    //% block="inch"
+    inch = 2,
+};
+
+enum MoistureMode {
+    //% block="Grove sensor (blue)"
+    //% block.loc.de="Grove Sensor (blau)"
+    Original = 0,
+    //% block="Calliope sensor (black)"
+    //% block.loc.de="Calliope Sensor (schwarz)"
+    Scaled = 1
+}
+
+enum MoistureOutput {
+    //% block="absolute value"
+    //% block.loc.de="absoluter Wert"
+    Number = 0,
+    //% block="percent"
+    //% block.loc.de="Prozent"
+    Percent = 1
+}
+
 
 /**
  * Functions to operate Grove module.
@@ -437,12 +462,46 @@ namespace grove {
     /**
      * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
      * @param pin signal pin of ultrasonic ranger module
+     * @param unit Distance unit of the measurement, cm or inch
+     */
+    //% blockId=grove_ultrasonic_centimeters
+    //% block="Measure distance at|%pin in|%unit"
+    //% block.loc.de="Messe Entfernung an|%pin in|%unit"
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
+    //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
+    //% group="Ultrasonic" group.loc.de="Ultraschall" pin.defl=DigitalPin.C16
+    export function measureDistance(pin: DigitalPin, unit: DistanceUnit): number {
+        let duration = 0;
+        let range = 0;
+        const boardVersionDivider = (grove.isCodal() ? 29 : 44) // 1 = DAL = 44, CODAL = 29 
+        const distanceUnitDivider = (unit == DistanceUnit.cm ? 1 : 2.54); // cm = 1, inch = 2.54
+
+        pins.digitalWritePin(pin, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(20);
+        pins.digitalWritePin(pin, 0);
+        duration = pins.pulseIn(pin, PulseValue.High, 50000); // Max duration 50 ms
+
+        range = Math.round(duration * 153 / boardVersionDivider / 2 / 100 / distanceUnitDivider); 
+
+        if (range > 0) distanceBackup = range;
+        else range = distanceBackup;
+
+        basic.pause(50);
+
+        return range;
+    }
+
+    /**
+     * Create a new driver of Grove - Ultrasonic Sensor to measure distances in cm
+     * @param pin signal pin of ultrasonic ranger module
      */
     //% blockId=grove_ultrasonic_centimeters block="Ultrasonic Sensor (in cm) at|%pin"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" pin.defl=DigitalPin.C16
-
+    //% hidden=1 deprecated=1
     export function measureInCentimeters(pin: DigitalPin): number {
         let duration = 0;
         let RangeInCentimeters = 0;
@@ -472,6 +531,7 @@ namespace grove {
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" pin.defl=DigitalPin.C16
+    //% hidden=1 deprecated=1
     export function measureInInches(pin: DigitalPin): number {
         let duration = 0;
         let RangeInInches = 0;
@@ -494,16 +554,38 @@ namespace grove {
     }
 
     /**
-     * Read the analog values of the moisture sensor
+     * Read the values of the moisture sensor
      * @param pin signal pin of moisture sensor module
+     * @param mode type of moisture sensor to use
+     * @param outputType type of output type to return
      */
-    //% blockId=grove_Moisture_analogVal block="Moisture Sensor (analog values) at|%pin"
+    //% blockId=grove_Moisture_analoggrove
+    //% block.loc.de="Feuchtigkeitssensor an |%pin| Version |%mode| als |%outputType|"
+    //% block="Moisture sensor at |%pin| version |%mode| output as |%outputType|"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
-    //% group="Moisture" pin.defl=AnalogPin.C16
-    export function measureMoistureAnalog(pin: AnalogPin): number {
-        return pins.analogReadPin(pin);
+    //% group="Moisture" pin.defl=AnalogPin.C16 
+    //% mode.defl=MoistureMode.Original 
+    //% outputType.defl=MoistureOutput.Number
+    export function measureMoistureAnalog(
+        pin: AnalogPin,
+        mode: MoistureMode = MoistureMode.Original,
+        outputType: MoistureOutput = MoistureOutput.Number
+    ): number {
+        let rawValue = pins.analogReadPin(pin);
+        let scaledValue = Math.round((rawValue - 700) * (500 - 10) / (400 - 700) + 10);
+
+        if (outputType === MoistureOutput.Percent) {
+            if (mode === MoistureMode.Scaled) {
+                return Math.round(((scaledValue - 10) * (85 - 10)) / (500 - 10) + 10);
+            } else {
+                return Math.round((rawValue / 1023) * 100);
+            }
+        } else {
+            return mode === MoistureMode.Scaled ? scaledValue : rawValue;
+        }
     }
+
 
     /**
      * Read the values of the moisture sensor in percent
@@ -513,6 +595,7 @@ namespace grove {
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Moisture" pin.defl=AnalogPin.C16
+    //% hidden=1 deprecated=1
     export function measureMoisturePercent(pin: AnalogPin): number {
         let percentValue = pins.analogReadPin(pin) / 1023 * 100;
         return Math.round(percentValue);
