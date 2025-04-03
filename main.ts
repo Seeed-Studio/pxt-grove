@@ -100,11 +100,11 @@ enum MoistureMode {
 }
 
 enum MoistureOutput {
-    //% block="absolute value"
-    //% block.loc.de="absoluter Wert"
+    //% block="absolute (0-1023)"
+    //% block.loc.de="absolut (0-1023)"
     Number = 0,
-    //% block="percent"
-    //% block.loc.de="Prozent"
+    //% block="percentage"
+    //% block.loc.de="prozentual"
     Percent = 1
 }
 
@@ -465,8 +465,8 @@ namespace grove {
      * @param unit Distance unit of the measurement, cm or inch
      */
     //% blockId=grove_ultrasonic_centimeters
-    //% block="Measure distance at|%pin in|%unit"
-    //% block.loc.de="Messe Entfernung an|%pin in|%unit"
+    //% block="Distance |%pin |%unit"
+    //% block.loc.de="Entfernung |%pin |%unit"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" group.loc.de="Ultraschall" pin.defl=DigitalPin.C16
@@ -560,8 +560,8 @@ namespace grove {
      * @param outputType type of output type to return
      */
     //% blockId=grove_Moisture_analoggrove
-    //% block.loc.de="Feuchtigkeitssensor an |%pin| Version |%mode| als |%outputType|"
-    //% block="Moisture sensor at |%pin| version |%mode| output as |%outputType|"
+    //% block.loc.de="Feuchtigkeit |%pin| |%mode| |%outputType|"
+    //% block="Moisture |%pin| |%mode| |%outputType|"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Moisture" pin.defl=AnalogPin.C16 
