@@ -465,8 +465,8 @@ namespace grove {
      * @param unit Distance unit of the measurement, cm or inch
      */
     //% blockId=grove_ultrasonic_centimeters
-    //% block="Distance |%pin |%unit"
-    //% block.loc.de="Entfernung |%pin |%unit"
+    //% block="Distance|%pin|%unit"
+    //% block.loc.de="Entfernung|%pin|%unit"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Ultrasonic" group.loc.de="Ultraschall" pin.defl=DigitalPin.C16
