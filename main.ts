@@ -560,8 +560,8 @@ namespace grove {
      * @param outputType type of output type to return
      */
     //% blockId=grove_Moisture_analoggrove
-    //% block.loc.de="Feuchtigkeit |%pin| |%mode| |%outputType|"
-    //% block="Moisture |%pin| |%mode| |%outputType|"
+    //% block.loc.de="Feuchtigkeit|%pin|%mode|%outputType"
+    //% block="Moisture|%pin|%mode|%outputType"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Moisture" pin.defl=AnalogPin.C16 
