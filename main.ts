@@ -560,21 +560,20 @@ namespace grove {
      * @param outputType type of output type to return
      */
     //% blockId=grove_Moisture_analoggrove
-    //% block.loc.de="Feuchtigkeit|%pin|%mode|%outputType"
-    //% block="Moisture|%pin|%mode|%outputType"
+    //% block.loc.de="Feuchtigkeit %pin %mode %outputType"
+    //% block="Moisture %pin %mode %outputType"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
-    //% group="Moisture" pin.defl=AnalogPin.C16 
-    //% mode.defl=MoistureMode.Original 
+    //% group="Moisture" pin.defl=AnalogPin.C16
+    //% mode.defl=MoistureMode.Original
     //% outputType.defl=MoistureOutput.Number
     export function measureMoistureAnalog(
         pin: AnalogPin,
         mode: MoistureMode = MoistureMode.Original,
         outputType: MoistureOutput = MoistureOutput.Number
-    ): number {
+        ): number {
         let rawValue = pins.analogReadPin(pin);
         let scaledValue = Math.round((rawValue - 700) * (500 - 10) / (400 - 700) + 10);
-
         if (outputType === MoistureOutput.Percent) {
             if (mode === MoistureMode.Scaled) {
                 return Math.round(((scaledValue - 10) * (85 - 10)) / (500 - 10) + 10);
@@ -591,7 +590,7 @@ namespace grove {
      * Read the values of the moisture sensor in percent
      * @param pin signal pin of moisture sensor module
      */
-    //% blockId=grove_Moisture_percent block="Moisture Sensor (percent) at|%pin"
+    //% blockId=grove_Moisture_percent block="Moisture Sensor (percent) at %pin"
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     //% group="Moisture" pin.defl=AnalogPin.C16
