@@ -155,6 +155,41 @@ grove.lcd_show_string("Hello", 0, 0)
 grove.lcd_show_number(12345, 0, 1)
 ```
 
+### Grove - Vision AI Module V2
+
+Connect the Grove Vision AI Module V2 through I2C and get AI inference results.
+
+```blocks
+grove.onReceiveDetectionResult(function (detectionResults) {
+    for (let detectionResult of detectionResults) {
+        serial.writeLine(detectionResult.toString())
+    }
+})
+
+let persons = 0
+
+serial.redirectToUSB()
+grove.connectAndSetupGroveVisionAIV2(true)
+
+while (!(grove.startAIInference())) {
+    serial.writeLine("Failed to start inference")
+    basic.pause(1000)
+}
+
+basic.forever(function () {
+    if (grove.fetchAIInferenceResults()) {
+        serial.writeLine("Fetch inference result success")
+        if (grove.containsObjectName(["person"])) {
+            persons = grove.countObjectByName(["pseron"])
+            serial.writeString("Detected persons: ")
+            serial.writeNumber(persons)
+            serial.writeLine("" + ("\n"))
+        }
+    }
+    basic.pause(100)
+})
+```
+
 ## License
 
 MIT
