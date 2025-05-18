@@ -45,6 +45,9 @@ class DetectionResult {
     //% blockCombine
     get label(): string { return this._label; }
 
+    /**
+     * Convert a detection result object to string representation
+     */
     //% block="convert $this to string"
     //% this.defl=detectionResult
     //% this.shadow=variables_get
@@ -78,6 +81,9 @@ class ClassificationResult {
     //% blockCombine
     public get label(): string { return this._label; }
 
+    /**
+     * Convert a classification result object to string representation
+     */
     //% block="convert $this to string"
     //% this.defl=classificationResult
     //% this.shadow=variables_get
@@ -128,6 +134,9 @@ class ModelInfo {
         return this._version;
     }
 
+    /**
+     * Get the label string by ID, returns empty string if ID is not exist
+     */
     //% block="get label by $id"
     //% id.defl=id
     //% id.min=0
@@ -155,6 +164,9 @@ namespace grove {
         Inferencing = 3,
     };
 
+    /**
+     * Choose a device status
+     */
     //% block="device status %status"
     //% group="Grove Vision AI V2"
     export function deviceStatus(status: DeviceStatus): DeviceStatus {
@@ -185,6 +197,9 @@ namespace grove {
         Unknown = 10
     };
 
+    /**
+     * Choose an error code
+     */
     //% block="error code %code"
     //% group="Grove Vision AI V2"
     export function operationCode(code: OperationCode): OperationCode {
