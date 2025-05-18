@@ -11,6 +11,8 @@
         "main.ts",
         "blocks/GroveAHT20.ts",
 		"blocks/GroveLCD1602v1.ts",
+        "blocks/GroveVisionAIV2.ts",
+        "plugins/SSCMA.ts",
         "_locales/ja/Grove-strings.json",
         "_locales/de/Grove-strings.json",
         "sensors/AHT20.ts"
