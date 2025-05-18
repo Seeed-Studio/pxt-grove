@@ -20,7 +20,7 @@ namespace grove {
     /**
      * Connect and setup the Grove Vision AI Module V2 through I2C transport
      */
-    //% block="connect and setup device (serial logging %serialLogging)"
+    //% block="connect and setup device, serial logging %serialLogging"
     //% group="Grove Vision AI V2"
     //% weight=100
     //% color="#AA278D"
@@ -259,7 +259,6 @@ namespace grove {
      * Event on receive detection results from the Grove Vision AI Module V2
      */
     //% block="on receive detection results"
-    //% handlerStatement
     //% group="Grove Vision AI V2"
     //% weight=59
     //% color="#AA278D"
@@ -271,7 +270,6 @@ namespace grove {
      * Event on receive classification results from the Grove Vision AI Module V2
      */
     //% block="on receive classification results"
-    //% handlerStatement
     //% group="Grove Vision AI V2"
     //% weight=58
     //% color="#AA278D"
@@ -283,7 +281,6 @@ namespace grove {
      * Event on receive error from the Grove Vision AI Module V2
      */
     //% block="on receive error"
-    //% handlerStatement
     //% group="Grove Vision AI V2"
     //% weight=57
     //% color="#AA278D"
