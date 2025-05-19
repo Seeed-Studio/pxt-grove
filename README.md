@@ -180,7 +180,7 @@ basic.forever(function () {
     if (grove.fetchAIInferenceResults()) {
         serial.writeLine("Fetch inference result success")
         if (grove.containsObjectName(["person"])) {
-            persons = grove.countObjectByName(["pseron"])
+            persons = grove.countObjectByName(["person"])
             serial.writeString("Detected persons: ")
             serial.writeNumber(persons)
             serial.writeLine("" + ("\n"))
