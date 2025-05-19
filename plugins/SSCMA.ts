@@ -560,7 +560,7 @@ namespace grove {
                 constructor(
                     transport: Transport,
                     loggingToSerial: boolean = false,
-                    responseQueueLimit: number = 30,
+                    responseQueueLimit: number = 10,
                     maxRetry: number = 3,
                     retryTimeout: number = 1000,
                     retryDelay: number = 100,
@@ -642,7 +642,10 @@ namespace grove {
                                 let idx = responseIdxs.shift();
                                 this.responseQueue.splice(idx, 1);
                             }
-                            return this.responseQueue[responseIdxs[0]];
+                            const idx = responseIdxs[0];
+                            const response = this.responseQueue[idx];
+                            this.responseQueue.splice(idx, 1);
+                            return response;
                         }
 
                         let responseCount = this.fetchResponse();

@@ -126,21 +126,21 @@ namespace grove {
     function _onReceiveDetectionResults(detectionResults: DetectionResult[]) {
         vision_ai_v2.detectionResults = detectionResults;
         if (_onDetectionResultsHandler) {
-            _onDetectionResultsHandler(detectionResults);
+            _onDetectionResultsHandler(vision_ai_v2.detectionResults);
         }
     }
 
     function _onReceiveClassificationResults(classificationResults: ClassificationResult[]) {
         vision_ai_v2.classificationResults = classificationResults;
         if (_onClassificationResultsHandler) {
-            _onClassificationResultsHandler(classificationResults);
+            _onClassificationResultsHandler(vision_ai_v2.classificationResults);
         }
     }
 
     function _onReceiveError(errorCode: OperationCode) {
         vision_ai_v2.errorCode = errorCode;
         if (_onErrorHandler) {
-            _onErrorHandler(errorCode);
+            _onErrorHandler(vision_ai_v2.errorCode);
         }
     }
 
@@ -155,6 +155,9 @@ namespace grove {
         maxResults: number = 15,
         timeout: number = 1000,
     ): boolean {
+        vision_ai_v2.detectionResults = []
+        vision_ai_v2.classificationResults = []
+
         if (vision_ai_v2.atClient) {
             return vision_ai_v2.atClient.fetchInferenceResult(
                 _onReceiveDetectionResults,
