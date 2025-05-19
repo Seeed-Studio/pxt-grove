@@ -82,6 +82,7 @@ namespace grove {
                 pins.digitalReadPin(this.signalPin);
                 endTime = control.micros() + DHT11.RESPONSE_START_TIMEOUT;
                 while (pins.digitalReadPin(this.signalPin) ^ 0) {
+                    control.waitMicros(1);
                     if (control.micros() > endTime) {
                         inTime = 0x0F00;
                         break;
@@ -90,6 +91,7 @@ namespace grove {
 
                 endTime = control.micros() + DHT11.RESPONSE_START_TIMEOUT;
                 while (pins.digitalReadPin(this.signalPin) ^ 1) {
+                    control.waitMicros(1);
                     if (control.micros() > endTime) {
                         inTime = 0xF000;
                         break;
@@ -97,6 +99,7 @@ namespace grove {
                 }
                 endTime = control.micros() + DHT11.RESPONSE_START_TIMEOUT;
                 while (pins.digitalReadPin(this.signalPin) ^ 0) {
+                    control.waitMicros(1);
                     if (control.micros() > endTime) {
                         inTime = 0xF000;
                         break;
@@ -106,6 +109,7 @@ namespace grove {
                 for (let i = 0; i < (DHT11.DATA_BITS & inTime); ++i) {
                     endTime = control.micros() + DHT11.RESPONSE_DATA_START_TIMEOUT;
                     while (pins.digitalReadPin(this.signalPin) ^ 0) {
+                        control.waitMicros(1);
                         if (control.micros() > endTime) {
                             inTime = 0xFF00;
                             break;
@@ -113,6 +117,7 @@ namespace grove {
                     }
                     endTime = control.micros() + DHT11.RESPONSE_DATA_START_TIMEOUT;
                     while (pins.digitalReadPin(this.signalPin) ^ 1) {
+                        control.waitMicros(1);
                         if (control.micros() > endTime) {
                             inTime = 0xFF00;
                             break;
@@ -121,6 +126,7 @@ namespace grove {
                     startTime = control.micros();
                     endTime = startTime + DHT11.RESPONSE_DATA_TIMEOUT;
                     while (pins.digitalReadPin(this.signalPin) ^ 0) {
+                        control.waitMicros(1);
                         if (control.micros() > endTime) {
                             inTime = 0x0F0000;
                             break;
