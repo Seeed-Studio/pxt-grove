@@ -8,6 +8,7 @@ namespace grove {
     * Connect and setup the Grove Temperature & Humidity Sensor (DHT11)
     */
     //% block="connect to sensor on %signalPin, serial logging %serialLogging"
+    //% signalPin.defl=DigitalPin.P1
     //% blockSetVariable=dht11
     //% group="DHT11"
     //% weight=99
@@ -25,9 +26,9 @@ namespace grove {
     //% group="DHT11"
     //% weight=98
     //% color="#AA278D"
-    export function readTemperatureHumidity(sensor: grove.sensors.DHT11): boolean {
+    export function readTemperatureHumidity(sensor: grove.sensors.DHT11, forceRead: boolean = false): boolean {
         if (sensor) {
-            return sensor.readSensorData();
+            return sensor.readSensorData(forceRead);
         }
         return false;
     }
