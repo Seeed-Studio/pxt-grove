@@ -90,7 +90,7 @@ namespace grove {
 
                     pins.setPull(this.signalPin, PinPullMode.PullUp);
                     control.waitMicros(responseLatency);
-                    
+
                     endTime = control.micros() + DHT11.RESPONSE_START_TIMEOUT;
                     while (pins.digitalReadPin(this.signalPin) ^ 1) {
                         control.waitMicros(1);
@@ -151,11 +151,20 @@ namespace grove {
                 }
 
                 let dataBits: boolean[] = [];
-                for (let i = 0; i < DHT11.DATA_BITS; ++i) {
-                    const lowDistance = Math.abs(highPulseDurations[i] - DHT11.BIT_0_TIME);
-                    const highDistance = Math.abs(highPulseDurations[i] - DHT11.BIT_1_TIME);
-                    dataBits.push(lowDistance > highDistance);
+                let bitLowTime = DHT11.BIT_0_TIME;
+                let bitHighTime = DHT11.BIT_1_TIME;
+                for (let pulseDuration of highPulseDurations) {
+                    const lowDist = Math.abs(pulseDuration - bitLowTime);
+                    const highDist = Math.abs(pulseDuration - bitHighTime);
+                    const isBitHigh = lowDist > highDist;
+                    if (isBitHigh) {
+                        bitHighTime = (bitHighTime + pulseDuration) * 0.5;
+                    } else {
+                        bitLowTime = (bitLowTime + pulseDuration) * 0.5;
+                    }
+                    dataBits.push(isBitHigh);
                 }
+                this.LOG("Adaptive bit time: " + bitLowTime.toString() + ", " + bitHighTime.toString());
 
                 if (this.serialLogging) {
                     const bits = dataBits.map((bit) => (bit ? "1" : "0"));
