@@ -160,16 +160,19 @@ grove.lcd_show_number(12345, 0, 1)
 Read the temperature and humidity from the Grove Temperature & Humidity Sensor.
 
 ```blocks
-serial.redirectToUSB()
+serial.redirectToUSB();
 
-let dht11 = grove.connectToDHT11(DigitalPin.P1, false)
+let dht11 = grove.connectToDHT11(DigitalPin.P1, false);
 
 basic.forever(function () {
     if (grove.readTemperatureHumidity(dht11)) {
-        serial.writeLine("New data received:")
-        serial.writeValue("humidity", grove.getHumidity(dht11))
-        serial.writeValue("temperature", grove.getTemperatureCelsius(dht11))
+        serial.writeLine("New data received:");
+        serial.writeValue("humidity", grove.getHumidity(dht11));
+        serial.writeValue("temperature", grove.getTemperatureCelsius(dht11));
+    } else {
+        serial.writeLine("Fail to read, try again later");
     }
+    basic.pause(2000);
 })
 ```
 
