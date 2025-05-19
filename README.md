@@ -155,6 +155,25 @@ grove.lcd_show_string("Hello", 0, 0)
 grove.lcd_show_number(12345, 0, 1)
 ```
 
+### Grove Temperature & Humidity Sensor (DHT11)
+
+Read the temperature and humidity from the Grove Temperature & Humidity Sensor.
+
+```blocks
+serial.redirectToUSB()
+
+let dht11 = grove.connectToDHT11(DigitalPin.P0, true)
+
+basic.forever(function () {
+    if (grove.readTemperatureHumidity(dht11)) {
+        serial.writeNumbers([grove.getHumidity(dht11), grove.getTemperatureCelsius(dht11)])
+    } else {
+        serial.writeLine("Read failed, try again later")
+    }
+    basic.pause(2000)
+})
+```
+
 ## License
 
 MIT
