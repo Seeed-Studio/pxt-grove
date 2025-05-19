@@ -20,15 +20,15 @@ namespace grove {
     /**
      * Read the temperature and humidity from the sensor
      */
-    //% block="read temperature and humidity from $sensor"
+    //% block="read temperature and humidity from $sensor, force read %forceRead"
     //% sensor.defl=dht11
     //% sensor.shadow=variables_get
     //% group="DHT11"
     //% weight=98
     //% color="#AA278D"
-    export function readTemperatureHumidity(sensor: grove.sensors.DHT11, forceRead: boolean = false): boolean {
+    export function readTemperatureHumidity(sensor: grove.sensors.DHT11, forceRead: boolean = false, responseLatency: number = 50): boolean {
         if (sensor) {
-            return sensor.readSensorData(forceRead);
+            return sensor.readSensorData(forceRead, responseLatency);
         }
         return false;
     }
@@ -42,11 +42,14 @@ namespace grove {
     //% sensor.shadow=variables_get
     //% group="DHT11"
     //% weight=89
-    export function getHumidity(sensor: grove.sensors.DHT11): number {
+    export function getHumidity(sensor: grove.sensors.DHT11, autoRead: boolean = true): number {
         if (sensor) {
+            if (autoRead) {
+                sensor.readSensorData();
+            }
             return sensor.humidity;
         }
-        return -999;
+        return NaN;
     }
 
     /**
@@ -57,11 +60,14 @@ namespace grove {
     //% sensor.shadow=variables_get
     //% group="DHT11"
     //% weight=88
-    export function getTemperatureCelsius(sensor: grove.sensors.DHT11): number {
+    export function getTemperatureCelsius(sensor: grove.sensors.DHT11, autoRead: boolean = true): number {
         if (sensor) {
+            if (autoRead) {
+                sensor.readSensorData();
+            }
             return sensor.temperature;
         }
-        return -999;
+        return NaN;
     }
 
     /**
@@ -72,12 +78,15 @@ namespace grove {
     //% sensor.shadow=variables_get
     //% group="DHT11"
     //% weight=87
-    export function getTemperatureFahrenheit(sensor: grove.sensors.DHT11): number {
+    export function getTemperatureFahrenheit(sensor: grove.sensors.DHT11, autoRead: boolean = true): number {
         if (sensor) {
+            if (autoRead) {
+                sensor.readSensorData();
+            }
             const celsius = sensor.temperature;
-            return (celsius * 9 / 5) + 32;
+            return (celsius * 1.8) + 32;
         }
-        return -999;
+        return NaN;
     }
 
 }
