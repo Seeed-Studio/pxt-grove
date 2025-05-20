@@ -160,12 +160,14 @@ namespace grove {
                     const high: number = highPulseTicks[i];
                     if (isNaN(low)) {
                         this.LOG("Timeout waiting for DHT11 response bits low signal");
+                        return false;
                     }
-                    if (isNaN(high)) {
+                    if (isNaN(high))
                         this.LOG("Timeout waiting for DHT11 response bits high signal");
+                        return false;
                     }
 
-                    if (low <= high) {
+                    if (low < high) {
                         dataBits.push(true);
                     } else {
                         dataBits.push(false);
