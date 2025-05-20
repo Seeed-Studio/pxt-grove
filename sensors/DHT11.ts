@@ -8,6 +8,7 @@ namespace grove {
 
         export class DHT11 {
             private lastSampleTime: number = 0;
+            private ticksPerMicro: number = 1;
 
             private signalPin: DigitalPin;
             private serialLogging: boolean = false;
@@ -18,6 +19,8 @@ namespace grove {
             private static INIT_WAIT_TIME_MS: number = 1000;
             private static RESAMPLE_WAIT_TIME_MS: number = 2000;
 
+            private static TICKS_PROBE_TIMES: number = 50;
+
             private static DATA_BITS: number = 40;
 
             private static PULL_DELAY_TIME: number = 1000;
@@ -27,15 +30,15 @@ namespace grove {
             private static RESPONSE_DATA_START_TIMEOUT: number = 100;
             private static RESPONSE_DATA_TIMEOUT: number = 140;
 
-            private static BIT_0_TIME: number = 28;
-            private static BIT_1_TIME: number = 70;
-
+            private static TEMP_MIN: number = 0;
+            private static TEMP_MAX: number = 50;
 
             constructor(signalPin: DigitalPin, serialLogging: boolean = false) {
                 this.signalPin = signalPin;
                 this.serialLogging = serialLogging;
 
                 this.lastSampleTime = input.runningTime();
+                this.measureTicksPerMicro();
             }
 
             private LOG(message: string) {
@@ -52,7 +55,37 @@ namespace grove {
                 return this._temperature;
             }
 
-            public readSensorData(forceRead: boolean = false, responseLatency: number = 50): boolean {
+            private waitPulseIn(xorLevel: number, maxTicks: number): number {
+                let ticks: number = 0;
+                while (pins.digitalReadPin(this.signalPin) ^ xorLevel) {
+                    if (++ticks > maxTicks) {
+                        return NaN;
+                    }
+                }
+                return ticks;
+            }
+
+            private microsToTicks(micros: number): number {
+                return micros * this.ticksPerMicro;
+            }
+
+            private measureTicksPerMicro(): boolean {
+                pins.setPull(this.signalPin, PinPullMode.PullUp);
+                const startTime: number = control.micros();
+                this.waitPulseIn(2, this.microsToTicks(DHT11.TICKS_PROBE_TIMES));
+                const endTime: number = control.micros();
+                const ticksPerMicro = DHT11.TICKS_PROBE_TIMES / (endTime - startTime);
+                if (ticksPerMicro > 0) {
+                    this.LOG("Measured ticks per microsecond: " + ticksPerMicro.toString());
+                    this.ticksPerMicro = ticksPerMicro;
+                    return true;
+                } else {
+                    this.LOG("Failed to measure ticks per microsecond, using default value: " + this.ticksPerMicro.toString());
+                    return false;
+                }
+            }
+
+            public readSensorData(forceRead: boolean = false): boolean {
                 if (!forceRead) {
                     const currentTime = input.runningTime();
                     const isInit = isNaN(this._humidity) || isNaN(this._temperature);
@@ -70,18 +103,24 @@ namespace grove {
 
                 this.LOG("Starting DHT11 read bits sequence");
 
-                let highPulseDurations: number[] = [];
-                for (let i = 0; i < DHT11.DATA_BITS; ++i) {
-                    highPulseDurations.push(0);
-                }
+                this.measureTicksPerMicro();
 
-                let staMask: number = 0xFF;
-                let startTime: number = 0;
-                let endTime: number = 0;
+                let lowPulseTicks: number[] = [];
+                for (let i = 0; i < DHT11.DATA_BITS; ++i) {
+                    lowPulseTicks.push(0);
+                }
+                let highPulseTicks: number[] = [];
+                for (let i = 0; i < DHT11.DATA_BITS; ++i) {
+                    highPulseTicks.push(0);
+                }
 
                 this.LOG("Send data read request to DHT11");
 
                 {
+                    const responseStartTimeout: number = this.microsToTicks(DHT11.RESPONSE_START_TIMEOUT);
+                    const responseDataStartTimeout: number = this.microsToTicks(DHT11.RESPONSE_DATA_START_TIMEOUT);
+                    const responseDataTimeout: number = this.microsToTicks(DHT11.RESPONSE_DATA_TIMEOUT);
+
                     pins.setPull(this.signalPin, PinPullMode.PullUp);
                     control.waitMicros(DHT11.PULL_DELAY_TIME);
 
@@ -89,82 +128,49 @@ namespace grove {
                     control.waitMicros(DHT11.START_SIGNAL_LOW_TIME);
 
                     pins.setPull(this.signalPin, PinPullMode.PullUp);
-                    control.waitMicros(responseLatency);
-
-                    endTime = control.micros() + DHT11.RESPONSE_START_TIMEOUT;
-                    while (pins.digitalReadPin(this.signalPin) ^ 1) {
-                        control.waitMicros(1);
-                        if (control.micros() > endTime) {
-                            staMask = 0x0F00;
-                            break;
-                        }
-                    }
-                    endTime = control.micros() + DHT11.RESPONSE_START_TIMEOUT;
-                    while (pins.digitalReadPin(this.signalPin) ^ 0) {
-                        control.waitMicros(1);
-                        if (control.micros() > endTime) {
-                            staMask = staMask ^ 0xFF ? staMask : 0xF000;
-                            break;
-                        }
-                    }
-
-                    for (let i = 0; i < (DHT11.DATA_BITS & staMask); ++i) {
-                        endTime = control.micros() + DHT11.RESPONSE_DATA_START_TIMEOUT;
-                        while (pins.digitalReadPin(this.signalPin) ^ 1) {
-                            control.waitMicros(1);
-                            if (control.micros() > endTime) {
-                                staMask = staMask ^ 0xFF ? staMask : 0x0F0000;
-                                break;
-                            }
-                        }
-                        startTime = control.micros();
-                        endTime = startTime + DHT11.RESPONSE_DATA_TIMEOUT;
-                        while (pins.digitalReadPin(this.signalPin) ^ 0) {
-                            control.waitMicros(1);
-                            if (control.micros() > endTime) {
-                                staMask = staMask ^ 0xFF ? staMask : 0xF00000;
-                                break;
-                            }
-                        }
-                        highPulseDurations[i] = control.micros() - startTime;
-                    }
-                }
-
-                switch (staMask) {
-                    case 0x0F00:
+                    if (isNaN(this.waitPulseIn(0, responseStartTimeout))) {
                         this.LOG("No response from DHT11");
                         return false;
-                    case 0xF000:
+                    }
+                    if (isNaN(this.waitPulseIn(1, responseStartTimeout))) {
                         this.LOG("Timeout waiting for DHT11 response start signal");
                         return false;
-                    case 0x0F0000:
-                        this.LOG("Timeout waiting for DHT11 response data start signal");
+                    }
+                    if (isNaN(this.waitPulseIn(0, responseStartTimeout))) {
+                        this.LOG("Timeout waiting for DHT11 response start signal");
                         return false;
-                    case 0xF00000:
-                        this.LOG("Timeout waiting for DHT11 response data bits signal");
-                        return false;
+                    }
+
+                    for (let i = 0; i < DHT11.DATA_BITS; ++i) {
+                        lowPulseTicks[i] = this.waitPulseIn(1, responseDataStartTimeout);
+                        highPulseTicks[i] = this.waitPulseIn(0, responseDataTimeout);
+                    }
                 }
 
                 if (this.serialLogging) {
-                    const durations = highPulseDurations.map((duration) => duration.toString());
-                    this.LOG("DHT11 response durations: " + durations.join(", "));
+                    const lowTicks = lowPulseTicks.map((duration) => duration.toString());
+                    this.LOG("DHT11 response low ticks: " + lowTicks.join(", "));
+                    const highTicks = highPulseTicks.map((duration) => duration.toString());
+                    this.LOG("DHT11 response high ticks: " + highTicks.join(", "));
                 }
 
                 let dataBits: boolean[] = [];
-                let bitLowTime = DHT11.BIT_0_TIME;
-                let bitHighTime = DHT11.BIT_1_TIME;
-                for (let pulseDuration of highPulseDurations) {
-                    const lowDist = Math.abs(pulseDuration - bitLowTime);
-                    const highDist = Math.abs(pulseDuration - bitHighTime);
-                    const isBitHigh = lowDist > highDist;
-                    if (isBitHigh) {
-                        bitHighTime = (bitHighTime + pulseDuration) * 0.5;
-                    } else {
-                        bitLowTime = (bitLowTime + pulseDuration) * 0.5;
+                for (let i = 0; i < DHT11.DATA_BITS; ++i) {
+                    const low: number = lowPulseTicks[i];
+                    const high: number = highPulseTicks[i];
+                    if (isNaN(low)) {
+                        this.LOG("Timeout waiting for DHT11 response bits low signal");
                     }
-                    dataBits.push(isBitHigh);
+                    if (isNaN(high)) {
+                        this.LOG("Timeout waiting for DHT11 response bits high signal");
+                    }
+
+                    if (low < high) {
+                        dataBits.push(true);
+                    } else {
+                        dataBits.push(false);
+                    }
                 }
-                this.LOG("Adaptive bit time: " + bitLowTime.toString() + ", " + bitHighTime.toString());
 
                 if (this.serialLogging) {
                     const bits = dataBits.map((bit) => (bit ? "1" : "0"));
@@ -198,8 +204,9 @@ namespace grove {
                     return false;
                 }
 
-                this._humidity = dataBytes[0] + dataBytes[1] * 0.1;
-                this._temperature = ((dataBytes[3] & 0x80) ? -1 - dataBytes[2] : dataBytes[2]) + (dataBytes[3] & 0x0F) * 0.1;
+                this._humidity = dataBytes[0] + dataBytes[1] * 0.01;
+                this._temperature = dataBytes[2] + dataBytes[3] * 0.01;
+                this._temperature = Math.max(DHT11.TEMP_MIN, Math.min(DHT11.TEMP_MAX, this._temperature));
 
                 this.LOG("DHT11 humidity: " + this._humidity.toString());
                 this.LOG("DHT11 temperature: " + this._temperature.toString());

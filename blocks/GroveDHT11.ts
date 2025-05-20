@@ -26,9 +26,9 @@ namespace grove {
     //% group="DHT11"
     //% weight=98
     //% color="#AA278D"
-    export function readTemperatureHumidity(sensor: grove.sensors.DHT11, forceRead: boolean = false, responseLatency: number = 50): boolean {
+    export function readTemperatureHumidity(sensor: grove.sensors.DHT11, forceRead: boolean = false): boolean {
         if (sensor) {
-            return sensor.readSensorData(forceRead, responseLatency);
+            return sensor.readSensorData(forceRead);
         }
         return false;
     }
