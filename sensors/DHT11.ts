@@ -165,7 +165,7 @@ namespace grove {
                         this.LOG("Timeout waiting for DHT11 response bits high signal");
                     }
 
-                    if (low < high) {
+                    if (low <= high) {
                         dataBits.push(true);
                     } else {
                         dataBits.push(false);
