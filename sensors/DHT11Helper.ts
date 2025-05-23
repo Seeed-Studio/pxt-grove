@@ -52,7 +52,7 @@ namespace grove {
                 return this._temperature;
             }
 
-            public readSensorData(forceRead: boolean = false): boolean {
+            public readSensorData(forceRead: boolean = false, retry: number = 30): boolean {
                 if (!forceRead) {
                     const currentTime = input.runningTime();
                     const isInit = isNaN(this._humidity) || isNaN(this._temperature);
