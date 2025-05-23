@@ -4,6 +4,16 @@
 
 namespace grove {
 
+    //% advanced=true
+    //%
+    export function DHT11InternalRead(signalPin: DigitalPin): Buffer {
+        // let resultBuffer: Buffer = control.createBuffer(8);
+        // resultBuffer.fill(0);
+        // resultBuffer.setNumber(NumberFormat.Int8LE, 2, 1);
+        // return resultBuffer;
+        0;
+    }
+
     export namespace sensors {
 
         export class DHT11Helper {
@@ -50,7 +60,7 @@ namespace grove {
                     const timeToWait = (isInit ? DHT11Helper.INIT_WAIT_TIME_MS : DHT11Helper.RESAMPLE_WAIT_TIME_MS) - (currentTime - this.lastSampleTime);
                     if (timeToWait > 0) {
                         if (!isInit) {
-                            this.LOG("Use cached DHT11Helper data, request new after " + timeToWait + "ms");
+                            this.LOG("Use cached DHT11 data, request new after " + timeToWait + "ms");
                             return true;
                         }
                         this.LOG(`Waiting for ${timeToWait}ms before reading sensor data.`);
@@ -59,14 +69,14 @@ namespace grove {
                     this.lastSampleTime = currentTime;
                 }
 
-                this.LOG("Calling DHT11Helper internal driver...");
+                this.LOG("Calling DHT11 internal driver...");
 
                 const resultBuffer: Buffer = grove.sensors.DHT11InternalRead(this.signalPin);
 
                 if (this.serialLogging) {
                     const bufferLength = resultBuffer.length;
-                    serial.writeLine("DHT11Helper result buffer length: " + bufferLength.toString());
-                    serial.writeString("DHT11Helper result buffer: ");
+                    serial.writeLine("DHT11 result buffer length: " + bufferLength.toString());
+                    serial.writeString("DHT11 result buffer: ");
                     for (let i = 0; i < bufferLength; ++i) {
                         const byte = resultBuffer.getNumber(NumberFormat.Int8LE, i);
                         serial.writeString(byte.toString() + " ");
@@ -75,7 +85,7 @@ namespace grove {
                 }
 
                 if (resultBuffer.length != 8) {
-                    this.LOG("DHT11Helper result buffer length error: " + resultBuffer.length.toString());
+                    this.LOG("DHT11 result buffer length error: " + resultBuffer.length.toString());
                     return false;
                 }
 
@@ -83,28 +93,28 @@ namespace grove {
                 if (returnCode != 0) {
                     switch (returnCode) {
                         case 1:
-                            this.LOG("DHT11Helper sensor not connected on pin " + this.signalPin.toString());
+                            this.LOG("DHT11 sensor not connected on pin " + this.signalPin.toString());
                             break;
                         case 1 << 1:
-                            this.LOG("DHT11Helper wait ack low init timeout");
+                            this.LOG("DHT11 wait ack low init timeout");
                             break;
                         case 1 << 2:
-                            this.LOG("DHT11Helper wait ack low timeout");
+                            this.LOG("DHT11 wait ack low timeout");
                             break;
                         case 1 << 3:
-                            this.LOG("DHT11Helper wait ack high timeout");
+                            this.LOG("DHT11 wait ack high timeout");
                             break;
                         case 1 << 4:
-                            this.LOG("DHT11Helper wait data high timeout");
+                            this.LOG("DHT11 wait data high timeout");
                             break;
                         case 1 << 5:
-                            this.LOG("DHT11Helper wait data low timeout");
+                            this.LOG("DHT11 wait data low timeout");
                             break;
                         case 1 << 6:
-                            this.LOG("DHT11Helper checksum error");
+                            this.LOG("DHT11 checksum error");
                             break;
                         default:
-                            this.LOG("DHT11Helper unknown error: " + returnCode.toString());
+                            this.LOG("DHT11 unknown error: " + returnCode.toString());
                             break;
                     }
                     return false;
@@ -119,8 +129,8 @@ namespace grove {
                 this._temperature = temperatureHigh + (temperatureLow * 0.01);
                 this._temperature = Math.max(DHT11Helper.TEMP_MIN, Math.min(DHT11Helper.TEMP_MAX, this._temperature));
 
-                this.LOG("DHT11Helper humidity: " + this._humidity.toString());
-                this.LOG("DHT11Helper temperature: " + this._temperature.toString());
+                this.LOG("DHT11 humidity: " + this._humidity.toString());
+                this.LOG("DHT11 temperature: " + this._temperature.toString());
 
                 return true;
             }

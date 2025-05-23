@@ -199,13 +199,13 @@ __dht11_read_impl_v1(const int pin_num) {
 
 //% advanced=true
 //%
-Buffer DHT11InternalRead(int pin_num) {
+Buffer DHT11InternalRead(int signalPin) {
     int64_t result = 1ll << 40;
 
-    __disable_irq();
-    result = sensors::__dht11_read_impl_v1(pin_num);
-    // result = sensors::__dht11_read_impl_v2(pin_num);
-    __enable_irq();
+    // __disable_irq();
+    result = sensors::__dht11_read_impl_v1(signalPin);
+    // result = sensors::__dht11_read_impl_v2(signalPin);
+    // __enable_irq();
 
     return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
 }
