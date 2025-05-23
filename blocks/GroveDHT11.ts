@@ -13,8 +13,8 @@ namespace grove {
     //% group="DHT11"
     //% weight=99
     //% color="#AA278D"
-    export function connectToDHT11(signalPin: DigitalPin = DigitalPin.P1, serialLogging: boolean = false): grove.sensors.DHT11 {
-        return new grove.sensors.DHT11(signalPin, serialLogging);
+    export function connectToDHT11(signalPin: DigitalPin = DigitalPin.P1, serialLogging: boolean = false): grove.sensors.DHT11Helper {
+        return new grove.sensors.DHT11Helper(signalPin, serialLogging);
     }
 
     /**
@@ -26,7 +26,7 @@ namespace grove {
     //% group="DHT11"
     //% weight=98
     //% color="#AA278D"
-    export function readTemperatureHumidity(sensor: grove.sensors.DHT11, forceRead: boolean = false): boolean {
+    export function readTemperatureHumidity(sensor: grove.sensors.DHT11Helper, forceRead: boolean = false): boolean {
         if (sensor) {
             return sensor.readSensorData(forceRead);
         }
@@ -42,7 +42,7 @@ namespace grove {
     //% sensor.shadow=variables_get
     //% group="DHT11"
     //% weight=89
-    export function getHumidity(sensor: grove.sensors.DHT11, autoRead: boolean = true): number {
+    export function getHumidity(sensor: grove.sensors.DHT11Helper, autoRead: boolean = true): number {
         if (sensor) {
             if (autoRead) {
                 sensor.readSensorData();
@@ -60,7 +60,7 @@ namespace grove {
     //% sensor.shadow=variables_get
     //% group="DHT11"
     //% weight=88
-    export function getTemperatureCelsius(sensor: grove.sensors.DHT11, autoRead: boolean = true): number {
+    export function getTemperatureCelsius(sensor: grove.sensors.DHT11Helper, autoRead: boolean = true): number {
         if (sensor) {
             if (autoRead) {
                 sensor.readSensorData();
@@ -78,7 +78,7 @@ namespace grove {
     //% sensor.shadow=variables_get
     //% group="DHT11"
     //% weight=87
-    export function getTemperatureFahrenheit(sensor: grove.sensors.DHT11, autoRead: boolean = true): number {
+    export function getTemperatureFahrenheit(sensor: grove.sensors.DHT11Helper, autoRead: boolean = true): number {
         if (sensor) {
             if (autoRead) {
                 sensor.readSensorData();
