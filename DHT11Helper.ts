@@ -4,18 +4,16 @@
 
 namespace grove {
 
+    //% advanced=true
+    //% shim=grove::DHT11InternalRead
+    export function DHT11InternalRead(signalPin: DigitalPin): Buffer {
+        let resultBuffer: Buffer = control.createBuffer(8);
+        resultBuffer.fill(0);
+        resultBuffer.setNumber(NumberFormat.Int8LE, 2, 1);
+        return resultBuffer;
+    }
+
     export namespace sensors {
-
-
-        //% advanced=true
-        //% shim=grove::sensors::DHT11InternalRead
-        export function DHT11InternalRead(signalPin: DigitalPin): Buffer {
-            let resultBuffer: Buffer = control.createBuffer(8);
-            resultBuffer.fill(0);
-            resultBuffer.setNumber(NumberFormat.Int8LE, 2, 1);
-            return resultBuffer;
-        }
-
 
         export class DHT11Helper {
 
@@ -72,7 +70,7 @@ namespace grove {
 
                 this.LOG("Calling DHT11 internal driver...");
 
-                const resultBuffer: Buffer = grove.sensors.DHT11InternalRead(this.signalPin);
+                const resultBuffer: Buffer = grove.DHT11InternalRead(this.signalPin);
 
                 if (this.serialLogging) {
                     const bufferLength = resultBuffer.length;

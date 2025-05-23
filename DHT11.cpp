@@ -197,6 +197,8 @@ __dht11_read_impl_v1(const int pin_num) {
            (static_cast<int64_t>(data_bytes[2]) << 8) | static_cast<int64_t>(data_bytes[3]);
 }
 
+} // namespace sensors
+
 
 //% advanced=true
 //%
@@ -211,7 +213,5 @@ Buffer DHT11InternalRead(int signalPin) {
     return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
 }
 
-
-} // namespace sensors
 
 }

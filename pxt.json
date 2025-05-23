@@ -1,6 +1,6 @@
 {
     "name": "Grove",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "description": "A Microsoft MakeCode package for Seeed Studio Grove module",
     "license": "MIT",
     "dependencies": {
@@ -15,8 +15,8 @@
         "_locales/ja/Grove-strings.json",
         "_locales/de/Grove-strings.json",
         "sensors/AHT20.ts",
-        "sensors/DHT11.cpp",
-        "sensors/DHT11Helper.ts"
+        "DHT11.cpp",
+        "DHT11Helper.ts"
     ],
     "testFiles": [
         "test.ts"
