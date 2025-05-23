@@ -10,22 +10,23 @@
         "README.md",
         "main.ts",
         "blocks/GroveAHT20.ts",
-		"blocks/GroveLCD1602v1.ts",
+        "blocks/GroveLCD1602v1.ts",
         "_locales/ja/Grove-strings.json",
         "_locales/de/Grove-strings.json",
-        "sensors/AHT20.ts"
+        "sensors/AHT20.ts",
+        "sensors/DHT11.cpp"
     ],
     "testFiles": [
         "test.ts"
     ],
     "public": true,
     "targetVersions": {
-	"target": "7.0.51",
-	       "targetId": "microbit"
-	  },
-	   "supportedTargets": [
-	       "calliopemini",
-	       "microbit"
-			    ],
+        "target": "7.0.51",
+        "targetId": "microbit"
+    },
+    "supportedTargets": [
+        "calliopemini",
+        "microbit"
+    ],
     "preferredEditor": "tsprj"
 }
