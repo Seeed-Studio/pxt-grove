@@ -5,7 +5,7 @@
 namespace grove {
 
     //% advanced=true
-    //% shim=grove::DHT11InternalRead
+    //% shim=sensors::DHT11InternalRead
     export function DHT11InternalRead(signalPin: DigitalPin): Buffer {
         let resultBuffer: Buffer = control.createBuffer(8);
         resultBuffer.fill(0);
