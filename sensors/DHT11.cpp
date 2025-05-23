@@ -27,7 +27,8 @@ namespace sensors {
 #define _DHT11_LIKELY(x) __builtin_expect(!!(x), 1)
 #define _DHT11_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
-__attribute__((noinline, long_call, section(".ramfuncs"), optimize("s"))) int64_t
+// __attribute__((noinline, long_call, section(".ramfuncs"), optimize("s")))
+int64_t
 __dht11_read_impl_v2(const int pin_num) {
 
     MicroBitPin *pin = getPin(pin_num);
@@ -104,7 +105,8 @@ __dht11_read_impl_v2(const int pin_num) {
     return result >> 8;
 }
 
-__attribute__((noinline, long_call, section(".ramfuncs"))) int64_t
+// __attribute__((noinline, long_call, section(".ramfuncs")))
+int64_t
 __dht11_read_impl_v1(const int pin_num) {
     MicroBitPin *pin = getPin((int)pin_num);
     if (!pin)
