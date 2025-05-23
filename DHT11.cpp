@@ -215,3 +215,14 @@ Buffer DHT11InternalRead(int signalPin) {
 
 
 }
+
+namespace sensors
+{
+
+    //% advanced=true
+    //%
+    Buffer DHT11InternalRead(int signalPin) {
+        return grove::DHT11InternalRead(signalPin);
+    }
+
+} // namespace sensors
