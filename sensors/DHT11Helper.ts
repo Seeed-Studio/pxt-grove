@@ -20,7 +20,8 @@ namespace grove {
             private signalPin: DigitalPin;
             private serialLogging: boolean = false;
 
-            private lastSampleTime: number = 0;
+            private lastSyncTime: number = 0;
+            private lastSuccessSyncTime: number = 0;
 
             private _humidity: number = NaN;
             private _temperature: number = NaN;
@@ -35,7 +36,7 @@ namespace grove {
                 this.signalPin = signalPin;
                 this.serialLogging = serialLogging;
 
-                this.lastSampleTime = input.runningTime();
+                this.lastSyncTime = input.runningTime();
             }
 
             private LOG(message: string) {
@@ -52,11 +53,15 @@ namespace grove {
                 return this._temperature;
             }
 
-            public readSensorData(forceRead: boolean = false, retry: number = 30): boolean {
+            getLastSuccessSyncTime(): number {
+                return this.lastSuccessSyncTime;
+            }
+
+            public readSensorData(forceRead: boolean = false, retryTimes: number = 30, retryDelayMs: number = 50): boolean {
                 if (!forceRead) {
                     const currentTime = input.runningTime();
                     const isInit = isNaN(this._humidity) || isNaN(this._temperature);
-                    const timeToWait = (isInit ? DHT11Helper.INIT_WAIT_TIME_MS : DHT11Helper.RESAMPLE_WAIT_TIME_MS) - (currentTime - this.lastSampleTime);
+                    const timeToWait = (isInit ? DHT11Helper.INIT_WAIT_TIME_MS : DHT11Helper.RESAMPLE_WAIT_TIME_MS) - (currentTime - this.lastSyncTime);
                     if (timeToWait > 0) {
                         if (!isInit) {
                             this.LOG("Use cached DHT11 data, request new after " + timeToWait + "ms");
@@ -65,31 +70,30 @@ namespace grove {
                         this.LOG(`Waiting for ${timeToWait}ms before reading sensor data.`);
                         basic.pause(timeToWait);
                     }
-                    this.lastSampleTime = currentTime;
+                    this.lastSyncTime = currentTime;
                 }
 
                 this.LOG("Calling DHT11 internal driver...");
 
-                const resultBuffer: Buffer = grove.DHT11InternalRead(this.signalPin);
-
-                if (this.serialLogging) {
-                    const bufferLength = resultBuffer.length;
-                    serial.writeLine("DHT11 result buffer length: " + bufferLength.toString());
-                    serial.writeString("DHT11 result buffer: ");
-                    for (let i = 0; i < bufferLength; ++i) {
-                        const byte = resultBuffer.getNumber(NumberFormat.Int8LE, i);
-                        serial.writeString(byte.toString() + " ");
+                let retryCount = 0;
+                let resultBuffer: Buffer;
+                while (true) {
+                    if (++retryCount > retryTimes) {
+                        this.LOG("DHT11 read failed after " + retryCount.toString() + " tries, max " + retryTimes.toString());
+                        return false;
                     }
-                    serial.writeLine("");
-                }
-
-                if (resultBuffer.length != 8) {
-                    this.LOG("DHT11 result buffer length error: " + resultBuffer.length.toString());
-                    return false;
-                }
-
-                const returnCode = resultBuffer[5];
-                if (returnCode != 0) {
+                    resultBuffer = grove.DHT11InternalRead(this.signalPin);
+                    if (!resultBuffer || resultBuffer.length != 8) {
+                        this.LOG("DHT11 result buffer length error: " + resultBuffer.length.toString());
+                        basic.pause(retryDelayMs);
+                        continue;
+                    }
+                    const returnCode = resultBufferresultBuffer.getNumber(NumberFormat.Int8LE, 5);
+                    if (returnCode == 0) {
+                        this.lastSuccessSyncTime = input.runningTime();
+                        this.LOG("DHT11 read success in " + retryCount.toString() + " tries, max " + retryTimes.toString());
+                        break;
+                    }
                     switch (returnCode) {
                         case 1:
                             this.LOG("DHT11 sensor not connected on pin " + this.signalPin.toString());
@@ -116,7 +120,18 @@ namespace grove {
                             this.LOG("DHT11 unknown error: " + returnCode.toString());
                             break;
                     }
-                    return false;
+                    basic.pause(retryDelayMs);
+                }
+
+                if (this.serialLogging) {
+                    const bufferLength = resultBuffer.length;
+                    serial.writeLine("DHT11 result buffer length: " + bufferLength.toString());
+                    serial.writeString("DHT11 result buffer: ");
+                    for (let i = 0; i < bufferLength; ++i) {
+                        const byte = resultBuffer.getNumber(NumberFormat.Int8LE, i);
+                        serial.writeString(byte.toString() + " ");
+                    }
+                    serial.writeLine("");
                 }
 
                 const humidityHigh = resultBuffer.getNumber(NumberFormat.Int8LE, 3);
