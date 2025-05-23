@@ -9,7 +9,7 @@ namespace grove {
     export function DHT11InternalRead(signalPin: DigitalPin): Buffer {
         let resultBuffer: Buffer = control.createBuffer(8);
         resultBuffer.fill(0);
-        resultBuffer.setNumber(NumberFormat.Int8LE, 2, 1);
+        resultBuffer.setNumber(NumberFormat.Int8LE, 5, 1);
         return resultBuffer;
     }
 
