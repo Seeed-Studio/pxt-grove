@@ -11,10 +11,12 @@
         "main.ts",
         "blocks/GroveAHT20.ts",
         "blocks/GroveLCD1602v1.ts",
+        "blocks/GroveDHT11.ts",
         "_locales/ja/Grove-strings.json",
         "_locales/de/Grove-strings.json",
         "sensors/AHT20.ts",
-        "sensors/DHT11.cpp"
+        "sensors/DHT11.cpp",
+        "sensors/DHT11.ts"
     ],
     "testFiles": [
         "test.ts"

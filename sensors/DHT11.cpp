@@ -197,10 +197,17 @@ __dht11_read_impl_v1(const int pin_num) {
 
 } // namespace sensors
 
+//% advanced=true
 //%
-int64_t DHT11InternalRead(int pin_num) {
-    return sensors::__dht11_read_impl_v1(pin_num);
-    // return sensors::__dht11_read_impl_v2(pin_num);
+Buffer DHT11InternalRead(int pin_num) {
+    int64_t result = 1ll << 40;
+
+    __disable_irq();
+    result = sensors::__dht11_read_impl_v1(pin_num);
+    // result = sensors::__dht11_read_impl_v2(pin_num);
+    __enable_irq();
+
+    return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
 }
 
 }

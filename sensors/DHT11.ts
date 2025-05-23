@@ -7,25 +7,17 @@ namespace grove {
     export namespace sensors {
 
         export class DHT11 {
-            private lastSampleTime: number = 0;
 
             private signalPin: DigitalPin;
             private serialLogging: boolean = false;
+
+            private lastSampleTime: number = 0;
 
             private _humidity: number = NaN;
             private _temperature: number = NaN;
 
             private static INIT_WAIT_TIME_MS: number = 1000;
             private static RESAMPLE_WAIT_TIME_MS: number = 2000;
-
-            private static DATA_BITS: number = 40;
-
-            private static PULL_DELAY_TIME: number = 1000;
-            private static START_SIGNAL_LOW_TIME: number = 20000;
-
-            private static RESPONSE_START_TIMEOUT: number = 160;
-            private static RESPONSE_DATA_START_TIMEOUT: number = 100;
-            private static RESPONSE_DATA_TIMEOUT: number = 140;
 
             private static TEMP_MIN: number = 0;
             private static TEMP_MAX: number = 50;
@@ -51,19 +43,6 @@ namespace grove {
                 return this._temperature;
             }
 
-            private waitPinLevel(xorLevel: number, timeout: number): number {
-                const startTime: number = control.micros();
-                const endTime: number = startTime + timeout;
-                let current: number = startTime;
-                while (pins.digitalReadPin(this.signalPin) ^ xorLevel) {
-                    current = control.micros();
-                    if (current > endTime) {
-                        return NaN;
-                    }
-                }
-                return current - startTime;
-            }
-
             public readSensorData(forceRead: boolean = false): boolean {
                 if (!forceRead) {
                     const currentTime = input.runningTime();
@@ -80,107 +59,64 @@ namespace grove {
                     this.lastSampleTime = currentTime;
                 }
 
-                this.LOG("Starting DHT11 read bits sequence");
+                this.LOG("Calling DHT11 internal driver...");
 
-                let lowPulseTicks: number[] = [];
-                for (let i = 0; i < DHT11.DATA_BITS; ++i) {
-                    lowPulseTicks.push(0);
-                }
-                let highPulseTicks: number[] = [];
-                for (let i = 0; i < DHT11.DATA_BITS; ++i) {
-                    highPulseTicks.push(0);
-                }
-
-                this.LOG("Send data read request to DHT11");
-
-                {
-                    pins.setPull(this.signalPin, PinPullMode.PullUp);
-                    control.waitMicros(DHT11.PULL_DELAY_TIME);
-
-                    pins.digitalWritePin(this.signalPin, 0);
-                    control.waitMicros(DHT11.START_SIGNAL_LOW_TIME);
-
-                    pins.setPull(this.signalPin, PinPullMode.PullUp);
-                    if (isNaN(this.waitPinLevel(0, DHT11.RESPONSE_START_TIMEOUT))) {
-                        this.LOG("No response from DHT11");
-                        return false;
-                    }
-                    if (isNaN(this.waitPinLevel(1, DHT11.RESPONSE_START_TIMEOUT))) {
-                        this.LOG("Timeout waiting for DHT11 response start signal");
-                        return false;
-                    }
-                    if (isNaN(this.waitPinLevel(0, DHT11.RESPONSE_START_TIMEOUT))) {
-                        this.LOG("Timeout waiting for DHT11 response start signal");
-                        return false;
-                    }
-
-                    for (let i = 0; i < DHT11.DATA_BITS; ++i) {
-                        lowPulseTicks[i] = this.waitPinLevel(1, DHT11.RESPONSE_DATA_START_TIMEOUT);
-                        highPulseTicks[i] = this.waitPinLevel(0, DHT11.RESPONSE_DATA_TIMEOUT);
-                    }
-                }
+                const resultBuffer: Buffer = grove.sensors.DHT11InternalRead(this.signalPin);
 
                 if (this.serialLogging) {
-                    const lowTicks = lowPulseTicks.map((duration) => duration.toString());
-                    this.LOG("DHT11 response low ticks: " + lowTicks.join(", "));
-                    const highTicks = highPulseTicks.map((duration) => duration.toString());
-                    this.LOG("DHT11 response high ticks: " + highTicks.join(", "));
-                }
-
-                let dataBits: boolean[] = [];
-                for (let i = 0; i < DHT11.DATA_BITS; ++i) {
-                    const low: number = lowPulseTicks[i];
-                    const high: number = highPulseTicks[i];
-                    if (isNaN(low)) {
-                        this.LOG("Timeout waiting for DHT11 response bits low signal");
-                        return false;
+                    const bufferLength = resultBuffer.length;
+                    serial.writeLine("DHT11 result buffer length: " + bufferLength.toString());
+                    serial.writeString("DHT11 result buffer: ");
+                    for (let i = 0; i < bufferLength; ++i) {
+                        const byte = resultBuffer.getNumber(NumberFormat.Int8LE, i);
+                        serial.writeString(byte.toString() + " ");
                     }
-                    if (isNaN(high)) {
-                        this.LOG("Timeout waiting for DHT11 response bits high signal");
-                        return false;
-                    }
-
-                    if (low < high) {
-                        dataBits.push(true);
-                    } else {
-                        dataBits.push(false);
-                    }
+                    serial.writeLine("");
                 }
 
-                if (this.serialLogging) {
-                    const bits = dataBits.map((bit) => (bit ? "1" : "0"));
-                    this.LOG("DHT11 data bits: " + bits.join(", "));
-                }
-
-                const nBytes = Math.floor(DHT11.DATA_BITS / 8);
-                let dataBytes: number[] = [];
-                for (let i = 0; i < nBytes; ++i) {
-                    let byte = 0;
-                    for (let j = 0; j < 8; ++j) {
-                        byte <<= 1;
-                        byte |= dataBits[i * 8 + j] ? 1 : 0;
-                    }
-                    dataBytes.push(byte);
-                }
-
-                if (this.serialLogging) {
-                    const bytes = dataBytes.map((byte) => byte.toString());
-                    this.LOG("DHT11 data bytes: " + bytes.join(", "));
-                }
-
-                if (dataBytes.length < 5) {
-                    this.LOG("DHT11 data bytes length is less than 5");
+                if (resultBuffer.length != 8) {
+                    this.LOG("DHT11 result buffer length error: " + resultBuffer.length.toString());
                     return false;
                 }
 
-                const checksum = (dataBytes[0] + dataBytes[1] + dataBytes[2] + dataBytes[3]) & 0xFF;
-                if (checksum != dataBytes[4]) {
-                    this.LOG("DHT11 checksum error: " + checksum.toString() + " != " + dataBytes[4].toString());
+                const returnCode = resultBuffer[2];
+                if (returnCode != 0) {
+                    switch (returnCode) {
+                        case 1:
+                            this.LOG("DHT11 sensor not connected on pin " + this.signalPin.toString());
+                            break;
+                        case 1 << 1:
+                            this.LOG("DHT11 wait ack low init timeout");
+                            break;
+                        case 1 << 2:
+                            this.LOG("DHT11 wait ack low timeout");
+                            break;
+                        case 1 << 3:
+                            this.LOG("DHT11 wait ack high timeout");
+                            break;
+                        case 1 << 4:
+                            this.LOG("DHT11 wait data high timeout");
+                            break;
+                        case 1 << 5:
+                            this.LOG("DHT11 wait data low timeout");
+                            break;
+                        case 1 << 6:
+                            this.LOG("DHT11 checksum error");
+                            break;
+                        default:
+                            this.LOG("DHT11 unknown error: " + returnCode.toString());
+                            break;
+                    }
                     return false;
                 }
 
-                this._humidity = dataBytes[0] + dataBytes[1] * 0.01;
-                this._temperature = dataBytes[2] + dataBytes[3] * 0.01;
+                const humidityHigh = resultBuffer.getNumber(NumberFormat.Int8LE, 4);
+                const humidityLow = resultBuffer.getNumber(NumberFormat.Int8LE, 5);
+                const temperatureHigh = resultBuffer.getNumber(NumberFormat.Int8LE, 6);
+                const temperatureLow = resultBuffer.getNumber(NumberFormat.Int8LE, 7);
+
+                this._humidity = humidityHigh + (humidityLow * 0.01);
+                this._temperature = temperatureHigh + (temperatureLow * 0.01);
                 this._temperature = Math.max(DHT11.TEMP_MIN, Math.min(DHT11.TEMP_MAX, this._temperature));
 
                 this.LOG("DHT11 humidity: " + this._humidity.toString());
