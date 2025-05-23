@@ -16,7 +16,7 @@
         "_locales/de/Grove-strings.json",
         "sensors/AHT20.ts",
         "sensors/DHT11.cpp",
-        "sensors/DHT11.ts"
+        "sensors/DHT11Helper.ts"
     ],
     "testFiles": [
         "test.ts"
