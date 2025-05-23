@@ -88,7 +88,7 @@ namespace grove {
                     return false;
                 }
 
-                const returnCode = resultBuffer[2];
+                const returnCode = resultBuffer[5];
                 if (returnCode != 0) {
                     switch (returnCode) {
                         case 1:
@@ -119,10 +119,10 @@ namespace grove {
                     return false;
                 }
 
-                const humidityHigh = resultBuffer.getNumber(NumberFormat.Int8LE, 4);
-                const humidityLow = resultBuffer.getNumber(NumberFormat.Int8LE, 5);
-                const temperatureHigh = resultBuffer.getNumber(NumberFormat.Int8LE, 6);
-                const temperatureLow = resultBuffer.getNumber(NumberFormat.Int8LE, 7);
+                const humidityHigh = resultBuffer.getNumber(NumberFormat.Int8LE, 3);
+                const humidityLow = resultBuffer.getNumber(NumberFormat.Int8LE, 2);
+                const temperatureHigh = resultBuffer.getNumber(NumberFormat.Int8LE, 1);
+                const temperatureLow = resultBuffer.getNumber(NumberFormat.Int8LE, 0);
 
                 this._humidity = humidityHigh + (humidityLow * 0.01);
                 this._temperature = temperatureHigh + (temperatureLow * 0.01);
