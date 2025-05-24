@@ -57,7 +57,7 @@ namespace grove {
                 return this.lastSuccessSyncTime;
             }
 
-            public readSensorData(forceRead: boolean = false, retryTimes: number = 30, retryDelayMs: number = 50): boolean {
+            public readSensorData(forceRead: boolean = false, retryTimes: number = 10, retryDelayMs: number = 100): boolean {
                 if (!forceRead) {
                     const currentTime = input.runningTime();
                     const isInit = isNaN(this._humidity) || isNaN(this._temperature);
@@ -96,17 +96,17 @@ namespace grove {
                     }
                     switch (returnCode) {
                         case 1:
-                            this.LOG("DHT11 sensor not connected on pin " + this.signalPin.toString());
-                            break;
+                            this.LOG("DHT11 pin not found " + this.signalPin.toString());
+                            return false;
                         case 1 << 1:
-                            this.LOG("DHT11 wait ack low init timeout");
-                            break;
+                            this.LOG("DHT11 sensor no response");
+                            return false;
                         case 1 << 2:
                             this.LOG("DHT11 wait ack low timeout");
-                            break;
+                            return false;
                         case 1 << 3:
                             this.LOG("DHT11 wait ack high timeout");
-                            break;
+                            return false;
                         case 1 << 4:
                             this.LOG("DHT11 wait data high timeout");
                             break;
