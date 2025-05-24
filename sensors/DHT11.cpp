@@ -3,7 +3,6 @@
  */
 
 #include "pxt.h"
-#include "mbed.h"
 #include "MicroBitConfig.h"
 #include "MicroBit.h"
 
@@ -14,16 +13,28 @@
 #include "nrf_delay.h"
 #endif
 
-using namespace pxt;
 
-namespace grove {
-
-namespace sensors {
-
+#define _DHT11_D_CLOCK_IMPL_VER 0
 #define _DHT11_D_IMPL_VER 1
+
+
+#if _DHT11_D_CLOCK_IMPL_VER == 1
+#include "mbed.h"
+#endif
+
+
 #define _DHT11_F_PIN_DIGITAL_WRITE_LOW pin->setDigitalValue(0)
 #define _DHT11_F_PIN_DIGITAL_READ pin->getDigitalValue()
-#define _DHT11_F_TIME_MICROS us_ticker_read()
+#define _DHT11_T_TIME_MICROS uint32_t 
+
+#if _DHT11_D_CLOCK_IMPL_VER == 0
+#define _DHT11_C_TIME_MICROS_MASK 0x3fffffff
+#define _DHT11_F_TIME_MICROS (system_timer_current_time_us() & _DHT11_C_TIME_MICROS_MASK)
+#elif _DHT11_D_CLOCK_IMPL_VER == 1
+#define _DHT11_C_TIME_MICROS_MASK 0x3fffffff
+#define _DHT11_F_TIME_MICROS (us_ticker_read() & _DHT11_C_TIME_MICROS_MASK) // us_ticker_read() is prohibited in pxt-microbit extension
+#endif
+
 #define _DHT11_C_PULLDOWN_TIME 20000
 #define _DHT11_C_ACK_1_TIMEOUT 300
 #define _DHT11_C_ACK_2_TIMEOUT 40
@@ -35,6 +46,14 @@ namespace sensors {
 #define _DHT11_LIKELY(x) __builtin_expect(!!(x), 1)
 #define _DHT11_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
+
+using namespace pxt;
+
+
+namespace grove {
+
+namespace sensors {
+
 #if _DHT11_D_IMPL_VER == 2
 // __attribute__((noinline, long_call, section(".ramfuncs"), optimize("s")))
 int64_t
@@ -45,13 +64,11 @@ __dht11_read_impl_v2(const int pin_num) {
 
     register int64_t result = 0;
 
-    uint32_t end_time = 0;
-    uint32_t start_time = 0;
+    _DHT11_T_TIME_MICROS start_time = 0;
 
     _DHT11_F_PIN_DIGITAL_WRITE_LOW;
     start_time = _DHT11_F_TIME_MICROS;
-    end_time = start_time + _DHT11_C_PULLDOWN_TIME;
-    while (_DHT11_F_TIME_MICROS < end_time)
+    while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_PULLDOWN_TIME)
         ;
     __disable_irq();
     start_time = _DHT11_F_TIME_MICROS;
@@ -62,24 +79,22 @@ __dht11_read_impl_v2(const int pin_num) {
     pin->setPull(PinMode::PullUp);
 #endif
 
-    end_time = start_time + _DHT11_C_ACK_1_TIMEOUT;
     while (_DHT11_F_PIN_DIGITAL_READ ^ 0) {
-        if (_DHT11_UNLIKELY(_DHT11_F_TIME_MICROS > end_time)) {
+        if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT)) {
             __enable_irq();
             return 1ll << 41;
         }
     }
 
     while (_DHT11_F_PIN_DIGITAL_READ ^ 1) {
-        if (_DHT11_UNLIKELY(_DHT11_F_TIME_MICROS > end_time)) {
+        if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT)) {
             __enable_irq();
             return 1ll << 42;
         }
     }
     start_time = _DHT11_F_TIME_MICROS;
 
-    end_time = start_time + _DHT11_C_ACK_2_TIMEOUT;
-    while (_DHT11_F_TIME_MICROS < end_time)
+    while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time)  < _DHT11_C_ACK_2_TIMEOUT)
         ;
 
     if (_DHT11_UNLIKELY(_DHT11_F_PIN_DIGITAL_READ ^ 1)) {
@@ -87,29 +102,25 @@ __dht11_read_impl_v2(const int pin_num) {
         return 1ll << 43;
     }
 
-    end_time = start_time + _DHT11_C_DATA_BITS_WAIT_DELAY;
-    while (_DHT11_F_TIME_MICROS < end_time)
+    while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_WAIT_DELAY)
         ;
 
     for (int i = 39; i >= 0; --i) {
         start_time = _DHT11_F_TIME_MICROS;
-        end_time = start_time + _DHT11_C_DATA_BITS_LOW_TIMEOUT;
         while (_DHT11_F_PIN_DIGITAL_READ ^ 1) {
-            if (_DHT11_UNLIKELY(_DHT11_F_TIME_MICROS > end_time)) {
+            if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_LOW_TIMEOUT)) {
                 __enable_irq();
                 return 1ll << 44;
             }
         }
         start_time = _DHT11_F_TIME_MICROS;
-        end_time = start_time + _DHT11_C_DATA_BITS_HIGH_DELAY;
-        while (_DHT11_F_TIME_MICROS < end_time)
+        while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_HIGH_DELAY)
             ;
 
         result |= static_cast<int64_t>(_DHT11_F_PIN_DIGITAL_READ) << i;
 
-        end_time = start_time + _DHT11_C_DATA_BITS_HIGH_TIMEOUT;
         while (_DHT11_F_PIN_DIGITAL_READ ^ 0) {
-            if (_DHT11_UNLIKELY(_DHT11_F_TIME_MICROS > end_time)) {
+            if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_HIGH_TIMEOUT)) {
                 __enable_irq();
                 return 1ll << 45;
             }
@@ -137,14 +148,11 @@ __dht11_read_impl_v1(const int pin_num) {
     bool data_bits[40];
 
     {
-
-        uint32_t start_time = 0;
-        uint32_t end_time = 0;
+        _DHT11_T_TIME_MICROS start_time = 0;
 
         _DHT11_F_PIN_DIGITAL_WRITE_LOW;
         start_time = _DHT11_F_TIME_MICROS;
-        end_time = start_time + _DHT11_C_PULLDOWN_TIME;
-        while (_DHT11_F_TIME_MICROS < end_time)
+        while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_PULLDOWN_TIME)
             ;
         __disable_irq();
         start_time = _DHT11_F_TIME_MICROS;
@@ -155,24 +163,22 @@ __dht11_read_impl_v1(const int pin_num) {
         pin->setPull(PinMode::PullUp);
 #endif
 
-        end_time = start_time + _DHT11_C_ACK_1_TIMEOUT;
         while (_DHT11_F_PIN_DIGITAL_READ ^ 0) {
-            if (_DHT11_F_TIME_MICROS > end_time) {
+            if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT) {
                 __enable_irq();
                 return 1ll << 41;
             }
         }
 
         while (_DHT11_F_PIN_DIGITAL_READ ^ 1) {
-            if (_DHT11_F_TIME_MICROS > end_time) {
+            if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT) {
                 __enable_irq();
                 return 1ll << 42;
             }
         }
         start_time = _DHT11_F_TIME_MICROS;
 
-        end_time = start_time + _DHT11_C_ACK_2_TIMEOUT;
-        while (_DHT11_F_TIME_MICROS < end_time)
+        while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_ACK_2_TIMEOUT)
             ;
 
         if (_DHT11_F_PIN_DIGITAL_READ ^ 1) {
@@ -180,29 +186,25 @@ __dht11_read_impl_v1(const int pin_num) {
             return 1ll << 43;
         }
 
-        end_time = start_time + _DHT11_C_DATA_BITS_WAIT_DELAY;
-        while (_DHT11_F_TIME_MICROS < end_time)
+        while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_WAIT_DELAY)
             ;
 
         for (int i = 0; i < 40; ++i) {
             start_time = _DHT11_F_TIME_MICROS;
-            end_time = start_time + _DHT11_C_DATA_BITS_LOW_TIMEOUT;
             while (_DHT11_F_PIN_DIGITAL_READ ^ 1) {
-                if (_DHT11_F_TIME_MICROS > end_time) {
+                if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_LOW_TIMEOUT) {
                     __enable_irq();
                     return 1ll << 44;
                 }
             }
             start_time = _DHT11_F_TIME_MICROS;
-            end_time = start_time + _DHT11_C_DATA_BITS_HIGH_DELAY;
-            while (_DHT11_F_TIME_MICROS < end_time)
+            while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_HIGH_DELAY)
                 ;
 
             data_bits[i] = _DHT11_F_PIN_DIGITAL_READ;
 
-            end_time = start_time + _DHT11_C_DATA_BITS_HIGH_TIMEOUT;
             while (_DHT11_F_PIN_DIGITAL_READ ^ 0) {
-                if (_DHT11_F_TIME_MICROS > end_time) {
+                if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_HIGH_TIMEOUT) {
                     __enable_irq();
                     return 1ll << 45;
                 }
@@ -234,7 +236,6 @@ __dht11_read_impl_v1(const int pin_num) {
 
 } // namespace sensors
 
-
 //% advanced=true
 //%
 Buffer DHT11InternalRead(int signalPin) {
@@ -249,8 +250,7 @@ Buffer DHT11InternalRead(int signalPin) {
     return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
 }
 
-
-}
+} // namespace grove
 
 
 namespace sensors
