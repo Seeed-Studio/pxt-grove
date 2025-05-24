@@ -88,7 +88,7 @@ namespace grove {
                         basic.pause(retryDelayMs);
                         continue;
                     }
-                    const returnCode = resultBufferresultBuffer.getNumber(NumberFormat.Int8LE, 5);
+                    const returnCode = resultBuffer.getNumber(NumberFormat.Int8LE, 5);
                     if (returnCode == 0) {
                         this.lastSuccessSyncTime = input.runningTime();
                         this.LOG("DHT11 read success in " + retryCount.toString() + " tries, max " + retryTimes.toString());
