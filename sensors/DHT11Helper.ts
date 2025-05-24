@@ -9,7 +9,7 @@ namespace grove {
     export function DHT11InternalRead(signalPin: DigitalPin): Buffer {
         let resultBuffer: Buffer = control.createBuffer(8);
         resultBuffer.fill(0);
-        resultBuffer.setNumber(NumberFormat.Int8LE, 5, 1);
+        resultBuffer.setNumber(NumberFormat.Int8LE, 5, 1 << 1);
         return resultBuffer;
     }
 
@@ -99,7 +99,7 @@ namespace grove {
                             this.LOG("DHT11 pin not found " + this.signalPin.toString());
                             return false;
                         case 1 << 1:
-                            this.LOG("DHT11 sensor no response");
+                            this.LOG("DHT11 sensor connection error, no response");
                             return false;
                         case 1 << 2:
                             this.LOG("DHT11 wait ack low timeout");
