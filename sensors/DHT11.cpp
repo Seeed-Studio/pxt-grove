@@ -314,6 +314,16 @@ __dht11_read_impl_v1(const int pin_num) {
 Buffer DHT11InternalRead(int signalPin) {
     int64_t result = 1ll << 40;
 
+#if _DHT11_D_CLOCK_IMPL_VER == 2
+    if (_DHT11_UNLIKELY(!_dht11_systick_initialized)) {
+        if (_dht11_systick_init() < 0) {
+            result = 1ll << 47;
+            return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
+        }
+        _dht11_systick_initialized = true;
+    }
+#endif
+
 #if _DHT11_D_IMPL_VER == 1
     result = grove::sensors::__dht11_read_impl_v1(signalPin);
 #elif _DHT11_D_IMPL_VER == 2
