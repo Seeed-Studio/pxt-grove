@@ -3,7 +3,10 @@
  */
 
 #include "pxt.h"
+#include "mbed.h"
+#include "MicroBitConfig.h"
 #include "MicroBit.h"
+
 
 #if MICROBIT_CODAL
 #include "nrf.h"
@@ -20,7 +23,7 @@ namespace sensors {
 #define _DHT11_D_IMPL_VER 1
 #define _DHT11_F_PIN_DIGITAL_WRITE_LOW pin->setDigitalValue(0)
 #define _DHT11_F_PIN_DIGITAL_READ pin->getDigitalValue()
-#define _DHT11_F_TIME_MICROS system_timer_current_time_us()
+#define _DHT11_F_TIME_MICROS us_ticker_read()
 #define _DHT11_C_PULLDOWN_TIME 20000
 #define _DHT11_C_ACK_1_TIMEOUT 300
 #define _DHT11_C_ACK_2_TIMEOUT 40
