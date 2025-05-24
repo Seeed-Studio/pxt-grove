@@ -1,5 +1,5 @@
 /**
- * Grove Temperature & Humidity Sensor (DHT11Helper) support by @nullptr, 2025.5.19
+ * Grove Temperature & Humidity Sensor (DHT11) support by @nullptr, 2025.5.19
  */
 
 namespace grove {

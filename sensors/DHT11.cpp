@@ -1,3 +1,7 @@
+/**
+ * Grove Temperature & Humidity Sensor (DHT11) support by @nullptr, 2025.5.19
+ */
+
 #include "pxt.h"
 #include "MicroBit.h"
 
@@ -236,7 +240,7 @@ Buffer DHT11InternalRead(int signalPin) {
 #if _DHT11_D_IMPL_VER == 1
     result = grove::sensors::__dht11_read_impl_v1(signalPin);
 #elif _DHT11_D_IMPL_VER == 2
-    result = sensors::__dht11_read_impl_v2(signalPin);
+    result = grove::sensors::__dht11_read_impl_v2(signalPin);
 #endif
 
     return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
