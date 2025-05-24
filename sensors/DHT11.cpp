@@ -8,11 +8,19 @@
 
 
 #if MICROBIT_CODAL
-#include "nrf.h"
-#include "nrf_soc.h"
-#include "nrf_delay.h"
+    #include "nrf.h"
+    #include "nrf_soc.h"
+    #include "nrf_systick.h"
+
+    #define _DHT11_D_CLOCK_IMPL_VER 2
+
+#else
+    #define _DHT11_D_CLOCK_IMPL_VER 0
+
 #endif
 
+#define _DHT11_LIKELY(x) __builtin_expect(!!(x), 1)
+#define _DHT11_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
 #define _DHT11_D_CLOCK_IMPL_VER 0
 #define _DHT11_D_IMPL_VER 1
@@ -22,12 +30,73 @@
 #define _DHT11_T_TIME_MICROS uint32_t 
 
 #if _DHT11_D_CLOCK_IMPL_VER == 0
-#define _DHT11_C_TIME_MICROS_MASK 0x3fffffff
-#define _DHT11_F_TIME_MICROS (system_timer_current_time_us() & _DHT11_C_TIME_MICROS_MASK)
+    #define _DHT11_C_TIME_MICROS_MASK 0x3fffffffUL
+    #define _DHT11_F_TIME_MICROS (system_timer_current_time_us() & _DHT11_C_TIME_MICROS_MASK)
+
 #elif _DHT11_D_CLOCK_IMPL_VER == 1
-#include "mbed.h"
-#define _DHT11_C_TIME_MICROS_MASK 0x3fffffff
-#define _DHT11_F_TIME_MICROS (us_ticker_read() & _DHT11_C_TIME_MICROS_MASK) // us_ticker_read() is prohibited in pxt-microbit extension
+    #include "mbed.h"
+
+    #define _DHT11_C_TIME_MICROS_MASK 0x3fffffffUL
+    #define _DHT11_F_TIME_MICROS (us_ticker_read() & _DHT11_C_TIME_MICROS_MASK) // prohibited in pxt-microbit extension
+
+#elif _DHT11_D_CLOCK_IMPL_VER == 2
+    #define _DHT11_C_TIME_MICROS_MASK 0x3fffffffUL
+
+    extern "C" {
+    
+    extern uint32_t SystemCoreClock;
+
+    struct _dht11_systick_t {
+        uint32_t val;
+        uint32_t load;
+    };
+
+    static _dht11_systick_t _dht11_systick_0;
+    static _dht11_systick_t _dht11_systick_1;
+    static volatile _dht11_systick_t* _dht11_systick_ptr = &_dht11_systick_0;
+
+    static bool _dht11_systick_initialized = false;
+
+    inline __attribute__((always_inline))
+    int _dht11_systick_init() {
+        if (_DHT11_UNLIKELY(SystemCoreClock == 0)) {
+            return -1;
+        }
+
+        _dht11_systick_0->val = nrf_systick_val_get() & NRF_SYSTICK_VAL_MASK;
+        _dht11_systick_0->load = nrf_systick_load_get();
+        
+        return 0;
+    }
+
+    inline __attribute__((always_inline))
+    void _dht11_systick_sync() {
+        const uint32_t val = nrf_systick_val_get() & NRF_SYSTICK_VAL_MASK;
+        const uint32_t load = nrf_systick_load_get();
+        if (load != _dht11_systick_ptr->load) {
+            _dht11_systick_t* next = _dht11_systick_ptr == &_dht11_systick_0 ? &_dht11_systick_1 : &_dht11_systick_0;
+            next->val = val;
+            next->load = load;
+            _dht11_systick_ptr = next;
+        }
+    }
+
+    inline __attribute__((always_inline))
+    uint32_t _dht11_systick_as_micros() {
+        const uint32_t val_durations = (nrf_systick_val_get() & NRF_SYSTICK_VAL_MASK) - _dht11_systick_ptr->val;
+        const uint64_t load_durations = static_cast<uint64_t>(nrf_systick_load_get() - _dht11_systick_ptr->load) * NRFX_SYSTICK_TICKS_MAX;
+
+        return static_cast<uint32_t>((static_cast<uint64_t>(val_durations + load_durations) * 1e6ULL) / SystemCoreClock);
+    }
+
+    } // extern "C"
+
+    #define _DHT11_F_TIME_MICROS_SYNC _dht11_systick_sync()
+    #define _DHT11_F_TIME_MICROS (_dht11_systick_as_micros() & _DHT11_C_TIME_MICROS_MASK)
+
+#else
+    #error "Unsupported _DHT11_D_CLOCK_IMPL_VER"
+
 #endif
 
 #define _DHT11_C_PULLDOWN_TIME 20000
@@ -37,9 +106,6 @@
 #define _DHT11_C_DATA_BITS_LOW_TIMEOUT 70
 #define _DHT11_C_DATA_BITS_HIGH_DELAY 30
 #define _DHT11_C_DATA_BITS_HIGH_TIMEOUT 90
-
-#define _DHT11_LIKELY(x) __builtin_expect(!!(x), 1)
-#define _DHT11_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
 
 using namespace pxt;
@@ -62,10 +128,16 @@ __dht11_read_impl_v2(const int pin_num) {
     _DHT11_T_TIME_MICROS start_time = 0;
 
     _DHT11_F_PIN_DIGITAL_WRITE_LOW;
+#ifdef _DHT11_F_TIME_MICROS_SYNC
+    _DHT11_F_TIME_MICROS_SYNC;
+#endif
     start_time = _DHT11_F_TIME_MICROS;
     while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_PULLDOWN_TIME)
         ;
     __disable_irq();
+#ifdef _DHT11_F_TIME_MICROS_SYNC
+    _DHT11_F_TIME_MICROS_SYNC;
+#endif
     start_time = _DHT11_F_TIME_MICROS;
 
 #if MICROBIT_CODAL
@@ -146,10 +218,16 @@ __dht11_read_impl_v1(const int pin_num) {
         _DHT11_T_TIME_MICROS start_time = 0;
 
         _DHT11_F_PIN_DIGITAL_WRITE_LOW;
+#ifdef _DHT11_F_TIME_MICROS_SYNC
+    _DHT11_F_TIME_MICROS_SYNC;
+#endif
         start_time = _DHT11_F_TIME_MICROS;
         while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_PULLDOWN_TIME)
             ;
         __disable_irq();
+#ifdef _DHT11_F_TIME_MICROS_SYNC
+    _DHT11_F_TIME_MICROS_SYNC;
+#endif
         start_time = _DHT11_F_TIME_MICROS;
 
 #if MICROBIT_CODAL
