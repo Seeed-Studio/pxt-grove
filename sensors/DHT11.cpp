@@ -17,12 +17,6 @@
 #define _DHT11_D_CLOCK_IMPL_VER 0
 #define _DHT11_D_IMPL_VER 1
 
-
-#if _DHT11_D_CLOCK_IMPL_VER == 1
-#include "mbed.h"
-#endif
-
-
 #define _DHT11_F_PIN_DIGITAL_WRITE_LOW pin->setDigitalValue(0)
 #define _DHT11_F_PIN_DIGITAL_READ pin->getDigitalValue()
 #define _DHT11_T_TIME_MICROS uint32_t 
@@ -31,6 +25,7 @@
 #define _DHT11_C_TIME_MICROS_MASK 0x3fffffff
 #define _DHT11_F_TIME_MICROS (system_timer_current_time_us() & _DHT11_C_TIME_MICROS_MASK)
 #elif _DHT11_D_CLOCK_IMPL_VER == 1
+#include "mbed.h"
 #define _DHT11_C_TIME_MICROS_MASK 0x3fffffff
 #define _DHT11_F_TIME_MICROS (us_ticker_read() & _DHT11_C_TIME_MICROS_MASK) // us_ticker_read() is prohibited in pxt-microbit extension
 #endif
