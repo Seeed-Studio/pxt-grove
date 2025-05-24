@@ -57,7 +57,7 @@ namespace grove {
                 return this.lastSuccessSyncTime;
             }
 
-            public readSensorData(forceRead: boolean = false, retryTimes: number = 10, retryDelayMs: number = 100): boolean {
+            public readSensorData(forceRead: boolean = false, retryTimes: number = 3, retryDelayMs: number = 2000): boolean {
                 if (!forceRead) {
                     const currentTime = input.runningTime();
                     const isInit = isNaN(this._humidity) || isNaN(this._temperature);
@@ -78,13 +78,14 @@ namespace grove {
                 let retryCount = 0;
                 let resultBuffer: Buffer;
                 while (true) {
-                    if (++retryCount > retryTimes) {
+                    if (retryCount > retryTimes) {
                         this.LOG("DHT11 read failed after " + retryCount.toString() + " tries, max " + retryTimes.toString());
                         return false;
                     }
+                    ++retryCount;
                     resultBuffer = grove.DHT11InternalRead(this.signalPin);
                     if (!resultBuffer || resultBuffer.length != 8) {
-                        this.LOG("DHT11 result buffer length error: " + resultBuffer.length.toString());
+                        this.LOG("DHT11 (" + retryCount.toString() + ") result buffer length error: " + resultBuffer.length.toString());
                         basic.pause(retryDelayMs);
                         continue;
                     }
@@ -96,28 +97,28 @@ namespace grove {
                     }
                     switch (returnCode) {
                         case 1:
-                            this.LOG("DHT11 pin not found " + this.signalPin.toString());
+                            this.LOG("DHT11 (" + retryCount.toString() + ") pin not found " + this.signalPin.toString());
                             return false;
                         case 1 << 1:
-                            this.LOG("DHT11 sensor connection error, no response");
+                            this.LOG("DHT11 (" + retryCount.toString() + ") sensor connection error, no response");
                             return false;
                         case 1 << 2:
-                            this.LOG("DHT11 wait ack low timeout");
+                            this.LOG("DHT11 (" + retryCount.toString() + ") wait ack low timeout");
                             return false;
                         case 1 << 3:
-                            this.LOG("DHT11 wait ack high timeout");
+                            this.LOG("DHT11 (" + retryCount.toString() + ") wait ack high timeout");
                             return false;
                         case 1 << 4:
-                            this.LOG("DHT11 wait data high timeout");
+                            this.LOG("DHT11 (" + retryCount.toString() + ") wait data high timeout");
                             break;
                         case 1 << 5:
-                            this.LOG("DHT11 wait data low timeout");
+                            this.LOG("DHT11 (" + retryCount.toString() + ") wait data low timeout");
                             break;
                         case 1 << 6:
-                            this.LOG("DHT11 checksum error");
+                            this.LOG("DHT11 (" + retryCount.toString() + ") checksum error");
                             break;
                         default:
-                            this.LOG("DHT11 unknown error: " + returnCode.toString());
+                            this.LOG("DHT11 (" + retryCount.toString() + ") unknown error: " + returnCode.toString());
                             break;
                     }
                     basic.pause(retryDelayMs);
