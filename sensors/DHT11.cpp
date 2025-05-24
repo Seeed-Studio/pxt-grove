@@ -63,8 +63,9 @@
             return -1;
         }
 
-        _dht11_systick_0->val = nrf_systick_val_get() & NRF_SYSTICK_VAL_MASK;
-        _dht11_systick_0->load = nrf_systick_load_get();
+        _dht11_systick_0.val = nrf_systick_val_get() & NRF_SYSTICK_VAL_MASK;
+        _dht11_systick_0.load = nrf_systick_load_get();
+        _dht11_systick_ptr = &_dht11_systick_0;
         
         return 0;
     }
