@@ -6,16 +6,15 @@
 #include "MicroBitConfig.h"
 #include "MicroBit.h"
 
-
 #if MICROBIT_CODAL
-    #include "nrf.h"
-    #include "nrf_soc.h"
-    #include "nrf_systick.h"
+#include "nrf.h"
+#include "nrf_soc.h"
+#include "nrf_systick.h"
 
-    #define _DHT11_D_CLOCK_IMPL_VER 2
+#define _DHT11_D_CLOCK_IMPL_VER 2
 
 #else
-    #define _DHT11_D_CLOCK_IMPL_VER 0
+#define _DHT11_D_CLOCK_IMPL_VER 0
 
 #endif
 
@@ -27,72 +26,79 @@
 
 #define _DHT11_F_PIN_DIGITAL_WRITE_LOW pin->setDigitalValue(0)
 #define _DHT11_F_PIN_DIGITAL_READ pin->getDigitalValue()
-#define _DHT11_T_TIME_MICROS uint32_t 
+#define _DHT11_T_TIME_MICROS uint32_t
 
 #if _DHT11_D_CLOCK_IMPL_VER == 0
-    #define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
-    #define _DHT11_F_TIME_MICROS (system_timer_current_time_us() & _DHT11_C_TIME_MICROS_MASK)
+#define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
+#define _DHT11_F_TIME_MICROS (system_timer_current_time_us() & _DHT11_C_TIME_MICROS_MASK)
 
 #elif _DHT11_D_CLOCK_IMPL_VER == 1
-    #include "mbed.h"
+#include "mbed.h"
 
-    #define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
-    #define _DHT11_F_TIME_MICROS (us_ticker_read() & _DHT11_C_TIME_MICROS_MASK) // prohibited in pxt-microbit extension
+#define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
+#define _DHT11_F_TIME_MICROS (us_ticker_read() & _DHT11_C_TIME_MICROS_MASK) // prohibited in pxt-microbit extension
 
 #elif _DHT11_D_CLOCK_IMPL_VER == 2
-    #define _DHT11_C_SYSTICK_WRAP_MIN_MS 30
-    #define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
+#define _DHT11_C_SYSTICK_WRAP_MIN_MS 30
+#define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
 
-    extern "C" {
-    
+extern "C"
+{
+
     extern uint32_t SystemCoreClock;
 
     static uint32_t _dht11_systick_snapshot = 0;
 
-    inline __attribute__((always_inline))
-    void _dht11_systick_sync() {
+    inline __attribute__((always_inline)) void _dht11_systick_sync()
+    {
         _dht11_systick_snapshot = nrf_systick_val_get() & NRF_SYSTICK_VAL_MASK;
     }
 
-    inline __attribute__((always_inline))
-    int _dht11_systick_init() {
-        if (_DHT11_UNLIKELY(!SystemCoreClock)) {
+    inline __attribute__((always_inline)) int _dht11_systick_init()
+    {
+        if (_DHT11_UNLIKELY(!SystemCoreClock))
+        {
             return 0b0011;
         }
 
         const uint32_t ctrl = nrf_systick_csr_get();
-        if (_DHT11_UNLIKELY((ctrl & NRF_SYSTICK_CSR_ENABLE_MASK) == NRF_SYSTICK_CSR_DISABLE)) {
+        if (_DHT11_UNLIKELY((ctrl & NRF_SYSTICK_CSR_ENABLE_MASK) == NRF_SYSTICK_CSR_DISABLE))
+        {
             nrf_systick_load_set(NRF_SYSTICK_VAL_MASK);
             nrf_systick_csr_set(
                 NRF_SYSTICK_CSR_CLKSOURCE_CPU |
                 NRF_SYSTICK_CSR_TICKINT_DISABLE |
-                NRF_SYSTICK_CSR_ENABLE
-            );
+                NRF_SYSTICK_CSR_ENABLE);
         }
 
         const uint32_t load = nrf_systick_load_get() & NRF_SYSTICK_VAL_MASK;
         const uint32_t wrap_period_ms = static_cast<uint64_t>(load) * 1e3ull / SystemCoreClock;
-        if (_DHT11_UNLIKELY(wrap_period_ms < _DHT11_C_SYSTICK_WRAP_MIN_MS)) {
+        if (_DHT11_UNLIKELY(wrap_period_ms < _DHT11_C_SYSTICK_WRAP_MIN_MS))
+        {
             return 0b0111;
         }
 
         _dht11_systick_sync();
-        
+
         return 0;
     }
 
     inline __attribute__((always_inline))
-    uint32_t _dht11_systick_as_micros() {
-        return static_cast<uint32_t>((static_cast<uint64_t>(_dht11_systick_snapshot - (nrf_systick_val_get() & NRF_SYSTICK_VAL_MASK)) * 1e6ull) / SystemCoreClock);
+    uint32_t
+    _dht11_systick_as_micros()
+    {
+        const uint32_t val = nrf_systick_val_get() & NRF_SYSTICK_VAL_MASK;
+        const uint64_t period = val < _dht11_systick_snapshot ? static_cast<uint64_t>(_dht11_systick_snapshot - val) : static_cast<uint64_t>(NRF_SYSTICK_VAL_MASK) + _dht11_systick_snapshot - val;
+        return static_cast<uint32_t>((period * 1e6ull) / SystemCoreClock);
     }
 
-    } // extern "C"
+} // extern "C"
 
-    #define _DHT11_F_TIME_MICROS_SYNC _dht11_systick_sync()
-    #define _DHT11_F_TIME_MICROS (_dht11_systick_as_micros() & _DHT11_C_TIME_MICROS_MASK)
+#define _DHT11_F_TIME_MICROS_SYNC _dht11_systick_sync()
+#define _DHT11_F_TIME_MICROS (_dht11_systick_as_micros() & _DHT11_C_TIME_MICROS_MASK)
 
 #else
-    #error "Unsupported _DHT11_D_CLOCK_IMPL_VER"
+#error "Unsupported _DHT11_D_CLOCK_IMPL_VER"
 
 #endif
 
@@ -104,233 +110,259 @@
 #define _DHT11_C_DATA_BITS_HIGH_DELAY 30
 #define _DHT11_C_DATA_BITS_HIGH_TIMEOUT 90
 
-
 using namespace pxt;
 
+namespace grove
+{
 
-namespace grove {
-
-namespace sensors {
+    namespace sensors
+    {
 
 #if _DHT11_D_IMPL_VER == 2
-// __attribute__((noinline, long_call, section(".ramfuncs"), optimize("s")))
-int64_t
-__dht11_read_impl_v2(const int pin_num) {
-    MicroBitPin *pin = getPin(pin_num);
-    if (_DHT11_UNLIKELY(!pin))
-        return 1ll << 40;
+        // __attribute__((noinline, long_call, section(".ramfuncs"), optimize("s")))
+        int64_t
+        __dht11_read_impl_v2(const int pin_num)
+        {
+            MicroBitPin *pin = getPin(pin_num);
+            if (_DHT11_UNLIKELY(!pin))
+                return 1ll << 40;
 
-    register int64_t result = 0;
+            register int64_t result = 0;
 
-    _DHT11_T_TIME_MICROS start_time = 0;
+            _DHT11_T_TIME_MICROS start_time = 0;
 
-    _DHT11_F_PIN_DIGITAL_WRITE_LOW;
-    __disable_irq();
+            _DHT11_F_PIN_DIGITAL_WRITE_LOW;
+            __disable_irq();
 #ifdef _DHT11_F_TIME_MICROS_SYNC
-    _DHT11_F_TIME_MICROS_SYNC;
+            _DHT11_F_TIME_MICROS_SYNC;
 #endif
-    start_time = _DHT11_F_TIME_MICROS;
-    while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_PULLDOWN_TIME)
-        ;
-    start_time = _DHT11_F_TIME_MICROS;
-
-#if MICROBIT_CODAL
-    pin->setPull(codal::PullMode::Up);
-#else
-    pin->setPull(PinMode::PullUp);
-#endif
-
-    while (_DHT11_F_PIN_DIGITAL_READ ^ 0) {
-        if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT)) {
-            __enable_irq();
-            return 1ll << 41;
-        }
-    }
-
-    while (_DHT11_F_PIN_DIGITAL_READ ^ 1) {
-        if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT)) {
-            __enable_irq();
-            return 1ll << 42;
-        }
-    }
-    start_time = _DHT11_F_TIME_MICROS;
-
-    while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time)  < _DHT11_C_ACK_2_TIMEOUT)
-        ;
-
-    if (_DHT11_UNLIKELY(_DHT11_F_PIN_DIGITAL_READ ^ 1)) {
-        __enable_irq();
-        return 1ll << 43;
-    }
-
-    while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_WAIT_DELAY)
-        ;
-
-    for (int i = 39; i >= 0; --i) {
-        start_time = _DHT11_F_TIME_MICROS;
-        while (_DHT11_F_PIN_DIGITAL_READ ^ 1) {
-            if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_LOW_TIMEOUT)) {
-                __enable_irq();
-                return 1ll << 44;
-            }
-        }
-        start_time = _DHT11_F_TIME_MICROS;
-        while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_HIGH_DELAY)
-            ;
-
-        result |= static_cast<int64_t>(_DHT11_F_PIN_DIGITAL_READ) << i;
-
-        while (_DHT11_F_PIN_DIGITAL_READ ^ 0) {
-            if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_HIGH_TIMEOUT)) {
-                __enable_irq();
-                return 1ll << 45;
-            }
-        }
-    }
-    __enable_irq();
-
-    if (((result >> 32) + ((result >> 24) & 0xff) + ((result >> 16) & 0xff) +
-         ((result >> 8) & 0xff)) ^
-        (result & 0xff))
-        return result | (1ll << 46);
-
-    return result >> 8;
-}
-#endif
-
-#if _DHT11_D_IMPL_VER == 1
-// __attribute__((noinline, long_call, section(".ramfuncs")))
-int64_t
-__dht11_read_impl_v1(const int pin_num) {
-    MicroBitPin *pin = getPin((int)pin_num);
-    if (!pin)
-        return 1ll << 40;
-
-    bool data_bits[40];
-
-    {
-        _DHT11_T_TIME_MICROS start_time = 0;
-
-        _DHT11_F_PIN_DIGITAL_WRITE_LOW;
-        __disable_irq();
-#ifdef _DHT11_F_TIME_MICROS_SYNC
-        _DHT11_F_TIME_MICROS_SYNC;
-#endif
-        start_time = _DHT11_F_TIME_MICROS;
-        while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_PULLDOWN_TIME)
-            ;
-        start_time = _DHT11_F_TIME_MICROS;
-
-#if MICROBIT_CODAL
-        pin->setPull(codal::PullMode::Up);
-#else
-        pin->setPull(PinMode::PullUp);
-#endif
-
-        while (_DHT11_F_PIN_DIGITAL_READ ^ 0) {
-            if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT) {
-                __enable_irq();
-                return 1ll << 41;
-            }
-        }
-
-        while (_DHT11_F_PIN_DIGITAL_READ ^ 1) {
-            if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT) {
-                __enable_irq();
-                return 1ll << 42;
-            }
-        }
-        start_time = _DHT11_F_TIME_MICROS;
-
-        while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_ACK_2_TIMEOUT)
-            ;
-
-        if (_DHT11_F_PIN_DIGITAL_READ ^ 1) {
-            __enable_irq();
-            return 1ll << 43;
-        }
-
-        while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_WAIT_DELAY)
-            ;
-
-        for (int i = 0; i < 40; ++i) {
             start_time = _DHT11_F_TIME_MICROS;
-            while (_DHT11_F_PIN_DIGITAL_READ ^ 1) {
-                if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_LOW_TIMEOUT) {
+            while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_PULLDOWN_TIME)
+                ;
+            start_time = _DHT11_F_TIME_MICROS;
+
+#if MICROBIT_CODAL
+            pin->setPull(codal::PullMode::Up);
+#else
+            pin->setPull(PinMode::PullUp);
+#endif
+
+            while (_DHT11_F_PIN_DIGITAL_READ ^ 0)
+            {
+                if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT))
+                {
                     __enable_irq();
-                    return 1ll << 44;
+                    return 1ll << 41;
+                }
+            }
+
+            while (_DHT11_F_PIN_DIGITAL_READ ^ 1)
+            {
+                if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT))
+                {
+                    __enable_irq();
+                    return 1ll << 42;
                 }
             }
             start_time = _DHT11_F_TIME_MICROS;
-            while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_HIGH_DELAY)
+
+            while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_ACK_2_TIMEOUT)
                 ;
 
-            data_bits[i] = _DHT11_F_PIN_DIGITAL_READ;
+            if (_DHT11_UNLIKELY(_DHT11_F_PIN_DIGITAL_READ ^ 1))
+            {
+                __enable_irq();
+                return 1ll << 43;
+            }
 
-            while (_DHT11_F_PIN_DIGITAL_READ ^ 0) {
-                if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_HIGH_TIMEOUT) {
-                    __enable_irq();
-                    return 1ll << 45;
+            while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_WAIT_DELAY)
+                ;
+
+            for (int i = 39; i >= 0; --i)
+            {
+                start_time = _DHT11_F_TIME_MICROS;
+                while (_DHT11_F_PIN_DIGITAL_READ ^ 1)
+                {
+                    if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_LOW_TIMEOUT))
+                    {
+                        __enable_irq();
+                        return 1ll << 44;
+                    }
+                }
+                start_time = _DHT11_F_TIME_MICROS;
+                while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_HIGH_DELAY)
+                    ;
+
+                result |= static_cast<int64_t>(_DHT11_F_PIN_DIGITAL_READ) << i;
+
+                while (_DHT11_F_PIN_DIGITAL_READ ^ 0)
+                {
+                    if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_HIGH_TIMEOUT))
+                    {
+                        __enable_irq();
+                        return 1ll << 45;
+                    }
                 }
             }
+            __enable_irq();
+
+            if (((result >> 32) + ((result >> 24) & 0xff) + ((result >> 16) & 0xff) +
+                 ((result >> 8) & 0xff)) ^
+                (result & 0xff))
+                return result | (1ll << 46);
+
+            return result >> 8;
         }
-    }
-    __enable_irq();
-
-    uint8_t data_bytes[5] = {0};
-    for (int i = 0; i < 5; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            data_bytes[i] <<= 1;
-            data_bytes[i] |= data_bits[i * 8 + j];
-        }
-    }
-
-    if (((data_bytes[0] + data_bytes[1] + data_bytes[2] + data_bytes[3]) & 0xff) != data_bytes[4])
-        return (static_cast<int64_t>(data_bytes[0]) << 32) |
-               (static_cast<int64_t>(data_bytes[1]) << 24) |
-               (static_cast<int64_t>(data_bytes[2]) << 16) |
-               (static_cast<int64_t>(data_bytes[3]) << 8) | static_cast<int64_t>(data_bytes[4]) |
-               (1ll << 46);
-
-    return (static_cast<int64_t>(data_bytes[0]) << 24) |
-           (static_cast<int64_t>(data_bytes[1]) << 16) |
-           (static_cast<int64_t>(data_bytes[2]) << 8) | static_cast<int64_t>(data_bytes[3]);
-}
-#endif
-
-} // namespace sensors
-
-//% advanced=true
-//%
-Buffer DHT11InternalRead(int signalPin) {
-    int64_t result = 1ll << 40;
-
-#if _DHT11_D_CLOCK_IMPL_VER == 2
-    int ret = _dht11_systick_init();
-    if (_DHT11_UNLIKELY(ret != 0)) {
-        result = static_cast<int64_t>(ret & 0xff) << 40;
-        return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
-    }
 #endif
 
 #if _DHT11_D_IMPL_VER == 1
-    result = grove::sensors::__dht11_read_impl_v1(signalPin);
-#elif _DHT11_D_IMPL_VER == 2
-    result = grove::sensors::__dht11_read_impl_v2(signalPin);
+        // __attribute__((noinline, long_call, section(".ramfuncs")))
+        int64_t
+        __dht11_read_impl_v1(const int pin_num)
+        {
+            MicroBitPin *pin = getPin((int)pin_num);
+            if (!pin)
+                return 1ll << 40;
+
+            bool data_bits[40];
+
+            {
+                _DHT11_T_TIME_MICROS start_time = 0;
+
+                _DHT11_F_PIN_DIGITAL_WRITE_LOW;
+                __disable_irq();
+#ifdef _DHT11_F_TIME_MICROS_SYNC
+                _DHT11_F_TIME_MICROS_SYNC;
+#endif
+                start_time = _DHT11_F_TIME_MICROS;
+                while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_PULLDOWN_TIME)
+                    ;
+                start_time = _DHT11_F_TIME_MICROS;
+
+#if MICROBIT_CODAL
+                pin->setPull(codal::PullMode::Up);
+#else
+                pin->setPull(PinMode::PullUp);
 #endif
 
-    return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
-}
+                while (_DHT11_F_PIN_DIGITAL_READ ^ 0)
+                {
+                    if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT)
+                    {
+                        __enable_irq();
+                        return 1ll << 41;
+                    }
+                }
+
+                while (_DHT11_F_PIN_DIGITAL_READ ^ 1)
+                {
+                    if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT)
+                    {
+                        __enable_irq();
+                        return 1ll << 42;
+                    }
+                }
+                start_time = _DHT11_F_TIME_MICROS;
+
+                while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_ACK_2_TIMEOUT)
+                    ;
+
+                if (_DHT11_F_PIN_DIGITAL_READ ^ 1)
+                {
+                    __enable_irq();
+                    return 1ll << 43;
+                }
+
+                while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_WAIT_DELAY)
+                    ;
+
+                for (int i = 0; i < 40; ++i)
+                {
+                    start_time = _DHT11_F_TIME_MICROS;
+                    while (_DHT11_F_PIN_DIGITAL_READ ^ 1)
+                    {
+                        if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_LOW_TIMEOUT)
+                        {
+                            __enable_irq();
+                            return 1ll << 44;
+                        }
+                    }
+                    start_time = _DHT11_F_TIME_MICROS;
+                    while (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) < _DHT11_C_DATA_BITS_HIGH_DELAY)
+                        ;
+
+                    data_bits[i] = _DHT11_F_PIN_DIGITAL_READ;
+
+                    while (_DHT11_F_PIN_DIGITAL_READ ^ 0)
+                    {
+                        if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_HIGH_TIMEOUT)
+                        {
+                            __enable_irq();
+                            return 1ll << 45;
+                        }
+                    }
+                }
+            }
+            __enable_irq();
+
+            uint8_t data_bytes[5] = {0};
+            for (int i = 0; i < 5; ++i)
+            {
+                for (int j = 0; j < 8; ++j)
+                {
+                    data_bytes[i] <<= 1;
+                    data_bytes[i] |= data_bits[i * 8 + j];
+                }
+            }
+
+            if (((data_bytes[0] + data_bytes[1] + data_bytes[2] + data_bytes[3]) & 0xff) != data_bytes[4])
+                return (static_cast<int64_t>(data_bytes[0]) << 32) |
+                       (static_cast<int64_t>(data_bytes[1]) << 24) |
+                       (static_cast<int64_t>(data_bytes[2]) << 16) |
+                       (static_cast<int64_t>(data_bytes[3]) << 8) | static_cast<int64_t>(data_bytes[4]) |
+                       (1ll << 46);
+
+            return (static_cast<int64_t>(data_bytes[0]) << 24) |
+                   (static_cast<int64_t>(data_bytes[1]) << 16) |
+                   (static_cast<int64_t>(data_bytes[2]) << 8) | static_cast<int64_t>(data_bytes[3]);
+        }
+#endif
+
+    } // namespace sensors
+
+    //% advanced=true
+    //%
+    Buffer DHT11InternalRead(int signalPin)
+    {
+        int64_t result = 1ll << 40;
+
+#if _DHT11_D_CLOCK_IMPL_VER == 2
+        int ret = _dht11_systick_init();
+        if (_DHT11_UNLIKELY(ret != 0))
+        {
+            result = static_cast<int64_t>(ret & 0xff) << 40;
+            return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
+        }
+#endif
+
+#if _DHT11_D_IMPL_VER == 1
+        result = grove::sensors::__dht11_read_impl_v1(signalPin);
+#elif _DHT11_D_IMPL_VER == 2
+        result = grove::sensors::__dht11_read_impl_v2(signalPin);
+#endif
+
+        return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
+    }
 
 } // namespace grove
-
 
 namespace sensors
 {
 
     //% advanced=true
     //%
-    Buffer DHT11InternalRead(int signalPin) {
+    Buffer DHT11InternalRead(int signalPin)
+    {
         return grove::DHT11InternalRead(signalPin);
     }
 
