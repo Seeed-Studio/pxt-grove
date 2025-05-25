@@ -132,7 +132,10 @@ namespace grove
             _DHT11_T_TIME_MICROS start_time = 0;
 
             _DHT11_F_PIN_DIGITAL_WRITE_LOW;
-            __disable_irq();
+            const bool irq_enabled = __get_PRIMASK() ^ 1;
+            if (irq_enabled) {
+                __disable_irq();
+            }
 #ifdef _DHT11_F_TIME_MICROS_SYNC
             _DHT11_F_TIME_MICROS_SYNC;
 #endif
@@ -151,7 +154,9 @@ namespace grove
             {
                 if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT))
                 {
-                    __enable_irq();
+                    if (irq_enabled) {
+                        __enable_irq();
+                    }
                     return 1ll << 41;
                 }
             }
@@ -160,7 +165,9 @@ namespace grove
             {
                 if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT))
                 {
-                    __enable_irq();
+                    if (irq_enabled) {
+                        __enable_irq();
+                    }
                     return 1ll << 42;
                 }
             }
@@ -171,7 +178,9 @@ namespace grove
 
             if (_DHT11_UNLIKELY(_DHT11_F_PIN_DIGITAL_READ ^ 1))
             {
-                __enable_irq();
+                if (irq_enabled) {
+                    __enable_irq();
+                }
                 return 1ll << 43;
             }
 
@@ -185,7 +194,9 @@ namespace grove
                 {
                     if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_LOW_TIMEOUT))
                     {
-                        __enable_irq();
+                        if (irq_enabled) {
+                            __enable_irq();
+                        }
                         return 1ll << 44;
                     }
                 }
@@ -199,12 +210,16 @@ namespace grove
                 {
                     if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_HIGH_TIMEOUT))
                     {
-                        __enable_irq();
+                        if (irq_enabled) {
+                            __enable_irq();
+                        }
                         return 1ll << 45;
                     }
                 }
             }
-            __enable_irq();
+            if (irq_enabled) {
+                __enable_irq();
+            }
 
             if (((result >> 32) + ((result >> 24) & 0xff) + ((result >> 16) & 0xff) +
                  ((result >> 8) & 0xff)) ^
@@ -230,7 +245,10 @@ namespace grove
                 _DHT11_T_TIME_MICROS start_time = 0;
 
                 _DHT11_F_PIN_DIGITAL_WRITE_LOW;
-                __disable_irq();
+                const bool irq_enabled = __get_PRIMASK() ^ 1;
+                if (irq_enabled) {
+                    __disable_irq();
+                }
 #ifdef _DHT11_F_TIME_MICROS_SYNC
                 _DHT11_F_TIME_MICROS_SYNC;
 #endif
@@ -249,7 +267,9 @@ namespace grove
                 {
                     if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT)
                     {
-                        __enable_irq();
+                        if (irq_enabled) {
+                            __enable_irq();
+                        }
                         return 1ll << 41;
                     }
                 }
@@ -258,7 +278,9 @@ namespace grove
                 {
                     if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT)
                     {
-                        __enable_irq();
+                        if (irq_enabled) {
+                            __enable_irq();
+                        }
                         return 1ll << 42;
                     }
                 }
@@ -269,7 +291,9 @@ namespace grove
 
                 if (_DHT11_F_PIN_DIGITAL_READ ^ 1)
                 {
-                    __enable_irq();
+                    if (irq_enabled) {
+                        __enable_irq();
+                    }
                     return 1ll << 43;
                 }
 
@@ -283,7 +307,9 @@ namespace grove
                     {
                         if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_LOW_TIMEOUT)
                         {
-                            __enable_irq();
+                            if (irq_enabled) {
+                                __enable_irq();
+                            }
                             return 1ll << 44;
                         }
                     }
@@ -297,13 +323,18 @@ namespace grove
                     {
                         if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_HIGH_TIMEOUT)
                         {
-                            __enable_irq();
+                            if (irq_enabled) {
+                                __enable_irq();
+                            }
                             return 1ll << 45;
                         }
                     }
                 }
+
+                if (irq_enabled) {
+                    __enable_irq();
+                }
             }
-            __enable_irq();
 
             uint8_t data_bytes[5] = {0};
             for (int i = 0; i < 5; ++i)
