@@ -32,7 +32,7 @@
 #define _DHT11_T_TIME_MICROS uint32_t
 
 #if _DHT11_D_CLOCK_IMPL_VER == 0
-#define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
+#define _DHT11_C_TIME_MICROS_MASK 0x3fffffff
 
 static uint32_t _dht11_system_timer_snapshot = 0;
 
@@ -54,7 +54,7 @@ inline __attribute__((always_inline)) uint32_t _dht11_system_timer_as_micros()
 #elif _DHT11_D_CLOCK_IMPL_VER == 1
 #include "mbed.h"
 
-#define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
+#define _DHT11_C_TIME_MICROS_MASK 0x3fffffff
 
 static uint32_t _dht11_system_timer_snapshot = 0;
 
@@ -75,7 +75,7 @@ inline __attribute__((always_inline)) uint32_t _dht11_system_timer_as_micros()
 
 #elif _DHT11_D_CLOCK_IMPL_VER == 2
 #define _DHT11_C_SYSTICK_WRAP_MIN_MS 30
-#define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
+#define _DHT11_C_TIME_MICROS_MASK 0x3fffffff
 
 extern "C"
 {
@@ -107,7 +107,7 @@ extern "C"
         }
 
         const uint32_t load = nrf_systick_load_get() & NRF_SYSTICK_VAL_MASK;
-        const uint32_t wrap_period_ms = static_cast<uint64_t>(load) * 1e3ul / SystemCoreClock;
+        const uint32_t wrap_period_ms = (static_cast<uint64_t>(load) * 1e3) / SystemCoreClock;
         if (_DHT11_UNLIKELY(wrap_period_ms < _DHT11_C_SYSTICK_WRAP_MIN_MS))
         {
             return 0b0111;
@@ -124,7 +124,7 @@ extern "C"
     {
         const uint32_t val = nrf_systick_val_get() & NRF_SYSTICK_VAL_MASK;
         const uint64_t period = val < _dht11_systick_snapshot ? static_cast<uint64_t>(_dht11_systick_snapshot - val) : static_cast<uint64_t>(NRF_SYSTICK_VAL_MASK) + _dht11_systick_snapshot - val;
-        return static_cast<uint32_t>(static_cast<uint64_t>(period * 1e6ul) / SystemCoreClock);
+        return static_cast<uint32_t>((static_cast<uint64_t>(period) * 1e6) / SystemCoreClock);
     }
 
 } // extern "C"
@@ -135,7 +135,7 @@ extern "C"
 
 #elif _DHT11_D_CLOCK_IMPL_VER == 3
 #define _DHT11_C_SYSTICK_WRAP_MIN_MS 30
-#define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
+#define _DHT11_C_TIME_MICROS_MASK 0x3fffffff
 
 extern "C"
 {
@@ -166,7 +166,7 @@ extern "C"
         }
 
         const uint32_t load = (SysTick->LOAD) & SysTick_VAL_CURRENT_Msk;
-        const uint32_t wrap_period_ms = static_cast<uint64_t>(load) * 1e3ul / SystemCoreClock;
+        const uint32_t wrap_period_ms = (static_cast<uint64_t>(load) * 1e3) / SystemCoreClock;
         if (_DHT11_UNLIKELY(wrap_period_ms < _DHT11_C_SYSTICK_WRAP_MIN_MS))
         {
             return 0b0111;
@@ -183,7 +183,7 @@ extern "C"
     {
         const uint32_t val = SysTick->VAL & SysTick_VAL_CURRENT_Msk;
         const uint64_t period = val < _dht11_systick_snapshot ? static_cast<uint64_t>(_dht11_systick_snapshot - val) : static_cast<uint64_t>(SysTick_VAL_CURRENT_Msk) + _dht11_systick_snapshot - val;
-        return static_cast<uint32_t>(static_cast<uint64_t>(period * 1e6ul) / SystemCoreClock);
+        return static_cast<uint32_t>((static_cast<uint64_t>(period) * 1e6) / SystemCoreClock);
     }
 
 } // extern "C"
