@@ -469,7 +469,7 @@ namespace grove
     //%
     Buffer DHT11InternalRead(int signalPin)
     {
-        int64_t result = 1ll << 40;
+        int64_t result = 0;
 
         result |= static_cast<int64_t>(_DHT11_D_CLOCK_IMPL_VER) << 48;
         result |= static_cast<int64_t>(_DHT11_D_IMPL_VER) << 56;
@@ -478,15 +478,15 @@ namespace grove
         int ret = _DHT11_F_TIME_MICROS_INIT;
         if (_DHT11_UNLIKELY(ret != 0))
         {
-            result = static_cast<int64_t>(ret & 0xff) << 40;
+            result |= static_cast<int64_t>(ret & 0xff) << 40;
             return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
         }
 #endif
 
 #if _DHT11_D_IMPL_VER == 1
-        result = grove::sensors::__dht11_read_impl_v1(signalPin);
+        result |= grove::sensors::__dht11_read_impl_v1(signalPin);
 #elif _DHT11_D_IMPL_VER == 2
-        result = grove::sensors::__dht11_read_impl_v2(signalPin);
+        result |= grove::sensors::__dht11_read_impl_v2(signalPin);
 #endif
 
         return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));
