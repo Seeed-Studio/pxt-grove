@@ -163,10 +163,8 @@ namespace grove
 
             _DHT11_F_PIN_DIGITAL_WRITE_LOW;
             const bool irq_enabled = __get_PRIMASK() ^ 1;
-            if (irq_enabled)
-            {
-                __disable_irq();
-            }
+            __disable_irq();
+
 #ifdef _DHT11_F_TIME_MICROS_SYNC
             _DHT11_F_TIME_MICROS_SYNC;
 #endif
@@ -283,10 +281,8 @@ namespace grove
 
                 _DHT11_F_PIN_DIGITAL_WRITE_LOW;
                 const bool irq_enabled = __get_PRIMASK() ^ 1;
-                if (irq_enabled)
-                {
-                    __disable_irq();
-                }
+                __disable_irq();
+
 #ifdef _DHT11_F_TIME_MICROS_SYNC
                 _DHT11_F_TIME_MICROS_SYNC;
 #endif
