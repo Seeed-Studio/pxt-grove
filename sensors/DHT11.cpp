@@ -14,7 +14,6 @@
 #define _DHT11_D_CLOCK_IMPL_VER 2
 
 #else
-
 #if defined(__arm)
 #define _DHT11_D_CLOCK_IMPL_VER 3
 #else
@@ -157,12 +156,12 @@ extern "C"
         }
 
         const uint32_t ctrl = SysTick->CTRL;
-        if (_DHT11_UNLIKELY((ctrl & NRF_SYSTICK_CSR_ENABLE_MASK) == NRF_SYSTICK_CSR_DISABLE))
+        if (_DHT11_UNLIKELY((ctrl & SysTick_CTRL_ENABLE_Msk) == (1U << SysTick_CTRL_ENABLE_Pos)))
         {
             SysTick->LOAD = SysTick_VAL_CURRENT_Msk;
-            SysTick->CTRL = (NRF_SYSTICK_CSR_CLKSOURCE_CPU |
-                             NRF_SYSTICK_CSR_TICKINT_DISABLE |
-                             NRF_SYSTICK_CSR_ENABLE);
+            SysTick->CTRL = ((1U << SysTick_CTRL_CLKSOURCE_Pos) |
+                             (0U << SysTick_CTRL_TICKINT_Pos) |
+                             (1U << SysTick_CTRL_ENABLE_Pos));
         }
 
         const uint32_t load = (SysTick->LOAD) & SysTick_VAL_CURRENT_Msk;
@@ -472,7 +471,10 @@ namespace grove
     {
         int64_t result = 1ll << 40;
 
-#if defined (_DHT11_F_TIME_MICROS_INIT)
+        result |= static_cast<int64_t>(_DHT11_D_CLOCK_IMPL_VER) << 48;
+        result |= static_cast<int64_t>(_DHT11_D_IMPL_VER) << 56;
+
+#if defined(_DHT11_F_TIME_MICROS_INIT)
         int ret = _DHT11_F_TIME_MICROS_INIT;
         if (_DHT11_UNLIKELY(ret != 0))
         {

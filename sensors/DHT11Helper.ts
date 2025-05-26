@@ -89,6 +89,23 @@ namespace grove {
                         basic.pause(retryDelayMs);
                         continue;
                     }
+
+                    if (this.serialLogging) {
+                        const bufferLength = resultBuffer.length;
+                        serial.writeLine("DHT11 result buffer length: " + bufferLength.toString());
+                        serial.writeString("DHT11 result buffer: ");
+                        for (let i = 0; i < bufferLength; ++i) {
+                            const byte = resultBuffer.getNumber(NumberFormat.Int8LE, i);
+                            serial.writeString(byte.toString() + " ");
+                        }
+                        serial.writeLine("");
+                    }
+
+                    const clockImplVersion = resultBuffer.getNumber(NumberFormat.Int8LE, 6);
+                    this.LOG("DHT11 clock implementation version: " + clockImplVersion.toString());
+                    const syncImplVersion = resultBuffer.getNumber(NumberFormat.Int8LE, 7);
+                    this.LOG("DHT11 sync implementation version: " + syncImplVersion.toString());
+
                     const returnCode = resultBuffer.getNumber(NumberFormat.Int8LE, 5);
                     if (returnCode == 0) {
                         this.lastSuccessSyncTime = input.runningTime();
@@ -122,17 +139,6 @@ namespace grove {
                             break;
                     }
                     basic.pause(retryDelayMs);
-                }
-
-                if (this.serialLogging) {
-                    const bufferLength = resultBuffer.length;
-                    serial.writeLine("DHT11 result buffer length: " + bufferLength.toString());
-                    serial.writeString("DHT11 result buffer: ");
-                    for (let i = 0; i < bufferLength; ++i) {
-                        const byte = resultBuffer.getNumber(NumberFormat.Int8LE, i);
-                        serial.writeString(byte.toString() + " ");
-                    }
-                    serial.writeLine("");
                 }
 
                 const humidityHigh = resultBuffer.getNumber(NumberFormat.Int8LE, 3);
