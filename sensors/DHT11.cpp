@@ -25,8 +25,7 @@
 #define _DHT11_LIKELY(x) __builtin_expect(!!(x), 1)
 #define _DHT11_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
-#define _DHT11_D_CLOCK_IMPL_VER 0
-#define _DHT11_D_IMPL_VER 1
+#define _DHT11_D_IMPL_VER 0
 
 #define _DHT11_F_PIN_DIGITAL_WRITE_LOW pin->setDigitalValue(0)
 #define _DHT11_F_PIN_DIGITAL_READ pin->getDigitalValue()
@@ -212,10 +211,10 @@ namespace grove
     namespace sensors
     {
 
-#if _DHT11_D_IMPL_VER == 2
+#if _DHT11_D_IMPL_VER == 1
         // __attribute__((noinline, long_call, section(".ramfuncs"), optimize("s")))
         int64_t
-        __dht11_read_impl_v2(const int pin_num)
+        __dht11_read_impl_v1(const int pin_num)
         {
             MicroBitPin *pin = getPin(pin_num);
             if (_DHT11_UNLIKELY(!pin))
@@ -329,10 +328,10 @@ namespace grove
         }
 #endif
 
-#if _DHT11_D_IMPL_VER == 1
+#if _DHT11_D_IMPL_VER == 0
         // __attribute__((noinline, long_call, section(".ramfuncs")))
         int64_t
-        __dht11_read_impl_v1(const int pin_num)
+        __dht11_read_impl_v0(const int pin_num)
         {
             MicroBitPin *pin = getPin((int)pin_num);
             if (!pin)
@@ -483,10 +482,12 @@ namespace grove
         }
 #endif
 
-#if _DHT11_D_IMPL_VER == 1
+#if _DHT11_D_IMPL_VER == 0
+        result |= grove::sensors::__dht11_read_impl_v0(signalPin);
+#elif _DHT11_D_IMPL_VER == 1
         result |= grove::sensors::__dht11_read_impl_v1(signalPin);
-#elif _DHT11_D_IMPL_VER == 2
-        result |= grove::sensors::__dht11_read_impl_v2(signalPin);
+#else
+        result |= 0b0011;
 #endif
 
         return mkBuffer(reinterpret_cast<uint8_t *>(&result), sizeof(result));

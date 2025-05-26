@@ -135,7 +135,7 @@ namespace grove {
                             this.LOG("DHT11 (" + retryCount.toString() + ") checksum error");
                             break;
                         default:
-                            this.LOG("DHT11 (" + retryCount.toString() + ") unknown error: " + returnCode.toString());
+                            this.LOG("DHT11 (" + retryCount.toString() + ") internal error: " + returnCode.toString());
                             break;
                     }
                     basic.pause(retryDelayMs);
