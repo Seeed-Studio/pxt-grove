@@ -14,7 +14,12 @@
 #define _DHT11_D_CLOCK_IMPL_VER 2
 
 #else
+
+#if defined(__arm)
+#define _DHT11_D_CLOCK_IMPL_VER 3
+#else
 #define _DHT11_D_CLOCK_IMPL_VER 0
+#endif
 
 #endif
 
@@ -124,6 +129,66 @@ extern "C"
 
 } // extern "C"
 
+#define _DHT11_F_TIME_MICROS_INIT _dht11_systick_init()
+#define _DHT11_F_TIME_MICROS_SYNC _dht11_systick_sync()
+#define _DHT11_F_TIME_MICROS (_dht11_systick_as_micros() & _DHT11_C_TIME_MICROS_MASK)
+
+#elif _DHT11_D_CLOCK_IMPL_VER == 3
+#define _DHT11_C_SYSTICK_WRAP_MIN_MS 30
+#define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
+
+extern "C"
+{
+
+    extern uint32_t SystemCoreClock;
+
+    static uint32_t _dht11_systick_snapshot = 0;
+
+    inline __attribute__((always_inline)) void _dht11_systick_sync()
+    {
+        _dht11_systick_snapshot = SysTick->VAL & SysTick_VAL_CURRENT_Msk;
+    }
+
+    inline __attribute__((always_inline)) int _dht11_systick_init()
+    {
+        if (_DHT11_UNLIKELY(!SystemCoreClock))
+        {
+            return 0b0011;
+        }
+
+        const uint32_t ctrl = SysTick->CTRL;
+        if (_DHT11_UNLIKELY((ctrl & NRF_SYSTICK_CSR_ENABLE_MASK) == NRF_SYSTICK_CSR_DISABLE))
+        {
+            SysTick->LOAD = SysTick_VAL_CURRENT_Msk;
+            SysTick->CTRL = (NRF_SYSTICK_CSR_CLKSOURCE_CPU |
+                             NRF_SYSTICK_CSR_TICKINT_DISABLE |
+                             NRF_SYSTICK_CSR_ENABLE);
+        }
+
+        const uint32_t load = (SysTick->LOAD) & SysTick_VAL_CURRENT_Msk;
+        const uint32_t wrap_period_ms = static_cast<uint64_t>(load) * 1e3ull / SystemCoreClock;
+        if (_DHT11_UNLIKELY(wrap_period_ms < _DHT11_C_SYSTICK_WRAP_MIN_MS))
+        {
+            return 0b0111;
+        }
+
+        _dht11_systick_sync();
+
+        return 0;
+    }
+
+    inline __attribute__((always_inline))
+    uint32_t
+    _dht11_systick_as_micros()
+    {
+        const uint32_t val = SysTick->VAL & SysTick_VAL_CURRENT_Msk;
+        const uint64_t period = val < _dht11_systick_snapshot ? static_cast<uint64_t>(_dht11_systick_snapshot - val) : static_cast<uint64_t>(SysTick_VAL_CURRENT_Msk) + _dht11_systick_snapshot - val;
+        return static_cast<uint32_t>(static_cast<uint64_t>(period * 1e6ull) / SystemCoreClock);
+    }
+
+} // extern "C"
+
+#define _DHT11_F_TIME_MICROS_INIT _dht11_systick_init()
 #define _DHT11_F_TIME_MICROS_SYNC _dht11_systick_sync()
 #define _DHT11_F_TIME_MICROS (_dht11_systick_as_micros() & _DHT11_C_TIME_MICROS_MASK)
 
@@ -407,8 +472,8 @@ namespace grove
     {
         int64_t result = 1ll << 40;
 
-#if _DHT11_D_CLOCK_IMPL_VER == 2
-        int ret = _dht11_systick_init();
+#if defined (_DHT11_F_TIME_MICROS_INIT)
+        int ret = _DHT11_F_TIME_MICROS_INIT;
         if (_DHT11_UNLIKELY(ret != 0))
         {
             result = static_cast<int64_t>(ret & 0xff) << 40;
