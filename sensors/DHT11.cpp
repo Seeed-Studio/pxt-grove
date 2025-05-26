@@ -30,13 +30,43 @@
 
 #if _DHT11_D_CLOCK_IMPL_VER == 0
 #define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
-#define _DHT11_F_TIME_MICROS (system_timer_current_time_us() & _DHT11_C_TIME_MICROS_MASK)
+
+static uint32_t _dht11_system_timer_snapshot = 0;
+
+inline __attribute__((always_inline)) void _dht11_system_timer_sync()
+{
+    _dht11_system_timer_snapshot = system_timer_current_time_us() & _DHT11_C_TIME_MICROS_MASK;
+}
+
+inline __attribute__((always_inline)) uint32_t _dht11_system_timer_as_micros()
+{
+    const uint32_t val = system_timer_current_time_us() & _DHT11_C_TIME_MICROS_MASK;
+    const uint64_t period = val < _dht11_system_timer_snapshot ? static_cast<uint64_t>(_DHT11_C_TIME_MICROS_MASK) - _dht11_system_timer_snapshot + val : static_cast<uint64_t>(val) - _dht11_system_timer_snapshot;
+    return static_cast<uint32_t>(period);
+}
+
+#define _DHT11_F_TIME_MICROS_SYNC _dht11_system_timer_sync()
+#define _DHT11_F_TIME_MICROS (_dht11_system_timer_as_micros() & _DHT11_C_TIME_MICROS_MASK)
 
 #elif _DHT11_D_CLOCK_IMPL_VER == 1
 #include "mbed.h"
 
 #define _DHT11_C_TIME_MICROS_MASK 0x3ffffffful
-#define _DHT11_F_TIME_MICROS (us_ticker_read() & _DHT11_C_TIME_MICROS_MASK) // prohibited in pxt-microbit extension
+
+inline __attribute__((always_inline)) void _dht11_system_timer_sync()
+{
+    _dht11_system_timer_snapshot = us_ticker_read() & _DHT11_C_TIME_MICROS_MASK;
+}
+
+inline __attribute__((always_inline)) uint32_t _dht11_system_timer_as_micros()
+{
+    const uint32_t val = us_ticker_read() & _DHT11_C_TIME_MICROS_MASK;
+    const uint64_t period = val < _dht11_system_timer_snapshot ? static_cast<uint64_t>(_DHT11_C_TIME_MICROS_MASK) - _dht11_system_timer_snapshot + val : static_cast<uint64_t>(val) - _dht11_system_timer_snapshot;
+    return static_cast<uint32_t>(period);
+}
+
+#define _DHT11_F_TIME_MICROS_SYNC _dht11_system_timer_sync()
+#define _DHT11_F_TIME_MICROS (_dht11_system_timer_as_micros() & _DHT11_C_TIME_MICROS_MASK)
 
 #elif _DHT11_D_CLOCK_IMPL_VER == 2
 #define _DHT11_C_SYSTICK_WRAP_MIN_MS 30
@@ -89,7 +119,7 @@ extern "C"
     {
         const uint32_t val = nrf_systick_val_get() & NRF_SYSTICK_VAL_MASK;
         const uint64_t period = val < _dht11_systick_snapshot ? static_cast<uint64_t>(_dht11_systick_snapshot - val) : static_cast<uint64_t>(NRF_SYSTICK_VAL_MASK) + _dht11_systick_snapshot - val;
-        return static_cast<uint32_t>((period * 1e6ull) / SystemCoreClock);
+        return static_cast<uint32_t>(static_cast<uint64_t>(period * 1e6ull) / SystemCoreClock);
     }
 
 } // extern "C"
@@ -133,7 +163,8 @@ namespace grove
 
             _DHT11_F_PIN_DIGITAL_WRITE_LOW;
             const bool irq_enabled = __get_PRIMASK() ^ 1;
-            if (irq_enabled) {
+            if (irq_enabled)
+            {
                 __disable_irq();
             }
 #ifdef _DHT11_F_TIME_MICROS_SYNC
@@ -154,7 +185,8 @@ namespace grove
             {
                 if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT))
                 {
-                    if (irq_enabled) {
+                    if (irq_enabled)
+                    {
                         __enable_irq();
                     }
                     return 1ll << 41;
@@ -165,7 +197,8 @@ namespace grove
             {
                 if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT))
                 {
-                    if (irq_enabled) {
+                    if (irq_enabled)
+                    {
                         __enable_irq();
                     }
                     return 1ll << 42;
@@ -178,7 +211,8 @@ namespace grove
 
             if (_DHT11_UNLIKELY(_DHT11_F_PIN_DIGITAL_READ ^ 1))
             {
-                if (irq_enabled) {
+                if (irq_enabled)
+                {
                     __enable_irq();
                 }
                 return 1ll << 43;
@@ -194,7 +228,8 @@ namespace grove
                 {
                     if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_LOW_TIMEOUT))
                     {
-                        if (irq_enabled) {
+                        if (irq_enabled)
+                        {
                             __enable_irq();
                         }
                         return 1ll << 44;
@@ -210,14 +245,16 @@ namespace grove
                 {
                     if (_DHT11_UNLIKELY(static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_HIGH_TIMEOUT))
                     {
-                        if (irq_enabled) {
+                        if (irq_enabled)
+                        {
                             __enable_irq();
                         }
                         return 1ll << 45;
                     }
                 }
             }
-            if (irq_enabled) {
+            if (irq_enabled)
+            {
                 __enable_irq();
             }
 
@@ -246,7 +283,8 @@ namespace grove
 
                 _DHT11_F_PIN_DIGITAL_WRITE_LOW;
                 const bool irq_enabled = __get_PRIMASK() ^ 1;
-                if (irq_enabled) {
+                if (irq_enabled)
+                {
                     __disable_irq();
                 }
 #ifdef _DHT11_F_TIME_MICROS_SYNC
@@ -267,7 +305,8 @@ namespace grove
                 {
                     if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT)
                     {
-                        if (irq_enabled) {
+                        if (irq_enabled)
+                        {
                             __enable_irq();
                         }
                         return 1ll << 41;
@@ -278,7 +317,8 @@ namespace grove
                 {
                     if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_ACK_1_TIMEOUT)
                     {
-                        if (irq_enabled) {
+                        if (irq_enabled)
+                        {
                             __enable_irq();
                         }
                         return 1ll << 42;
@@ -291,7 +331,8 @@ namespace grove
 
                 if (_DHT11_F_PIN_DIGITAL_READ ^ 1)
                 {
-                    if (irq_enabled) {
+                    if (irq_enabled)
+                    {
                         __enable_irq();
                     }
                     return 1ll << 43;
@@ -307,7 +348,8 @@ namespace grove
                     {
                         if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_LOW_TIMEOUT)
                         {
-                            if (irq_enabled) {
+                            if (irq_enabled)
+                            {
                                 __enable_irq();
                             }
                             return 1ll << 44;
@@ -323,7 +365,8 @@ namespace grove
                     {
                         if (static_cast<_DHT11_T_TIME_MICROS>(_DHT11_F_TIME_MICROS - start_time) > _DHT11_C_DATA_BITS_HIGH_TIMEOUT)
                         {
-                            if (irq_enabled) {
+                            if (irq_enabled)
+                            {
                                 __enable_irq();
                             }
                             return 1ll << 45;
@@ -331,7 +374,8 @@ namespace grove
                     }
                 }
 
-                if (irq_enabled) {
+                if (irq_enabled)
+                {
                     __enable_irq();
                 }
             }
