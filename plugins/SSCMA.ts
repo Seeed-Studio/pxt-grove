@@ -47,7 +47,7 @@ class DetectionResult {
 
     /**
      * Convert a detection result object to string representation
-     * @returns A string representation of the detection result
+     * @return A string representation of the detection result
      */
     //% block="convert $this to string"
     //% this.defl=detectionResult
@@ -84,7 +84,7 @@ class ClassificationResult {
 
     /**
      * Convert a classification result object to string representation
-     * @returns A string representation of the classification result
+     * @return A string representation of the classification result
      */
     //% block="convert $this to string"
     //% this.defl=classificationResult
@@ -128,11 +128,13 @@ class ModelInfo {
     }
 
     //% blockCombine
+    //% advanced=true
     get name(): string {
         return this._name;
     }
 
     //% blockCombine
+    //% advanced=true
     get version(): string {
         return this._version;
     }
@@ -146,6 +148,7 @@ class ModelInfo {
     //% id.defl=id
     //% id.min=0
     //% id.shadow=variables_get
+    //% advanced=true
     public getLabel(id: number): string {
         if (id >= 0 && id < this._labels.length) {
             return this._labels[id];

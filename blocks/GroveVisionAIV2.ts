@@ -54,10 +54,11 @@ namespace grove {
     /**
      * Get the device status of the Grove Vision AI Module V2
      * @param fromCache Use cached status if available, default is true
-     * @returns The current device status
+     * @return The current device status
      */
     //% block="get device status"
     //% group="Grove Vision AI V2"
+    //% advanced=true
     //% weight=99
     export function getGroveVisionAIV2DeviceStatus(fromCache: boolean = true): DeviceStatus {
         if (vision_ai_v2.atClient) {
@@ -121,7 +122,7 @@ namespace grove {
      * Start AI inference on the Grove Vision AI Module V2
      * @param timeout The timeout in milliseconds for the inference operation, default is 1000ms
      * @param force Force start inference even if already running, default is true
-     * @returns True if inference started successfully, false otherwise
+     * @return True if inference started successfully, false otherwise
      */
     //% block="start ai inference"
     //% group="Grove Vision AI V2"
@@ -166,12 +167,12 @@ namespace grove {
      * Fetch AI inference results from the Grove Vision AI Module V2
      * @param maxResults The maximum number of results to fetch, default is 15
      * @param timeout The timeout in milliseconds for the fetch operation, default is 1000ms
-     * @returns True if results fetched successfully, false otherwise
+     * @return True if results fetched successfully, false otherwise
      */
     //% block="fetch ai inference results"
     //% group="Grove Vision AI V2"
     //% weight=78
-    //% color="#AA278D"
+    //% color="#008B8D"
     export function fetchAIInferenceResults(
         maxResults: number = 15,
         timeout: number = 1000,
@@ -197,6 +198,7 @@ namespace grove {
      */
     //% block="stop ai inference"
     //% group="Grove Vision AI V2"
+    //% advanced=true
     //% weight=77
     export function stopAIInference(timeout: number = 1000) {
         if (vision_ai_v2.atClient) {
@@ -207,7 +209,7 @@ namespace grove {
     /**
      * Get total number of specific object id(s)
      * @param ids An array of object IDs to count
-     * @returns The total count of objects with the specified IDs
+     * @return The total count of objects with the specified IDs
      */
     //% block
     //% group="Grove Vision AI V2"
@@ -238,7 +240,7 @@ namespace grove {
     /**
      * Get total number of specific object name(s)
      * @param labels An array of object names to count
-     * @returns The total count of objects with the specified names
+     * @return The total count of objects with the specified names
      */
     //% block
     //% group="Grove Vision AI V2"
@@ -268,7 +270,7 @@ namespace grove {
     /**
      * Check if contains specific object id(s)
      * @param ids An array of object IDs to check
-     * @returns True if any of the specified object IDs are found, false otherwise
+     * @return True if any of the specified object IDs are found, false otherwise
      */
     //% block
     //% group="Grove Vision AI V2"
@@ -281,7 +283,7 @@ namespace grove {
     /**
      * Check if contains specific object name(s)
      * @param labels An array of object names to check
-     * @returns True if any of the specified object names are found, false otherwise
+     * @return True if any of the specified object names are found, false otherwise
      */
     //% block
     //% group="Grove Vision AI V2"
@@ -334,7 +336,7 @@ namespace grove {
 
     /**
      * Get fetched detection results from the Grove Vision AI Module V2
-     * @returns An array of DetectionResult objects containing the results of the last inference
+     * @return An array of DetectionResult objects containing the results of the last inference
      *          operation, or an empty array if no results are available.
      */
     //% block="get fetched detection results"
@@ -347,7 +349,7 @@ namespace grove {
 
     /**
      * Get fetched classification results from the Grove Vision AI Module V2
-     * @returns An array of ClassificationResult objects containing the results of the last inference
+     * @return An array of ClassificationResult objects containing the results of the last inference
      *          operation, or an empty array if no results are available.
      */
     //% block="get fetched classification results"
@@ -360,7 +362,7 @@ namespace grove {
 
     /**
      * Get the AI inference error code from the Grove Vision AI Module V2
-     * @returns The error code as an OperationCode enum value, indicating the status of the last inference operation.
+     * @return The error code as an OperationCode enum value, indicating the status of the last inference operation.
      */
     //% block="get inference error code"
     //% blockSetVariable=errorCode
