@@ -92,7 +92,7 @@ namespace grove
      * turn on LCD
      */
     //% group="LCD1602v1"
-    //% block="[Grove - LCD 16x2]|display trun on"
+    //% block="[Grove - LCD 16x2]|display turn on"
     //% weight=3
     export function lcd_dispaly_on(): void {
         _displaycontrol |= 0x04;
@@ -103,7 +103,7 @@ namespace grove
      * turn off LCD
      */
     //% group="LCD1602v1"
-    //% block="[Grove - LCD 16x2]|dispaly trun off"
+    //% block="[Grove - LCD 16x2]|dispaly turn off"
     //% weight=3
     export function lcd_dispaly_off(): void {
         _displaycontrol &= ~0x04;
