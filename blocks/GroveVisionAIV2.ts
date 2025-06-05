@@ -172,7 +172,7 @@ namespace grove {
     //% block="fetch ai inference results"
     //% group="Grove Vision AI V2"
     //% weight=78
-    //% color="#008B8D"
+    //% color="#008D63"
     export function fetchAIInferenceResults(
         maxResults: number = 15,
         timeout: number = 1000,

@@ -31,7 +31,7 @@ namespace grove {
     //% sensor.shadow=variables_get
     //% group="DHT11"
     //% weight=98
-    //% color="#008B8D"
+    //% color="#008D63"
     export function readTemperatureHumidity(sensor: grove.sensors.DHT11Helper, forceRead: boolean = false): boolean {
         if (sensor) {
             return sensor.readSensorData(forceRead);
