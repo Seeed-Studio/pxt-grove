@@ -127,13 +127,11 @@ class ModelInfo {
         this._labels = safeLabels as string[];
     }
 
-    //% blockCombine
     //% advanced=true
     get name(): string {
         return this._name;
     }
 
-    //% blockCombine
     //% advanced=true
     get version(): string {
         return this._version;
