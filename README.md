@@ -182,6 +182,38 @@ basic.forever(function () {
 
 Connect the Grove Vision AI Module V2 through I2C and get AI inference results.
 
+Before uploading the code, make sure you have deployed the model on the AI Module V2. [Click here to deploy.](https://sensecraft.seeed.cc/ai/model)
+
+We use People Detection model and Gesture Detection model as examples.
+
+This demo shows how to get the number of detected gesture of Rock, Paper, Scissors,  and dispay the number on the LED matrix of Microbit.
+
+```blocks
+let person_num = 0
+serial.redirectToUSB()
+grove.connectAndSetupGroveVisionAIV2(
+true
+)
+while (!(grove.startAIInference())) {
+    serial.writeLine("Fail to initialize")
+    basic.pause(5000)
+}
+basic.forever(function () {
+    if (grove.fetchAIInferenceResults()) {
+        if (grove.containsObjectName(["Rock", "Paper", "Scissors"])) {
+            person_num = grove.countObjectByName(["Rock", "Paper", "Scissors"])
+            basic.showNumber(person_num)
+            basic.pause(2000)
+        } else {
+            basic.showIcon(IconNames.No)
+        }
+    }
+    basic.pause(1000)
+})
+```
+
+This demo will teach you how to use callback functions to print the recognized information in the serial port.
+
 ```blocks
 grove.onReceiveDetectionResult(function (detectionResults) {
     for (let detectionResult of detectionResults) {
