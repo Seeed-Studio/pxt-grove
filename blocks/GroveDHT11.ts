@@ -6,6 +6,9 @@ namespace grove {
 
     /**
     * Connect and setup the Grove Temperature & Humidity Sensor (DHT11)
+    * @param signalPin The digital pin connected to the sensor
+    * @param serialLogging Enable serial logging for debugging
+    * @return A DHT11Helper instance for reading temperature and humidity
     */
     //% block="connect to sensor on %signalPin, serial logging %serialLogging"
     //% signalPin.defl=DigitalPin.P1
@@ -19,13 +22,16 @@ namespace grove {
 
     /**
      * Read the temperature and humidity from the sensor
+     * @param sensor The DHT11Helper instance
+     * @param forceRead Force a read from sensor even if the last read was recent (in 2 seconds), false is recommended for normal usage
+     * @return True if the read was successful, otherwise false
      */
     //% block="read temperature and humidity from $sensor, force read %forceRead"
     //% sensor.defl=dht11
     //% sensor.shadow=variables_get
     //% group="DHT11"
     //% weight=98
-    //% color="#AA278D"
+    //% color="#008D63"
     export function readTemperatureHumidity(sensor: grove.sensors.DHT11Helper, forceRead: boolean = false): boolean {
         if (sensor) {
             return sensor.readSensorData(forceRead);
@@ -36,6 +42,9 @@ namespace grove {
 
     /**
      * Get the humidity in percentage
+     * @param sensor The DHT11Helper instance
+     * @param autoRead Automatically read the sensor data before getting humidity
+     * @return The humidity value in percentage, or NaN if the sensor is not connected
      */
     //% block="get humidity from $sensor"
     //% sensor.defl=dht11
@@ -54,6 +63,9 @@ namespace grove {
 
     /**
      * Get the temperature in Celsius
+     * @param sensor The DHT11Helper instance
+     * @param autoRead Automatically read the sensor data before getting temperature
+     * @return The temperature value in Celsius, or NaN if the sensor is not connected
      */
     //% block="get temperature in celsius from $sensor"
     //% sensor.defl=dht11
@@ -72,6 +84,9 @@ namespace grove {
 
     /**
      * Get the temperature in Fahrenheit
+     * @param sensor The DHT11Helper instance
+     * @param autoRead Automatically read the sensor data before getting temperature
+     * @return The temperature value in Fahrenheit, or NaN if the sensor is not connected
      */
     //% block="get temperature in fahrenheit from $sensor"
     //% sensor.defl=dht11
