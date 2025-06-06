@@ -1,6 +1,6 @@
 {
     "name": "Grove",
-    "version": "0.7.1",
+    "version": "0.7.3",
     "description": "A Microsoft MakeCode package for Seeed Studio Grove module",
     "license": "MIT",
     "dependencies": {
@@ -11,6 +11,7 @@
         "main.ts",
         "blocks/GroveAHT20.ts",
         "blocks/GroveLCD1602v1.ts",
+        "blocks/GroveVEML6040.ts",
         "blocks/GroveVisionAIV2.ts",
         "plugins/SSCMA.ts",
         "blocks/GroveLCD1602v1.ts",
@@ -19,7 +20,8 @@
         "_locales/de/Grove-strings.json",
         "sensors/AHT20.ts",
         "sensors/DHT11.cpp",
-        "sensors/DHT11Helper.ts"
+        "sensors/DHT11Helper.ts",
+        "sensors/VEML6040.ts"
     ],
     "testFiles": [
         "test.ts"

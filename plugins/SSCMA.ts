@@ -47,6 +47,7 @@ class DetectionResult {
 
     /**
      * Convert a detection result object to string representation
+     * @return A string representation of the detection result
      */
     //% block="convert $this to string"
     //% this.defl=detectionResult
@@ -83,6 +84,7 @@ class ClassificationResult {
 
     /**
      * Convert a classification result object to string representation
+     * @return A string representation of the classification result
      */
     //% block="convert $this to string"
     //% this.defl=classificationResult
@@ -96,6 +98,7 @@ class ClassificationResult {
 
 //% blockNamespace=grove
 //% group="Grove Vision AI V2"
+//% advanced=true
 class ModelInfo {
     private _name: string;
     private _version: string;
@@ -124,23 +127,26 @@ class ModelInfo {
         this._labels = safeLabels as string[];
     }
 
-    //% blockCombine
+    //% advanced=true
     get name(): string {
         return this._name;
     }
 
-    //% blockCombine
+    //% advanced=true
     get version(): string {
         return this._version;
     }
 
     /**
      * Get the label string by ID, returns empty string if ID is not exist
+     * @param id The label ID
+     * @return The label string, or empty string if ID is not exist
      */
     //% block="get label by $id"
     //% id.defl=id
     //% id.min=0
     //% id.shadow=variables_get
+    //% advanced=true
     public getLabel(id: number): string {
         if (id >= 0 && id < this._labels.length) {
             return this._labels[id];
@@ -153,6 +159,7 @@ class ModelInfo {
 namespace grove {
 
     //% group="Grove Vision AI V2"
+    //% advanced=true
     export enum DeviceStatus {
         //% block="Disconnected"
         Disconnected = 0,
@@ -166,14 +173,18 @@ namespace grove {
 
     /**
      * Choose a device status
+     * @param status The device status to choose
+     * @return The selected device status
      */
     //% block="device status %status"
     //% group="Grove Vision AI V2"
+    //% advanced=true
     export function deviceStatus(status: DeviceStatus): DeviceStatus {
         return status;
     }
 
     //% group="Grove Vision AI V2"
+    //% advanced=true
     export enum OperationCode {
         //% block="Success"
         Success = 0,
@@ -199,9 +210,12 @@ namespace grove {
 
     /**
      * Choose an error code
+     * @param code The error code to choose
+     * @return The selected error code
      */
     //% block="error code %code"
     //% group="Grove Vision AI V2"
+    //% advanced=true
     export function operationCode(code: OperationCode): OperationCode {
         return code;
     }
