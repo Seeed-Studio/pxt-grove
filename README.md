@@ -176,7 +176,19 @@ basic.forever(function () {
     basic.pause(2000);
 })
 ```
+### Grove - Color Sensor
 
+This demo shows how to get the red color level from Grove Color Sensor and display the number on serial port and the LED matrix of Microbit.
+
+```blocks
+let veml6040 = grove.connectToVEML6040(false)
+basic.forever(function () {
+    serial.writeString("red color level:")
+    serial.writeLine("" + (grove.readColorRed(veml6040)))
+    basic.showNumber(grove.readColorRed(veml6040))
+    basic.pause(1000)
+})
+```
 
 ### Grove - Vision AI Module V2
 
