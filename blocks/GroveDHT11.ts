@@ -24,7 +24,7 @@ namespace grove {
      * Read the temperature and humidity from the sensor
      * @param sensor The DHT11Helper instance
      * @param forceRead Force a read from sensor even if the last read was recent (in 2 seconds), false is recommended for normal usage
-     * @return True if the read was successful, false otherwise
+     * @return True if the read was successful, otherwise false
      */
     //% block="read temperature and humidity from $sensor, force read %forceRead"
     //% sensor.defl=dht11

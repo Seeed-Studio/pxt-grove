@@ -122,7 +122,7 @@ namespace grove {
      * Start AI inference on the Grove Vision AI Module V2
      * @param timeout The timeout in milliseconds for the inference operation, default is 1000ms
      * @param force Force start inference even if already running, default is true
-     * @return True if inference started successfully, false otherwise
+     * @return True if inference started successfully, otherwise false
      */
     //% block="start ai inference"
     //% group="Grove Vision AI V2"
@@ -167,7 +167,7 @@ namespace grove {
      * Fetch AI inference results from the Grove Vision AI Module V2
      * @param maxResults The maximum number of results to fetch, default is 15
      * @param timeout The timeout in milliseconds for the fetch operation, default is 1000ms
-     * @return True if results fetched successfully, false otherwise
+     * @return True if results fetched successfully, otherwise false
      */
     //% block="fetch ai inference results"
     //% group="Grove Vision AI V2"
@@ -270,7 +270,7 @@ namespace grove {
     /**
      * Check if contains specific object id(s)
      * @param ids An array of object IDs to check
-     * @return True if any of the specified object IDs are found, false otherwise
+     * @return True if any of the specified object IDs are found, otherwise false
      */
     //% block
     //% group="Grove Vision AI V2"
@@ -283,7 +283,7 @@ namespace grove {
     /**
      * Check if contains specific object name(s)
      * @param labels An array of object names to check
-     * @return True if any of the specified object names are found, false otherwise
+     * @return True if any of the specified object names are found, otherwise false
      */
     //% block
     //% group="Grove Vision AI V2"
