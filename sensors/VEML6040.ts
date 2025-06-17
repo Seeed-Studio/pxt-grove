@@ -292,12 +292,18 @@ namespace grove {
 
             private readRegister(command: VEML6040Command, bytes: number): Buffer {
                 let regBuffer = pins.createBuffer(1);
+                let response = pins.createBuffer(bytes);
+                let received = 0;
                 regBuffer.setNumber(NumberFormat.UInt8LE, 0, command);
-                let success = pins.i2cWriteBuffer(this.i2cAddr, regBuffer, true);
-                if (!success) {
-                    return null;
+                pins.i2cWriteBuffer(this.i2cAddr, regBuffer, true);
+                while (received < bytes) {
+                    const buf = pins.i2cReadBuffer(this.i2cAddr, 1, true);
+                    if (buf != null) {
+                        response.setUint8(received++, buf.getUint8(0));
+                    }
                 }
-                return pins.i2cReadBuffer(this.i2cAddr, bytes, false);
+                pins.i2cReadBuffer(this.i2cAddr, 0, false);
+                return response
             }
 
         };
