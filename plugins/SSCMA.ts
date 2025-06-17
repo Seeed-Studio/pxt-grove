@@ -251,7 +251,8 @@ namespace grove {
 
                 private constructor() {
                     if (!Transport.probBuffer) {
-                        Transport.probBuffer = pins.createBuffer(0);
+                        Transport.probBuffer = pins.createBuffer(1);
+                        Transport.probBuffer.setNumber(NumberFormat.UInt8LE, 0, 0);
                     }
 
                     if (!Transport.readSofBuffer) {
