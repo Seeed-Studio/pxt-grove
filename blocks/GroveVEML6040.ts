@@ -27,20 +27,179 @@ namespace grove {
         Darkness
     }
 
+    interface CIE {
+        x: number;
+        y: number;
+        z: number;
+    };
+
+    interface RGB {
+        r: number;
+        g: number;
+        b: number;
+    };
+
+    interface HSV {
+        h: number;
+        s: number;
+        v: number;
+    };
+
+    const gamma_correction_linear_2_srgb = (value: number): number => {
+        if (value <= 0.0031308) {
+            return 12.92 * value;
+        } else {
+            return (1.055 * Math.pow(value, 1.0 / 2.4)) - 0.055;
+        }
+    };
+
+    const reference_brightness_normalized = (color: RGB): number => {
+        return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722 * color.b);
+    };
+
+    const raw_rgb_2_cie = (color: RGB, calibration_matrix: number[][]): CIE => {
+        const r = color.r;
+        const g = color.g;
+        const b = color.b;
+
+        const x = (r * calibration_matrix[0][0]) + (g * calibration_matrix[0][1]) + (b * calibration_matrix[0][2]);
+        const y = (r * calibration_matrix[1][0]) + (g * calibration_matrix[1][1]) + (b * calibration_matrix[1][2]);
+        const z = (r * calibration_matrix[2][0]) + (g * calibration_matrix[2][1]) + (b * calibration_matrix[2][2]);
+
+        return { x, y, z };
+    };
+
+    const cie_2_cie_normalized = (color: CIE): CIE => {
+        color.x = Math.max(0, color.x);
+        color.y = Math.max(0, color.y);
+        color.z = Math.max(0, color.z);
+
+        const sum = color.x + color.y + color.z;
+        if (sum == 0) {
+            return { x: 0, y: 0, z: 0 };
+        }
+
+        return {
+            x: color.x / sum,
+            y: color.y / sum,
+            z: color.z / sum
+        };
+    };
+
+    const cie_normalized_2_rgb_linear = (color: CIE): RGB => {
+        const x = color.x;
+        const y = color.y;
+        const z = color.z;
+
+        const r = (3.2406 * x) - (1.5372 * y) - (0.4986 * z);
+        const g = (-0.9689 * x) + (1.8758 * y) + (0.0415 * z);
+        const b = (0.0557 * x) - (0.2040 * y) + (1.0570 * z);
+
+        return {
+            r: Math.max(0, Math.min(1, r)),
+            g: Math.max(0, Math.min(1, g)),
+            b: Math.max(0, Math.min(1, b))
+        };
+    };
+
+    const rgb_linear_apply_luminance = (color: RGB, luminance: number, eps: number = 0.0001): RGB => {
+        const current = reference_brightness_normalized(color);
+        if (current < eps) {
+            return { r: 0, g: 0, b: 0 };
+        }
+        const scale = luminance / current;
+
+        return {
+            r: Math.min(1, color.r * scale),
+            g: Math.min(1, color.g * scale),
+            b: Math.min(1, color.b * scale)
+        };
+    };
+
+    const rgb_linear_2_srgb = (color: RGB): RGB => {
+        return {
+            r: gamma_correction_linear_2_srgb(color.r),
+            g: gamma_correction_linear_2_srgb(color.g),
+            b: gamma_correction_linear_2_srgb(color.b)
+        };
+    };
+
+    const srgb_normalized_2_srgb_quantized = (color: RGB): RGB => {
+        return {
+            r: Math.round(color.r * 255.0),
+            g: Math.round(color.g * 255.0),
+            b: Math.round(color.b * 255.0)
+        };
+    };
+
+    const srgb_normalized_2_hsv_normalized = (color: RGB): HSV => {
+        const r = color.r;
+        const g = color.g;
+        const b = color.b;
+
+        const maxc = Math.max(r, Math.max(g, b));
+        const minc = Math.min(r, Math.min(g, b));
+        const rangec = maxc - minc;
+        const v = maxc;
+        if (minc == maxc) {
+            return { h: 0, s: 0, v: v };
+        }
+        const s = rangec / maxc;
+        const rc = (maxc - r) / rangec;
+        const gc = (maxc - g) / rangec;
+        const bc = (maxc - b) / rangec;
+        let h: number;
+        if (r == maxc) {
+            h = bc - gc;
+        }
+        else if (g == maxc) {
+            h = 2.0 + rc - bc;
+        }
+        else {
+            h = 4.0 + gc - rc;
+        }
+        h = (h / 6.0) % 1.0;
+        if (h < 0) {
+            h += 1.0;
+        }
+        return { h: h, s: s, v: v };
+    };
+
+    const hsv_normalized_color_strength = (current: HSV, target: HSV, weight: HSV): number => {
+        const delta_h = Math.abs(current.h - target.h);
+        const delta_s = Math.abs(current.s - target.s);
+        const delta_v = Math.abs(current.v - target.v);
+
+        const weighted_h = Math.min(delta_h, 1.0 - delta_h) * weight.h;
+        const weighted_s = delta_s * weight.s;
+        const weighted_v = delta_v * weight.v;
+
+        const strength = 1.0 - ((weighted_h + weighted_s + weighted_v) / 3.0);
+        return Math.max(0.0, Math.min(1.0, strength));
+    };
+
+    const hsv_normalized_presets: { [index: number]: HSV } = {
+        [Color.Red]: { h: 0, s: 1, v: 1 },
+        [Color.Green]: { h: 0.3333, s: 1, v: 1 },
+        [Color.Blue]: { h: 0.6667, s: 1, v: 1 },
+        [Color.Yellow]: { h: 0.1667, s: 1, v: 1 },
+        [Color.Cyan]: { h: 0.5, s: 1, v: 1 },
+        [Color.Magenta]: { h: 0.8333, s: 1, v: 1 },
+        [Color.White]: { h: 0, s: 0, v: 1 },
+        [Color.Black]: { h: 0, s: 0, v: 0 },
+    };
 
     let _veml6040: grove.sensors.VEML6040 = null;
-    let _veml6040_r: number = 0;
-    let _veml6040_g: number = 0;
-    let _veml6040_b: number = 0;
-    let _veml6040_w: number = 0;
-    let _veml6040_decoupled = {
-        red: 0,
-        green: 0,
-        blue: 0,
-        yellow: 0,
-        cyan: 0,
-        magenta: 0,
-        white: 0
+    let _veml6040_l: number = 0;
+    let _veml6040_decoupled: { [index: number]: number } = {
+        [Color.Red]: 0,
+        [Color.Green]: 0,
+        [Color.Blue]: 0,
+        [Color.Yellow]: 0,
+        [Color.Cyan]: 0,
+        [Color.Magenta]: 0,
+        [Color.White]: 0,
+        [Color.Black]: 0,
     };
     let _veml6040_last_read_time: number = 0;
 
@@ -54,7 +213,7 @@ namespace grove {
     //% block="read %Color color"
     //% group="VEML6040"
     //% weight=99
-    export function readColorFromVEML6040(color: Color): number {
+    export function readColorFromVEML6040(color: Color, loggingToSerial: boolean = true): number {
         if (!_veml6040) {
             _veml6040 = new grove.sensors.VEML6040(0x10, false);
             while (!_veml6040.connect());
@@ -64,139 +223,103 @@ namespace grove {
             return NaN;
         }
 
-        const gamma_correction = (value: number) => {
-            if (value <= 0.0031308) {
-                return value * 12.92;
-            } else {
-                return (1.055 * Math.pow(value, 1.0 / 2.4)) - 0.055;
-            }
-        };
-
-        const get_ref_luminance = (r: number, g: number, b: number) => {
-            return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
-        };
-
-        const srgb_decouple = (r: number, g: number, b: number) => {
-            const v_w = [r, g, b].reduce((a, b) => Math.min(a, b), 1.0);
-
-            const r_prime = r - v_w;
-            const g_prime = g - v_w;
-            const b_prime = b - v_w;
-
-            const v_yellow = Math.min(r_prime, g_prime);
-            const v_cyan = Math.min(g_prime, b_prime);
-            const v_magenta = Math.min(b_prime, r_prime);
-
-            const v_red = r_prime - v_yellow - v_magenta;
-            const v_green = g_prime - v_yellow - v_cyan;
-            const v_blue = b_prime - v_cyan - v_magenta;
-
-            return {
-                red: v_red,
-                green: v_green,
-                blue: v_blue,
-                yellow: v_yellow,
-                cyan: v_cyan,
-                magenta: v_magenta,
-                white: v_w
-            };
-        };
 
         let current_time = control.millis();
         while ((current_time - _veml6040_last_read_time) > _veml6040.getIntegrationTimeMs()
             || _veml6040_last_read_time == 0
         ) {
-            let r_raw = _veml6040.readRed();
-            let g_raw = _veml6040.readGreen();
-            let b_raw = _veml6040.readBlue();
+            let rgb_raw: RGB = {
+                r: _veml6040.readRed(),
+                g: _veml6040.readGreen(),
+                b: _veml6040.readBlue()
+            };
             let w_raw = _veml6040.readWhite();
-            if (isNaN(r_raw) || isNaN(g_raw) || isNaN(b_raw) || isNaN(w_raw)) {
+            if (isNaN(rgb_raw.r) || isNaN(rgb_raw.g) || isNaN(rgb_raw.b) || isNaN(w_raw)) {
                 current_time = control.millis();
                 continue;
             }
             _veml6040_last_read_time = current_time;
 
             const g_sensitivity = _veml6040.getGSensitivity();
-            r_raw *= g_sensitivity;
-            g_raw *= g_sensitivity;
-            b_raw *= g_sensitivity;
             w_raw *= g_sensitivity;
 
             const lux_range = _veml6040.getLuxRange();
-            r_raw /= lux_range;
-            g_raw /= lux_range;
-            b_raw /= lux_range;
             w_raw /= lux_range;
+            w_raw = Math.max(0.0, Math.min(1.0, w_raw));
 
-            const x_cie = (0.048403 * r_raw) + (0.183633 * g_raw) - (0.253589 * b_raw);
-            const y_cie = (0.022916 * r_raw) + (0.176388 * g_raw) - (0.183205 * b_raw);
-            const z_cie = (-0.077436 * r_raw) + (0.124541 * g_raw) + (0.032081 * b_raw)
+            _veml6040_l = Math.round(w_raw * 255.0);
 
-            let r_linear = (3.2404542 * x_cie) - (1.5371385 * y_cie) - (0.4985314 * z_cie);
-            let g_linear = (-0.9692660 * x_cie) + (1.8760108 * y_cie) + (0.0415560 * z_cie);
-            let b_linear = (0.0556434 * x_cie) - (0.2040259 * y_cie) + (1.0572252 * z_cie);
+            if (loggingToSerial) {
+                serial.writeLine(`VEML6040 RGB Raw: ${JSON.stringify(rgb_raw)}`);
+            }
+            const calibration_matrix: number[][] = [
+                [-0.023249, 0.291014, -0.364880],
+                [-0.042799, 0.272148, -0.279591],
+                [-0.155901, 0.251534, -0.076240]
+            ];
+            const xyz_cie: CIE = raw_rgb_2_cie(rgb_raw, calibration_matrix);
+            if (loggingToSerial) {
+                serial.writeLine(`VEML6040 CIE XYZ: ${JSON.stringify(xyz_cie)}`);
+            }
+            const xyz_cie_normalized: CIE = cie_2_cie_normalized(xyz_cie);
+            if (loggingToSerial) {
+                serial.writeLine(`VEML6040 CIE XYZ Normalized: ${JSON.stringify(xyz_cie_normalized)}`);
+            }
 
-            r_linear = Math.max(0.0, Math.min(1.0, r_linear));
-            g_linear = Math.max(0.0, Math.min(1.0, g_linear));
-            b_linear = Math.max(0.0, Math.min(1.0, b_linear));
+            const rgb_linear: RGB = cie_normalized_2_rgb_linear(xyz_cie_normalized);
+            if (loggingToSerial) {
+                serial.writeLine(`VEML6040 RGB Linear: ${JSON.stringify(rgb_linear)}`);
+            }
+            const rgb_linear_luminance = rgb_linear_apply_luminance(rgb_linear, w_raw);
+            if (loggingToSerial) {
+                serial.writeLine(`VEML6040 RGB Linear with Luminance: ${JSON.stringify(rgb_linear_luminance)}`);
+            }
 
-            _veml6040_r = r_linear;
-            _veml6040_g = g_linear;
-            _veml6040_b = b_linear;
-            _veml6040_w = w_raw;
+            const rgb_srgb: RGB = rgb_linear_2_srgb(rgb_linear_luminance);
+            if (loggingToSerial) {
+                serial.writeLine(`VEML6040 RGB sRGB: ${JSON.stringify(rgb_srgb)}`);
+            }
+            const hsv: HSV = srgb_normalized_2_hsv_normalized(rgb_srgb);
+            if (loggingToSerial) {
+                serial.writeLine(`VEML6040 HSV: ${JSON.stringify(hsv)}`);
+            }
 
-            const luminance = w_raw;
-            const ref_luminance = get_ref_luminance(r_linear, g_linear, b_linear);
-            const factor = luminance / ref_luminance;
-            let decoupled = srgb_decouple(r_linear, g_linear, b_linear);
-            const r_l = Math.round(gamma_correction(Math.max(0.0, Math.min(decoupled.red * factor, 1.0))) * 255.0);
-            const g_l = Math.round(gamma_correction(Math.max(0.0, Math.min(decoupled.green * factor, 1.0))) * 255.0);
-            const b_l = Math.round(gamma_correction(Math.max(0.0, Math.min(decoupled.blue * factor, 1.0))) * 255.0);
-            const y_l = Math.round(gamma_correction(Math.max(0.0, Math.min(decoupled.yellow * factor, 1.0))) * 255.0);
-            const c_l = Math.round(gamma_correction(Math.max(0.0, Math.min(decoupled.cyan * factor, 1.0))) * 255.0);
-            const m_l = Math.round(gamma_correction(Math.max(0.0, Math.min(decoupled.magenta * factor, 1.0))) * 255.0);
-            const w_l = Math.round(gamma_correction(Math.max(0.0, Math.min(decoupled.white * factor, 1.0))) * 255.0);
+            const weight: HSV = { h: 8, s: 3, v: 3 };
 
-            _veml6040_decoupled.red = r_l;
-            _veml6040_decoupled.green = g_l;
-            _veml6040_decoupled.blue = b_l;
-            _veml6040_decoupled.yellow = y_l;
-            _veml6040_decoupled.cyan = c_l;
-            _veml6040_decoupled.magenta = m_l;
-            _veml6040_decoupled.white = w_l;
+            // for in statement not supported in micro:bit
+            _veml6040_decoupled[Color.Red] = Math.round(hsv_normalized_color_strength(hsv, hsv_normalized_presets[Color.Red], weight) * 255.0);
+            _veml6040_decoupled[Color.Green] = Math.round(hsv_normalized_color_strength(hsv, hsv_normalized_presets[Color.Green], weight) * 255.0);
+            _veml6040_decoupled[Color.Blue] = Math.round(hsv_normalized_color_strength(hsv, hsv_normalized_presets[Color.Blue], weight) * 255.0);
+            _veml6040_decoupled[Color.Yellow] = Math.round(hsv_normalized_color_strength(hsv, hsv_normalized_presets[Color.Yellow], weight) * 255.0);
+            _veml6040_decoupled[Color.Cyan] = Math.round(hsv_normalized_color_strength(hsv, hsv_normalized_presets[Color.Cyan], weight) * 255.0);
+            _veml6040_decoupled[Color.Magenta] = Math.round(hsv_normalized_color_strength(hsv, hsv_normalized_presets[Color.Magenta], weight) * 255.0);
+            _veml6040_decoupled[Color.White] = Math.round(hsv_normalized_color_strength(hsv, hsv_normalized_presets[Color.White], weight) * 255.0);
+            _veml6040_decoupled[Color.Black] = Math.round(hsv_normalized_color_strength(hsv, hsv_normalized_presets[Color.Black], weight) * 255.0);
 
             break;
         }
 
         switch (color) {
             case Color.Red:
-                return _veml6040_decoupled.red;
+                return _veml6040_decoupled[Color.Red];
             case Color.Green:
-                return _veml6040_decoupled.green;
+                return _veml6040_decoupled[Color.Green];
             case Color.Blue:
-                return _veml6040_decoupled.blue;
+                return _veml6040_decoupled[Color.Blue];
             case Color.White:
-                return _veml6040_decoupled.white;
+                return _veml6040_decoupled[Color.White];
             case Color.Yellow:
-                return _veml6040_decoupled.yellow;
+                return _veml6040_decoupled[Color.Yellow];
             case Color.Cyan:
-                return _veml6040_decoupled.cyan;
+                return _veml6040_decoupled[Color.Cyan];
             case Color.Magenta:
-                return _veml6040_decoupled.magenta;
+                return _veml6040_decoupled[Color.Magenta];
             case Color.Black:
-                return 255 - [
-                    _veml6040_decoupled.red,
-                    _veml6040_decoupled.green,
-                    _veml6040_decoupled.blue,
-                    _veml6040_decoupled.yellow,
-                    _veml6040_decoupled.cyan,
-                    _veml6040_decoupled.magenta,
-                    _veml6040_decoupled.white
-                ].reduce((a, b) => Math.max(a, b), 0);
+                return _veml6040_decoupled[Color.Black];
             case Color.Luminosity:
-                return Math.round(_veml6040_w * 255.0);
+                return _veml6040_l;
             case Color.Darkness:
-                return 255 - Math.round(_veml6040_w * 255.0);
+                return 255 - _veml6040_l;
             default:
                 return NaN;
         }
