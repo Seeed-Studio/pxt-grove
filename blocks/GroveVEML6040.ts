@@ -307,7 +307,7 @@ namespace grove {
             break;
         }
 
-        return _veml6040_decoupled[color] || NaN;
+        return _veml6040_decoupled[color];
     }
 
 }
