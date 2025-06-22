@@ -24,7 +24,9 @@ namespace grove {
         //% block="Luminosity"
         Luminosity,
         //% block="Darkness"
-        Darkness
+        Darkness,
+        //% block="Ambient Light"
+        AmbientLight
     }
 
     interface CIE {
@@ -190,7 +192,6 @@ namespace grove {
     };
 
     let _veml6040: grove.sensors.VEML6040 = null;
-    let _veml6040_l: number = 0;
     let _veml6040_decoupled: { [index: number]: number } = {
         [Color.Red]: 0,
         [Color.Green]: 0,
@@ -200,6 +201,9 @@ namespace grove {
         [Color.Magenta]: 0,
         [Color.White]: 0,
         [Color.Black]: 0,
+        [Color.Luminosity]: 0,
+        [Color.Darkness]: 0,
+        [Color.AmbientLight]: 0
     };
     let _veml6040_last_read_time: number = 0;
 
@@ -247,7 +251,11 @@ namespace grove {
             w_raw /= lux_range;
             w_raw = Math.max(0.0, Math.min(1.0, w_raw));
 
-            _veml6040_l = Math.round(w_raw * 255.0);
+            _veml6040_decoupled[Color.Luminosity] = Math.round(w_raw * 255.0);
+            _veml6040_decoupled[Color.Darkness] = 255 - _veml6040_decoupled[Color.Luminosity];
+
+            const ambient_light = (rgb_raw.g * g_sensitivity) / lux_range;
+            _veml6040_decoupled[Color.AmbientLight] = Math.round(ambient_light * 255.0);
 
             if (loggingToSerial) {
                 serial.writeLine(`VEML6040 RGB Raw: ${JSON.stringify(rgb_raw)}`);
@@ -299,31 +307,7 @@ namespace grove {
             break;
         }
 
-        switch (color) {
-            case Color.Red:
-                return _veml6040_decoupled[Color.Red];
-            case Color.Green:
-                return _veml6040_decoupled[Color.Green];
-            case Color.Blue:
-                return _veml6040_decoupled[Color.Blue];
-            case Color.White:
-                return _veml6040_decoupled[Color.White];
-            case Color.Yellow:
-                return _veml6040_decoupled[Color.Yellow];
-            case Color.Cyan:
-                return _veml6040_decoupled[Color.Cyan];
-            case Color.Magenta:
-                return _veml6040_decoupled[Color.Magenta];
-            case Color.Black:
-                return _veml6040_decoupled[Color.Black];
-            case Color.Luminosity:
-                return _veml6040_l;
-            case Color.Darkness:
-                return 255 - _veml6040_l;
-            default:
-                return NaN;
-        }
-
+        return _veml6040_decoupled[color] || NaN;
     }
 
 }
