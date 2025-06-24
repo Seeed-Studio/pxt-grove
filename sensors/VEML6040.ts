@@ -43,8 +43,8 @@ namespace grove {
         };
 
         export const VEML6040SyncDelay = {
-            [VEML6040IntegrationTime.IT_40MS]: 50,
-            [VEML6040IntegrationTime.IT_80MS]: 100,
+            [VEML6040IntegrationTime.IT_40MS]: 200,
+            [VEML6040IntegrationTime.IT_80MS]: 200,
             [VEML6040IntegrationTime.IT_160MS]: 200,
             [VEML6040IntegrationTime.IT_320MS]: 400,
             [VEML6040IntegrationTime.IT_640MS]: 800,
@@ -78,7 +78,7 @@ namespace grove {
                 this.configRegisters = pins.createBuffer(2);
                 this.configRegisters.fill(0);
                 this.measurementMode = VEML6040MeasurementMode.Auto;
-                this.integrationTime = VEML6040IntegrationTime.IT_1280MS;
+                this.integrationTime = VEML6040IntegrationTime.IT_160MS;
             }
 
             public connect(): boolean {

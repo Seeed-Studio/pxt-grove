@@ -5,6 +5,14 @@
 namespace grove {
 
     export enum Color {
+        //% block="Raw Red"
+        RawRed,
+        //% block="Raw Green"
+        RawGreen,
+        //% block="Raw Blue"
+        RawBlue,
+        //% block="Raw White"
+        RawWhite,
         //% block="Red"
         Red,
         //% block="Green"
@@ -35,6 +43,12 @@ namespace grove {
         z: number;
     };
 
+    interface CIEXYY {
+        x: number;
+        y: number;
+        Y: number;
+    };
+
     interface RGB {
         r: number;
         g: number;
@@ -59,7 +73,7 @@ namespace grove {
         return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722 * color.b);
     };
 
-    const raw_rgb_2_cie = (color: RGB, calibration_matrix: number[][]): CIE => {
+    const rgb_raw_2_cie = (color: RGB, calibration_matrix: number[][]): CIE => {
         const r = color.r;
         const g = color.g;
         const b = color.b;
@@ -68,24 +82,22 @@ namespace grove {
         const y = (r * calibration_matrix[1][0]) + (g * calibration_matrix[1][1]) + (b * calibration_matrix[1][2]);
         const z = (r * calibration_matrix[2][0]) + (g * calibration_matrix[2][1]) + (b * calibration_matrix[2][2]);
 
-        return { x, y, z };
+        return {
+            x: Math.max(0.0, x),
+            y: Math.max(0.0, y),
+            z: Math.max(0.0, z)
+        };
     };
 
-    const cie_2_cie_normalized = (color: CIE): CIE => {
-        color.x = Math.max(0, color.x);
-        color.y = Math.max(0, color.y);
-        color.z = Math.max(0, color.z);
-
+    const cie_2_cie_xyy_normalized = (color: CIE): CIEXYY => {
         const sum = color.x + color.y + color.z;
-        if (sum == 0) {
-            return { x: 0, y: 0, z: 0 };
+        if (sum <= 0) {
+            return { x: 0, y: 0, Y: 0 };
         }
-
-        return {
-            x: color.x / sum,
-            y: color.y / sum,
-            z: color.z / sum
-        };
+        const x = Math.max(0.0, Math.min(1.0, color.x / sum));
+        const y = Math.max(0.0, Math.min(1.0, color.y / sum));
+        const Y = Math.max(0.0, color.y);
+        return { x, y, Y };
     };
 
     const cie_normalized_2_rgb_linear = (color: CIE): RGB => {
@@ -93,14 +105,67 @@ namespace grove {
         const y = color.y;
         const z = color.z;
 
-        const r = (3.2406 * x) - (1.5372 * y) - (0.4986 * z);
-        const g = (-0.9689 * x) + (1.8758 * y) + (0.0415 * z);
-        const b = (0.0557 * x) - (0.2040 * y) + (1.0570 * z);
+        // CIE XYZ D65 White Point Conversion
+        const r = (3.2404542 * x) + (-1.5371385 * y) + (-0.4985314 * z);
+        const g = (-0.9692660 * x) + (1.8760108 * y) + (0.0415560 * z);
+        const b = (0.0556434 * x) + (-0.2040259 * y) + (1.0572252 * z);
 
         return {
-            r: Math.max(0, Math.min(1, r)),
-            g: Math.max(0, Math.min(1, g)),
-            b: Math.max(0, Math.min(1, b))
+            r: Math.max(0.0, Math.min(1.0, r)),
+            g: Math.max(0.0, Math.min(1.0, g)),
+            b: Math.max(0.0, Math.min(1.0, b))
+        };
+    };
+
+    const cie_xyy_normalized_2_rgb = (color: CIEXYY, luminance: number = NaN): RGB => {
+        if (!isNaN(luminance)) {
+            color.Y = luminance;
+        }
+        if (color.Y <= 0) {
+            return { r: 0, g: 0, b: 0 };
+        }
+
+        const Y_y = color.Y / color.y;
+        const x = color.x * Y_y;
+        const y = color.Y;
+        const z = (1.0 - (color.x + color.y)) * Y_y;
+
+        return cie_normalized_2_rgb_linear({ x: x, y: y, z: z });
+    };
+
+    const rgb_raw_map = (color: RGB, sensitivity: RGB): RGB => {
+        return {
+            r: color.r * sensitivity.r,
+            g: color.g * sensitivity.g,
+            b: color.b * sensitivity.b
+        };
+    };
+
+    const rgb_raw_2_rgb_normalized = (color: RGB, ref: RGB): RGB => {
+        return {
+            r: Math.max(0, Math.min(1, color.r / ref.r)),
+            g: Math.max(0, Math.min(1, color.g / ref.g)),
+            b: Math.max(0, Math.min(1, color.b / ref.b))
+        };
+    };
+
+    const cie_2_cie_normalized = (color: CIE, white_point: CIE): CIE => {
+        const x = color.x / white_point.x;
+        const y = color.y / white_point.y;
+        const z = color.z / white_point.z;
+
+        return {
+            x: Math.max(0, Math.min(1, x)),
+            y: Math.max(0, Math.min(1, y)),
+            z: Math.max(0, Math.min(1, z))
+        };
+    };
+
+    const cie_clip = (color: CIE): CIE => {
+        return {
+            x: Math.max(0, color.x),
+            y: Math.max(0, color.y),
+            z: Math.max(0, color.z)
         };
     };
 
@@ -112,9 +177,9 @@ namespace grove {
         const scale = luminance / current;
 
         return {
-            r: Math.min(1, color.r * scale),
-            g: Math.min(1, color.g * scale),
-            b: Math.min(1, color.b * scale)
+            r: Math.min(1.0, color.r * scale),
+            g: Math.min(1.0, color.g * scale),
+            b: Math.min(1.0, color.b * scale)
         };
     };
 
@@ -227,63 +292,60 @@ namespace grove {
             return NaN;
         }
 
-
         let current_time = control.millis();
         while ((current_time - _veml6040_last_read_time) > _veml6040.getIntegrationTimeMs()
             || _veml6040_last_read_time == 0
         ) {
-            let rgb_raw: RGB = {
+            const rgb_raw: RGB = {
                 r: _veml6040.readRed(),
                 g: _veml6040.readGreen(),
                 b: _veml6040.readBlue()
             };
-            let w_raw = _veml6040.readWhite();
+            const w_raw = _veml6040.readWhite();
             if (isNaN(rgb_raw.r) || isNaN(rgb_raw.g) || isNaN(rgb_raw.b) || isNaN(w_raw)) {
                 current_time = control.millis();
                 continue;
             }
             _veml6040_last_read_time = current_time;
+            _veml6040_decoupled[Color.RawRed] = Math.round(rgb_raw.r);
+            _veml6040_decoupled[Color.RawGreen] = Math.round(rgb_raw.g);
+            _veml6040_decoupled[Color.RawBlue] = Math.round(rgb_raw.b);
+            _veml6040_decoupled[Color.RawWhite] = Math.round(w_raw);
 
             const g_sensitivity = _veml6040.getGSensitivity();
-            w_raw *= g_sensitivity;
-
             const lux_range = _veml6040.getLuxRange();
-            w_raw /= lux_range;
-            w_raw = Math.max(0.0, Math.min(1.0, w_raw));
 
-            _veml6040_decoupled[Color.Luminosity] = Math.round(w_raw * 255.0);
+            const luminance = Math.max(0.0, Math.min(1.0, w_raw / 2000.0));
+            _veml6040_decoupled[Color.Luminosity] = Math.round(luminance * 255.0);
             _veml6040_decoupled[Color.Darkness] = 255 - _veml6040_decoupled[Color.Luminosity];
 
-            const ambient_light = (rgb_raw.g * g_sensitivity) / lux_range;
+            const ambient_light = Math.max(0.0, Math.min(1.0, (rgb_raw.g * g_sensitivity) / lux_range));
             _veml6040_decoupled[Color.AmbientLight] = Math.round(ambient_light * 255.0);
 
             if (loggingToSerial) {
                 serial.writeLine(`VEML6040 RGB Raw: ${JSON.stringify(rgb_raw)}`);
+                serial.writeLine(`VEML6040 White Raw: ${w_raw}, Ambient Light: ${ambient_light}`);
             }
             const calibration_matrix: number[][] = [
-                [-0.023249, 0.291014, -0.364880],
-                [-0.042799, 0.272148, -0.279591],
-                [-0.155901, 0.251534, -0.076240]
+                [0.06022466, 0.00026593, -0.00119225],
+                [-0.01014349, 0.09901431, -0.05070332],
+                [-0.05460345, -0.02123816, 0.23950621]
             ];
-            const xyz_cie: CIE = raw_rgb_2_cie(rgb_raw, calibration_matrix);
+            const xyz_cie: CIE = rgb_raw_2_cie(rgb_raw, calibration_matrix);
             if (loggingToSerial) {
                 serial.writeLine(`VEML6040 CIE XYZ: ${JSON.stringify(xyz_cie)}`);
             }
-            const xyz_cie_normalized: CIE = cie_2_cie_normalized(xyz_cie);
+            const xyy_cie_normalized: CIEXYY = cie_2_cie_xyy_normalized(xyz_cie);
             if (loggingToSerial) {
-                serial.writeLine(`VEML6040 CIE XYZ Normalized: ${JSON.stringify(xyz_cie_normalized)}`);
+                serial.writeLine(`VEML6040 CIE xyY Normalized: ${JSON.stringify(xyy_cie_normalized)}`);
             }
 
-            const rgb_linear: RGB = cie_normalized_2_rgb_linear(xyz_cie_normalized);
+            const rgb_linear: RGB = cie_xyy_normalized_2_rgb(xyy_cie_normalized, xyy_cie_normalized.Y / 80.0);
             if (loggingToSerial) {
                 serial.writeLine(`VEML6040 RGB Linear: ${JSON.stringify(rgb_linear)}`);
             }
-            const rgb_linear_luminance = rgb_linear_apply_luminance(rgb_linear, w_raw);
-            if (loggingToSerial) {
-                serial.writeLine(`VEML6040 RGB Linear with Luminance: ${JSON.stringify(rgb_linear_luminance)}`);
-            }
 
-            const rgb_srgb: RGB = rgb_linear_2_srgb(rgb_linear_luminance);
+            const rgb_srgb: RGB = rgb_linear_2_srgb(rgb_linear);
             if (loggingToSerial) {
                 serial.writeLine(`VEML6040 RGB sRGB: ${JSON.stringify(rgb_srgb)}`);
             }
