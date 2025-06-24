@@ -340,7 +340,7 @@ namespace grove {
                 serial.writeLine(`VEML6040 CIE xyY Normalized: ${JSON.stringify(xyy_cie_normalized)}`);
             }
 
-            const rgb_linear: RGB = cie_xyy_normalized_2_rgb(xyy_cie_normalized, xyy_cie_normalized.Y / 80.0);
+            const rgb_linear: RGB = cie_xyy_normalized_2_rgb(xyy_cie_normalized, Math.min(1.0, xyy_cie_normalized.Y / 130.0));
             if (loggingToSerial) {
                 serial.writeLine(`VEML6040 RGB Linear: ${JSON.stringify(rgb_linear)}`);
             }
