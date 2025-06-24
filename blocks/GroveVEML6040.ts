@@ -282,7 +282,7 @@ namespace grove {
     //% block="read %Color color"
     //% group="VEML6040"
     //% weight=99
-    export function readColorFromVEML6040(color: Color, loggingToSerial: boolean = true): number {
+    export function readColorFromVEML6040(color: Color, loggingToSerial: boolean = false): number {
         if (!_veml6040) {
             _veml6040 = new grove.sensors.VEML6040(0x10, false);
             while (!_veml6040.connect());
