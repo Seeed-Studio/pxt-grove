@@ -1,4 +1,5 @@
 namespace grove {
+
     export namespace sensors {
 
         export class DHT20 {
@@ -215,5 +216,7 @@ namespace grove {
                 return this._temperature;
             }
         };
+
     }
+
 }
