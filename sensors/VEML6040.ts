@@ -329,11 +329,17 @@ namespace grove {
                 let response = pins.createBuffer(bytes);
                 let received = 0;
                 regBuffer.setNumber(NumberFormat.UInt8LE, 0, command);
+                let start = control.millis();
+                const timeout = 1000;
                 pins.i2cWriteBuffer(this.i2cAddr, regBuffer, true);
                 while (received < bytes) {
                     const buf = pins.i2cReadBuffer(this.i2cAddr, 1, true);
                     if (buf != null) {
                         response.setUint8(received++, buf.getUint8(0));
+                    } else if (control.millis() - start > timeout) {
+                        this.LOG("VEML6040 read timeout after " + timeout + " ms");
+                        response = null;
+                        break;
                     }
                 }
                 pins.i2cReadBuffer(this.i2cAddr, 0, false);
