@@ -24,7 +24,7 @@ namespace grove {
             W_DATA = 0x0B,
         };
 
-        export const VEML6040GreenSensitivity = {
+        export const VEML6040GSensitivity = {
             [VEML6040IntegrationTime.IT_40MS]: 0.25168,
             [VEML6040IntegrationTime.IT_80MS]: 0.12584,
             [VEML6040IntegrationTime.IT_160MS]: 0.06292,
@@ -33,9 +33,18 @@ namespace grove {
             [VEML6040IntegrationTime.IT_1280MS]: 0.00787,
         };
 
+        export const VEML6040LuxRange = {
+            [VEML6040IntegrationTime.IT_40MS]: 16496,
+            [VEML6040IntegrationTime.IT_80MS]: 8248,
+            [VEML6040IntegrationTime.IT_160MS]: 4124,
+            [VEML6040IntegrationTime.IT_320MS]: 2062,
+            [VEML6040IntegrationTime.IT_640MS]: 1031,
+            [VEML6040IntegrationTime.IT_1280MS]: 515.4,
+        };
+
         export const VEML6040SyncDelay = {
-            [VEML6040IntegrationTime.IT_40MS]: 50,
-            [VEML6040IntegrationTime.IT_80MS]: 100,
+            [VEML6040IntegrationTime.IT_40MS]: 200,
+            [VEML6040IntegrationTime.IT_80MS]: 200,
             [VEML6040IntegrationTime.IT_160MS]: 200,
             [VEML6040IntegrationTime.IT_320MS]: 400,
             [VEML6040IntegrationTime.IT_640MS]: 800,
@@ -47,6 +56,7 @@ namespace grove {
             private loggingToSerial: boolean;
             private lastSyncTime: number;
             private configRegisters: Buffer;
+            private measurementMode: VEML6040MeasurementMode;
             private integrationTime: VEML6040IntegrationTime;
 
             private static bitFieldMap = {
@@ -67,7 +77,8 @@ namespace grove {
                 this.lastSyncTime = 0;
                 this.configRegisters = pins.createBuffer(2);
                 this.configRegisters.fill(0);
-                this.integrationTime = VEML6040IntegrationTime.IT_40MS;
+                this.measurementMode = VEML6040MeasurementMode.Auto;
+                this.integrationTime = VEML6040IntegrationTime.IT_160MS;
             }
 
             public connect(): boolean {
@@ -82,7 +93,7 @@ namespace grove {
                 if (!success) {
                     this.LOG("VEML6040 failed to write CONFIG register, value: " + config.toString());
                 }
-                return this.setIntegrationTime(this.integrationTime) && this.setMeasurementMode(VEML6040MeasurementMode.Auto);
+                return this.setIntegrationTime(this.integrationTime) && this.setMeasurementMode(this.measurementMode);
             }
 
             public disconnect(): boolean {
@@ -109,7 +120,20 @@ namespace grove {
                 return success;
             }
 
+            public getIntegrationTimeMs(): number {
+                return VEML6040SyncDelay[this.integrationTime];
+            }
+
+            public getGSensitivity(): number {
+                return VEML6040GSensitivity[this.integrationTime];
+            }
+
+            public getLuxRange(): number {
+                return VEML6040LuxRange[this.integrationTime];
+            }
+
             public setMeasurementMode(mode: VEML6040MeasurementMode): boolean {
+                this.measurementMode = mode;
                 let config = this.configRegisters.getNumber(NumberFormat.UInt8LE, 0);
                 if (mode == VEML6040MeasurementMode.Auto) {
                     config &= ~VEML6040.bitFieldMap.AF;
@@ -153,7 +177,9 @@ namespace grove {
                         control.waitMicros(1000 * 10);
                         continue;
                     }
-                    this.lastSyncTime = control.millis();
+                    if (this.measurementMode == VEML6040MeasurementMode.Manual) {
+                        this.lastSyncTime = control.millis();
+                    }
                     let redValueLow = buffer.getNumber(NumberFormat.UInt8LE, 0);
                     let redValueHigh = buffer.getNumber(NumberFormat.UInt8LE, 1);
                     let redValue = (redValueHigh << 8) | redValueLow;
@@ -179,7 +205,9 @@ namespace grove {
                         control.waitMicros(1000 * 10);
                         continue;
                     }
-                    this.lastSyncTime = control.millis();
+                    if (this.measurementMode == VEML6040MeasurementMode.Manual) {
+                        this.lastSyncTime = control.millis();
+                    }
                     let greenValueLow = buffer.getNumber(NumberFormat.UInt8LE, 0);
                     let greenValueHigh = buffer.getNumber(NumberFormat.UInt8LE, 1);
                     let greenValue = (greenValueHigh << 8) | greenValueLow;
@@ -205,7 +233,9 @@ namespace grove {
                         control.waitMicros(1000 * 10);
                         continue;
                     }
-                    this.lastSyncTime = control.millis();
+                    if (this.measurementMode == VEML6040MeasurementMode.Manual) {
+                        this.lastSyncTime = control.millis();
+                    }
                     let blueValueLow = buffer.getNumber(NumberFormat.UInt8LE, 0);
                     let blueValueHigh = buffer.getNumber(NumberFormat.UInt8LE, 1);
                     let blueValue = (blueValueHigh << 8) | blueValueLow;
@@ -231,7 +261,9 @@ namespace grove {
                         control.waitMicros(1000 * 10);
                         continue;
                     }
-                    this.lastSyncTime = control.millis();
+                    if (this.measurementMode == VEML6040MeasurementMode.Manual) {
+                        this.lastSyncTime = control.millis();
+                    }
                     let whiteValueLow = buffer.getNumber(NumberFormat.UInt8LE, 0);
                     let whiteValueHigh = buffer.getNumber(NumberFormat.UInt8LE, 1);
                     let whiteValue = (whiteValueHigh << 8) | whiteValueLow;
@@ -255,7 +287,9 @@ namespace grove {
                         this.LOG("VEML6040 [" + attempts.toString() + "] read RGBW data failed, expected 8 bytes, got " + (buffer ? buffer.length : "null"));
                         return { red: NaN, green: NaN, blue: NaN, white: NaN };
                     }
-                    this.lastSyncTime = control.millis();
+                    if (this.measurementMode == VEML6040MeasurementMode.Manual) {
+                        this.lastSyncTime = control.millis();
+                    }
                     return {
                         red: (buffer.getNumber(NumberFormat.UInt8LE, 1) << 8) | buffer.getNumber(NumberFormat.UInt8LE, 0),
                         green: (buffer.getNumber(NumberFormat.UInt8LE, 3) << 8) | buffer.getNumber(NumberFormat.UInt8LE, 2),
@@ -272,7 +306,7 @@ namespace grove {
                     this.LOG("Failed to read green channel, cannot calculate ambient light.");
                     return NaN;
                 }
-                return g * VEML6040GreenSensitivity[this.integrationTime];
+                return g * VEML6040GSensitivity[this.integrationTime];
             }
 
             public isConnected(): boolean {
@@ -295,11 +329,17 @@ namespace grove {
                 let response = pins.createBuffer(bytes);
                 let received = 0;
                 regBuffer.setNumber(NumberFormat.UInt8LE, 0, command);
+                let start = control.millis();
+                const timeout = 1000;
                 pins.i2cWriteBuffer(this.i2cAddr, regBuffer, true);
                 while (received < bytes) {
                     const buf = pins.i2cReadBuffer(this.i2cAddr, 1, true);
                     if (buf != null) {
                         response.setUint8(received++, buf.getUint8(0));
+                    } else if (control.millis() - start > timeout) {
+                        this.LOG("VEML6040 read timeout after " + timeout + " ms");
+                        response = null;
+                        break;
                     }
                 }
                 pins.i2cReadBuffer(this.i2cAddr, 0, false);
