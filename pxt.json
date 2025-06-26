@@ -4,7 +4,8 @@
     "description": "A Microsoft MakeCode package for Seeed Studio Grove module",
     "license": "MIT",
     "dependencies": {
-        "core": "*"
+        "core": "*",
+        "neopixel": "github:Microsoft/pxt-neopixel#v0.7.6"
     },
     "files": [
         "README.md",
