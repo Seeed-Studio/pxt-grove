@@ -1,7 +1,7 @@
 /**
  * Grove Color Sensor (VEML6040) support
  */
-//% groups='["VEML6040"]'
+//% groups='["Color Sensor (VEML6040)"]'
 namespace grove {
 
     export enum Color {
@@ -280,7 +280,7 @@ namespace grove {
      * @return The color value as a number, or NaN if the sensor is not connected
      */
     //% block="read %Color color"
-    //% group="VEML6040"
+    //% group="Color Sensor (VEML6040)"
     //% weight=99
     export function readColorFromVEML6040(color: Color, loggingToSerial: boolean = false): number {
         if (!_veml6040) {

@@ -2,7 +2,7 @@
 /**
  * SenseCraft AI support for Grove Vision AI Module V2
  */
-//% groups='["Grove Vision AI V2"]'
+//% groups='["Vision AI V2"]'
 namespace grove {
 
     namespace vision_ai_v2 {
@@ -25,7 +25,7 @@ namespace grove {
      * @param force Force re-connection and setup even if already connected
      */
     //% block="connect and setup device, serial logging %serialLogging"
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% weight=100
     //% color="#AA278D"
     export function connectAndSetupGroveVisionAIV2(
@@ -57,7 +57,7 @@ namespace grove {
      * @return The current device status
      */
     //% block="get device status"
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=99
     export function getGroveVisionAIV2DeviceStatus(fromCache: boolean = true): DeviceStatus {
@@ -74,7 +74,7 @@ namespace grove {
      */
     //% block="get device name"
     //% blockSetVariable=deviceName
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=98
     export function getGroveVisionAIV2DeviceName(fromCache: boolean = true): string {
@@ -91,7 +91,7 @@ namespace grove {
      */
     //% block="get device id"
     //% blockSetVariable=deviceId
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=97
     export function getGroveVisionAIV2DeviceId(fromCache: boolean = true): string {
@@ -108,7 +108,7 @@ namespace grove {
      */
     //% block="get ai model info"
     //% blockSetVariable=modelInfo
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=89
     export function getAIModelInfo(fromCache: boolean = true): ModelInfo {
@@ -125,7 +125,7 @@ namespace grove {
      * @return True if inference started successfully, otherwise false
      */
     //% block="start ai inference"
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% weight=79
     //% color="#AA278D"
     export function startAIInference(timeout: number = 1000, force: boolean = true): boolean {
@@ -170,7 +170,7 @@ namespace grove {
      * @return True if results fetched successfully, otherwise false
      */
     //% block="fetch ai inference results"
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% weight=78
     //% color="#008D63"
     export function fetchAIInferenceResults(
@@ -197,7 +197,7 @@ namespace grove {
      * @param timeout The timeout in milliseconds for the stop operation, default is 1000ms
      */
     //% block="stop ai inference"
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=77
     export function stopAIInference(timeout: number = 1000) {
@@ -212,7 +212,7 @@ namespace grove {
      * @return The total count of objects with the specified IDs
      */
     //% block
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=69
     export function countObjectById(ids: number[]): number {
@@ -243,7 +243,7 @@ namespace grove {
      * @return The total count of objects with the specified names
      */
     //% block
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% weight=68
     export function countObjectByName(labels: string[]): number {
         let count = 0;
@@ -273,7 +273,7 @@ namespace grove {
      * @return True if any of the specified object IDs are found, otherwise false
      */
     //% block
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=67
     export function containsObjectId(ids: number[]): boolean {
@@ -286,7 +286,7 @@ namespace grove {
      * @return True if any of the specified object names are found, otherwise false
      */
     //% block
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% weight=66
     export function containsObjectName(labels: string[]): boolean {
         return countObjectByName(labels) > 0;
@@ -298,7 +298,7 @@ namespace grove {
      * @param handler The callback function to handle detection results
      */
     //% block="on receive detection results"
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=59
     //% color="#AA278D"
@@ -312,7 +312,7 @@ namespace grove {
      * @param handler The callback function to handle classification results
      */
     //% block="on receive classification results"
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=58
     //% color="#AA278D"
@@ -326,7 +326,7 @@ namespace grove {
      * @param handler The callback function to handle error results
      */
     //% block="on receive error"
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=57
     //% color="#AA278D"
@@ -341,7 +341,7 @@ namespace grove {
      */
     //% block="get fetched detection results"
     //% blockSetVariable=detectionResults
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% weight=56
     export function getFetchedDetectionResults(): DetectionResult[] {
         return vision_ai_v2.detectionResults;
@@ -354,7 +354,7 @@ namespace grove {
      */
     //% block="get fetched classification results"
     //% blockSetVariable=classificationResults
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% weight=55
     export function getFetchedClassificationResults(): ClassificationResult[] {
         return vision_ai_v2.classificationResults;
@@ -366,7 +366,7 @@ namespace grove {
      */
     //% block="get inference error code"
     //% blockSetVariable=errorCode
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     //% weight=54
     export function getAIInferenceErrorCode(): OperationCode {

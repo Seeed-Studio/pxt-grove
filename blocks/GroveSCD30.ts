@@ -1,7 +1,7 @@
 /**
  * Grove CO2, Temperature & Humidity Sensor (SCD30) support
  */
-//% groups='["SCD30"]'
+//% groups='["CO2, Temperature & Humidity Sensor (SCD30)"]'
 namespace grove {
 
     export enum SCD30DataType {
@@ -26,7 +26,7 @@ namespace grove {
      * @return The requested data value, or NaN if the sensor is not connected or read failed
      */
     //% block="read %dataType from SCD30"
-    //% group="SCD30"
+    //% group="CO2, Temperature & Humidity Sensor (SCD30)"
     //% weight=99
     export function readDataFromSCD30(dataType: SCD30DataType, serialLogging: boolean = false): number {
         if (!_scd30) {

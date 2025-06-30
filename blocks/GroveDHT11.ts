@@ -1,7 +1,7 @@
 /**
  * Grove Temperature & Humidity Sensor (DHT11) support
  */
-//% groups='["DHT11"]'
+//% groups='["Temperature & Humidity Sensor (DHT11)"]'
 namespace grove {
 
     /**
@@ -13,7 +13,7 @@ namespace grove {
     //% block="connect to sensor on %signalPin, serial logging %serialLogging"
     //% signalPin.defl=DigitalPin.P1
     //% blockSetVariable=dht11
-    //% group="DHT11"
+    //% group="Temperature & Humidity Sensor (DHT11)"
     //% weight=99
     //% color="#AA278D"
     export function connectToDHT11(signalPin: DigitalPin = DigitalPin.P1, serialLogging: boolean = false): grove.sensors.DHT11Helper {
@@ -29,7 +29,7 @@ namespace grove {
     //% block="read temperature and humidity from $sensor, force read %forceRead"
     //% sensor.defl=dht11
     //% sensor.shadow=variables_get
-    //% group="DHT11"
+    //% group="Temperature & Humidity Sensor (DHT11)"
     //% weight=98
     //% color="#008D63"
     export function readTemperatureHumidity(sensor: grove.sensors.DHT11Helper, forceRead: boolean = false): boolean {
@@ -49,7 +49,7 @@ namespace grove {
     //% block="get humidity from $sensor"
     //% sensor.defl=dht11
     //% sensor.shadow=variables_get
-    //% group="DHT11"
+    //% group="Temperature & Humidity Sensor (DHT11)"
     //% weight=89
     export function getHumidity(sensor: grove.sensors.DHT11Helper, autoRead: boolean = true): number {
         if (sensor) {
@@ -70,7 +70,7 @@ namespace grove {
     //% block="get temperature in celsius from $sensor"
     //% sensor.defl=dht11
     //% sensor.shadow=variables_get
-    //% group="DHT11"
+    //% group="Temperature & Humidity Sensor (DHT11)"
     //% weight=88
     export function getTemperatureCelsius(sensor: grove.sensors.DHT11Helper, autoRead: boolean = true): number {
         if (sensor) {
@@ -91,7 +91,7 @@ namespace grove {
     //% block="get temperature in fahrenheit from $sensor"
     //% sensor.defl=dht11
     //% sensor.shadow=variables_get
-    //% group="DHT11"
+    //% group="Temperature & Humidity Sensor (DHT11)"
     //% weight=87
     export function getTemperatureFahrenheit(sensor: grove.sensors.DHT11Helper, autoRead: boolean = true): number {
         if (sensor) {

@@ -1,7 +1,7 @@
 /**
  * Grove RGB LED strip (WS2813) support
  */
-//% groups='["WS2813"]'
+//% groups='["RGB LED (WS2813)"]'
 namespace grove {
 
     /**
@@ -13,7 +13,7 @@ namespace grove {
     //% block="connect to color strip on %signalPin with %numLEDs LED(s)"
     //% signalPin.defl=DigitalPin.P1
     //% numLEDs.defl=16
-    //% group="WS2813"
+    //% group="RGB LED (WS2813)"
     //% weight=99
     //% blockSetVariable=strip
     export function connectToWS2813Strip(
@@ -36,7 +36,7 @@ namespace grove {
     //% strip.defl=strip
     //% color.defl=NeoPixelColors.Red
     //% strip.shadow=variables_get
-    //% group="WS2813"
+    //% group="RGB LED (WS2813)"
     //% weight=89
     export function showColorOnWS2813Strip(
         strip: neopixel.Strip,
@@ -56,7 +56,7 @@ namespace grove {
     //% block="clear color strip $strip"
     //% strip.defl=strip
     //% strip.shadow=variables_get
-    //% group="WS2813"
+    //% group="RGB LED (WS2813)"
     //% weight=88
     export function clearWS2813Strip(strip: neopixel.Strip): void {
         strip.clear();
@@ -74,7 +74,7 @@ namespace grove {
     //% index.defl=0
     //% color.defl=NeoPixelColors.Red
     //% strip.shadow=variables_get
-    //% group="WS2813"
+    //% group="RGB LED (WS2813)"
     //% weight=87
     export function showColorAtIndexOnWS2813Strip(
         strip: neopixel.Strip,
@@ -97,7 +97,7 @@ namespace grove {
     //% strip.defl=strip
     //% index.defl=0
     //% strip.shadow=variables_get
-    //% group="WS2813"
+    //% group="RGB LED (WS2813)"
     //% weight=86
     export function clearAtIndexOnWS2813Strip(strip: neopixel.Strip, index: number): void {
         if (index < 0 || index >= strip.length()) {
@@ -116,7 +116,7 @@ namespace grove {
     //% strip.defl=strip
     //% brightness.defl=100
     //% strip.shadow=variables_get
-    //% group="WS2813"
+    //% group="RGB LED (WS2813)"
     //% weight=85
     export function setBrightnessOnWS2813Strip(strip: neopixel.Strip, brightness: number): void {
         if (brightness < 0 || brightness > 255) {
@@ -139,7 +139,7 @@ namespace grove {
     //% green.defl=0
     //% blue.defl=0
     //% strip.shadow=variables_get
-    //% group="WS2813"
+    //% group="RGB LED (WS2813)"
     //% weight=85
     export function showCustomColorOnWS2813Strip(
         strip: neopixel.Strip,
@@ -169,7 +169,7 @@ namespace grove {
     //% green.defl=0
     //% blue.defl=0
     //% strip.shadow=variables_get
-    //% group="WS2813"
+    //% group="RGB LED (WS2813)"
     //% weight=84
     export function showCustomColorAtIndexOnWS2813Strip(
         strip: neopixel.Strip,

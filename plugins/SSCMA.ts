@@ -4,7 +4,7 @@
 
 
 //% blockNamespace=grove
-//% group="Grove Vision AI V2"
+//% group="Vision AI V2"
 class DetectionResult {
     private _x: number;
     private _y: number;
@@ -61,7 +61,7 @@ class DetectionResult {
 };
 
 //% blockNamespace=grove
-//% group="Grove Vision AI V2"
+//% group="Vision AI V2"
 class ClassificationResult {
     private _score: number;
     private _id: number;
@@ -97,7 +97,7 @@ class ClassificationResult {
 };
 
 //% blockNamespace=grove
-//% group="Grove Vision AI V2"
+//% group="Vision AI V2"
 //% advanced=true
 class ModelInfo {
     private _name: string;
@@ -158,7 +158,7 @@ class ModelInfo {
 
 namespace grove {
 
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     export enum DeviceStatus {
         //% block="Disconnected"
@@ -177,13 +177,13 @@ namespace grove {
      * @return The selected device status
      */
     //% block="device status %status"
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     export function deviceStatus(status: DeviceStatus): DeviceStatus {
         return status;
     }
 
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     export enum OperationCode {
         //% block="Success"
@@ -214,7 +214,7 @@ namespace grove {
      * @return The selected error code
      */
     //% block="error code %code"
-    //% group="Grove Vision AI V2"
+    //% group="Vision AI V2"
     //% advanced=true
     export function operationCode(code: OperationCode): OperationCode {
         return code;

@@ -1,7 +1,7 @@
 /**
  * Grove Mini I2C Motor Driver support
  */
-//% groups='["DRV8830"]'
+//% groups='["Mini I2C Motor Driver (DRV8830)"]'
 namespace grove {
 
     export enum DRV8830Addr {
@@ -73,7 +73,7 @@ namespace grove {
      * @param speed The speed to set (-64 to 63)
      */
     //% block="set %channel speed to %speed"
-    //% group="DRV8830"
+    //% group="Mini I2C Motor Driver (DRV8830)"
     //% advanced=true
     //% weight=99
     export function setSpeedUsingDRV8830(
@@ -91,7 +91,7 @@ namespace grove {
      * @param speed The speed to set (-64 to 63)
      */
     //% block="set %channel speed to %speed"
-    //% group="DRV8830"
+    //% group="Mini I2C Motor Driver (DRV8830)"
     //% weight=99
     export function setSpeedUsingDRV8830NoReturn(
         channel: DRV8830Addr = DRV8830Addr.Channel1,
@@ -105,7 +105,7 @@ namespace grove {
      * @param channel The DRV8830 channel to use (Channel 1 or Channel 2)
      */
     //% block="stop motor on %channel"
-    //% group="DRV8830"
+    //% group="Mini I2C Motor Driver (DRV8830)"
     //% advanced=true
     //% weight=98
     export function stopUsingDRV8830(
@@ -121,7 +121,7 @@ namespace grove {
      * @param channel The DRV8830 channel to use (Channel 1 or Channel 2)
      */
     //% block="stop motor on %channel"
-    //% group="DRV8830"
+    //% group="Mini I2C Motor Driver (DRV8830)"
     //% weight=98
     export function stopUsingDRV8830NoReturn(
         channel: DRV8830Addr = DRV8830Addr.Channel1
@@ -134,7 +134,7 @@ namespace grove {
      * @param channel The DRV8830 channel to use (Channel 1 or Channel 2)
      */
     //% block="brake motor on %channel"
-    //% group="DRV8830"
+    //% group="Mini I2C Motor Driver (DRV8830)"
     //% advanced=true
     //% weight=97
     export function brakeUsingDRV8830(
@@ -150,7 +150,7 @@ namespace grove {
      * @param channel The DRV8830 channel to use (Channel 1 or Channel 2)
      */
     //% block="brake motor on %channel"
-    //% group="DRV8830"
+    //% group="Mini I2C Motor Driver (DRV8830)"
     //% weight=97
     export function brakeUsingDRV8830NoReturn(
         channel: DRV8830Addr = DRV8830Addr.Channel1
@@ -164,7 +164,7 @@ namespace grove {
      * @return The fault status as a DRV8830Fault enum value
      */
     //% block="get fault from %channel"
-    //% group="DRV8830"
+    //% group="Mini I2C Motor Driver (DRV8830)"
     //% weight=96
     export function getFaultFromDRV8830(
         channel: DRV8830Addr = DRV8830Addr.Channel1
@@ -197,7 +197,7 @@ namespace grove {
      * @return True if the fault was cleared successfully, false otherwise
      */
     //% block="clear fault on %channel"
-    //% group="DRV8830"
+    //% group="Mini I2C Motor Driver (DRV8830)"
     //% advanced=true
     //% weight=95
     export function clearFaultUsingDRV8830(
@@ -213,7 +213,7 @@ namespace grove {
      * @param channel The DRV8830 channel to use (Channel 1 or Channel 2)
      */
     //% block="clear fault on %channel"
-    //% group="DRV8830"
+    //% group="Mini I2C Motor Driver (DRV8830)"
     //% weight=95
     export function clearFaultUsingDRV8830NoReturn(
         channel: DRV8830Addr = DRV8830Addr.Channel1

@@ -1,7 +1,7 @@
 /**
  * Grove Temperature & Humidity Sensor (DHT20) support
  */
-//% groups='["DHT20"]'
+//% groups='["Temperature & Humidity Sensor (DHT20)"]'
 namespace grove {
 
     export enum DHT20DataType {
@@ -24,7 +24,7 @@ namespace grove {
      * @return The requested data value, or NaN if the sensor is not connected or read failed
      */
     //% block="read %dataType from DHT20"
-    //% group="DHT20"
+    //% group="Temperature & Humidity Sensor (DHT20)"
     //% weight=99
     export function readDataFromDHT20(dataType: DHT20DataType, serialLogging: boolean = false): number {
         if (!_dht20) {
