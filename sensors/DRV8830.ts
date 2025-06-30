@@ -76,17 +76,12 @@ namespace grove {
             }
 
             public setSpeed(speed: number): boolean {
-                if (speed < -64 || speed > 63) {
-                    this.LOG("DRV8830: speed out of range (-64 to 63)");
-                    return false;
-                }
-
                 if (!this.clearFault()) {
                     this.LOG("DRV8830: clear fault failed before setting speed");
                     return false;
                 }
 
-                const val = (speed & 0x3F) << 2 | (speed < 0 ? 0x01 : 0x02);
+                const val = (Math.abs(speed) & 0x3F) << 2 | (speed < 0 ? 0x01 : 0x02);
                 if (!this.write(0x00, val)) {
                     this.LOG(`DRV8830: set speed ${speed} failed`);
                     return false;
