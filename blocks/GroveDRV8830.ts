@@ -6,9 +6,9 @@ namespace grove {
 
     export enum DRV8830Addr {
         //% block="Channel 1"
-        Channel1 = 0xC0,
+        Channel1 = 0xCA,
         //% block="Channel 2"
-        Channel2 = 0xC4,
+        Channel2 = 0xC0,
     };
 
     export enum DRV8830Command {
