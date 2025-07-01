@@ -176,17 +176,28 @@ basic.forever(function () {
     basic.pause(2000);
 })
 ```
-### Grove - Color Sensor
+
+### Grove - Temperature & Humidity Sensor (DHT20)
+
+```blocks
+basic.forever(function () {
+    basic.showNumber(grove.readDataFromDHT20(grove.DHT20DataType.Humidity))
+    basic.pause(1000)
+    serial.writeLine("" + (grove.readDataFromDHT20(grove.DHT20DataType.Temperature)))
+    serial.writeLine("" + (grove.readDataFromDHT20(grove.DHT20DataType.CelsiusTemperature)))
+    serial.writeLine("" + (grove.readDataFromDHT20(grove.DHT20DataType.FarenheitTemperature)))
+    basic.pause(2000)
+})
+```
+
+### Grove - Color Sensor (VEML6040)
 
 This demo shows how to get the red color level from Grove Color Sensor and display the number on serial port and the LED matrix of Microbit.
 
 ```blocks
-let veml6040 = grove.connectToVEML6040(false)
 basic.forever(function () {
-    serial.writeString("red color level:")
-    serial.writeLine("" + (grove.readColorRed(veml6040)))
-    basic.showNumber(grove.readColorRed(veml6040))
-    basic.pause(1000)
+    serial.writeNumber(grove.readColorFromVEML6040(grove.Color.Red));
+    basic.pause(3000)
 })
 ```
 
@@ -253,6 +264,73 @@ basic.forever(function () {
             serial.writeLine("" + ("\n"))
         }
     }
+    basic.pause(100)
+})
+```
+
+### Grove - RGB LED Ring (WS2813)
+
+```blocks
+let strip: neopixel.Strip = null
+basic.forever(function () {
+    strip = grove.connectToWS2813Strip(DigitalPin.P1, 16)
+    basic.pause(2000)
+    grove.showColorOnWS2813Strip(strip, NeoPixelColors.Yellow)
+    basic.pause(2000)
+    grove.clearWS2813Strip(strip)
+    basic.pause(2000)
+    grove.showColorAtIndexOnWS2813Strip(strip, 0, NeoPixelColors.Red)
+    grove.showColorAtIndexOnWS2813Strip(strip, 4, NeoPixelColors.Yellow)
+    grove.showColorAtIndexOnWS2813Strip(strip, 8, NeoPixelColors.Green)
+    grove.showColorAtIndexOnWS2813Strip(strip, 12, NeoPixelColors.Blue)
+    basic.pause(2000)
+})
+```
+
+### Grove - CO2, Temperature & Humidity Sensor (SCD30)
+
+```blocks
+basic.forever(function () {
+    basic.showNumber(grove.readDataFromSCD30(grove.SCD30DataType.CO2))
+    basic.pause(1000)
+    serial.writeLine("" + (grove.readDataFromSCD30(grove.SCD30DataType.Humidity)))
+    serial.writeLine("" + (grove.readDataFromSCD30(grove.SCD30DataType.Temperature)))
+    serial.writeLine("" + (grove.readDataFromSCD30(grove.SCD30DataType.CelsiusTemperature)))
+    serial.writeLine("" + (grove.readDataFromSCD30(grove.SCD30DataType.FarenheitTemperature)))
+    basic.pause(2000)
+})
+```
+
+### Grove - CO2, Temperature & Humidity Sensor (SCD41)
+
+```blocks
+basic.forever(function () {
+    basic.showNumber(grove.readDataFromSCD41(grove.SCD41DataType.CO2))
+    basic.pause(1000)
+    serial.writeLine("" + (grove.readDataFromSCD41(grove.SCD41DataType.CO2)))
+    serial.writeLine("" + (grove.readDataFromSCD41(grove.SCD41DataType.Humidity)))
+    serial.writeLine("" + (grove.readDataFromSCD41(grove.SCD41DataType.Temperature)))
+    serial.writeLine("" + (grove.readDataFromSCD41(grove.SCD41DataType.CelsiusTemperature)))
+    serial.writeLine("" + (grove.readDataFromSCD41(grove.SCD41DataType.FarenheitTemperature)))
+    basic.pause(2000)
+})
+```
+
+### Grove - I2C Mini Motor Driver (DRV8833)
+
+```blocks
+basic.forever(function () {
+    grove.setSpeedUsingDRV8830NoReturn(grove.DRV8830Addr.Channel2, 50)
+    grove.setSpeedUsingDRV8830NoReturn(grove.DRV8830Addr.Channel1, -50)
+    basic.pause(1000)
+    grove.stopUsingDRV8830NoReturn(grove.DRV8830Addr.Channel2)
+    grove.stopUsingDRV8830NoReturn(grove.DRV8830Addr.Channel1)
+    basic.pause(100)
+    grove.setSpeedUsingDRV8830NoReturn(grove.DRV8830Addr.Channel2, -50)
+    grove.setSpeedUsingDRV8830NoReturn(grove.DRV8830Addr.Channel1, 50)
+    basic.pause(1000)
+    grove.stopUsingDRV8830NoReturn(grove.DRV8830Addr.Channel2)
+    grove.stopUsingDRV8830NoReturn(grove.DRV8830Addr.Channel1)
     basic.pause(100)
 })
 ```
